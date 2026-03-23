@@ -76,3 +76,7 @@ pnpm build
 - add more native primitives (`Image`, `ScrollView`, layout wrappers)
 - replace the in-memory debug tree with a real JS ↔ native bridge
 - support `.vue` single-file components in the sandbox
+
+## Next-step architecture doc
+
+- See `docs/NEXT_STEPS_ARCHITECTURE.md`
