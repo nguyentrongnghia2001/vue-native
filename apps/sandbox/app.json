@@ -1,0 +1,9 @@
+{
+  "expo": {
+    "name": "vue-native-sandbox",
+    "slug": "vue-native-sandbox",
+    "scheme": "vue-native-sandbox",
+    "platforms": ["ios", "android", "web"],
+    "jsEngine": "hermes"
+  }
+}

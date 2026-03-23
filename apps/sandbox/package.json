@@ -1,0 +1,28 @@
+{
+  "name": "@vue-native/sandbox",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "main": "./index.js",
+  "scripts": {
+    "start": "expo start",
+    "android": "expo run:android",
+    "ios": "expo run:ios",
+    "web": "expo start --web",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "dependencies": {
+    "@expo/metro-runtime": "^5.0.4",
+    "@vue-native/runtime-native": "workspace:*",
+    "expo": "^52.0.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-native": "^0.76.0",
+    "react-native-safe-area-context": "^4.12.0"
+  },
+  "devDependencies": {
+    "@types/react": "^18.3.18",
+    "@types/react-dom": "^18.3.6",
+    "typescript": "^5.6.3"
+  }
+}
