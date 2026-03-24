@@ -1,4 +1,4 @@
-import { describe, expect, it, beforeEach } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import {
   createNativeApp,
   createNativeRoot,
@@ -178,6 +178,7 @@ describe('@vue-native/runtime-native', () => {
   })
 
   it('renders new native primitives (Image, ScrollView, Pressable)', () => {
+    const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {})
     const root = createNativeRoot()
     const App = {
       setup() {
@@ -224,5 +225,10 @@ describe('@vue-native/runtime-native', () => {
         },
       ],
     })
+
+    expect(warnSpy).not.toHaveBeenCalledWith(
+      expect.stringContaining('Failed to resolve component'),
+    )
+    warnSpy.mockRestore()
   })
 })

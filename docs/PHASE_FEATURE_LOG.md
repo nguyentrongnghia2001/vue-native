@@ -176,3 +176,21 @@ Mục đích: Ghi lại phần đã làm để review nhanh trước khi vào Ph
 
 ### Decision / Next
 - Tiếp tục **Feature 3.2**: register global các primitives mới trong `createNativeApp` để bỏ cảnh báo resolve component.
+
+---
+
+## [2026-03-24 12:07] Phase 3 / Feature 3.2 (Global register primitives)
+
+### Overview
+- Đăng ký global `Image`, `ScrollView`, `Pressable` trong `createNativeApp`.
+- Cập nhật test để assert không còn warning `Failed to resolve component` khi dùng primitives mới trong template.
+
+### Files changed
+- `packages/runtime-native/src/nativeApp.ts`
+- `packages/runtime-native/__tests__/runtime-native.spec.ts`
+
+### Validation
+- Test: ✅ `pnpm test` → 10/10 tests pass.
+
+### Decision / Next
+- Tiếp tục **Feature 3.3**: cập nhật sandbox/docs để làm usage reference cho primitives mới.
