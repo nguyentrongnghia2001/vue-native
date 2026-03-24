@@ -111,6 +111,7 @@ Tài liệu này là **nguồn tổng hợp duy nhất** cho:
 - ✅ Gắn sandbox transport implementation để kiểm chứng wiring trong host app
 - ✅ Bổ sung runtime-aware transport layer ưu tiên native module + event subscription
 - ✅ Implement native bridge module source cho Android/iOS (`VueNativeHostBridge`) + integration docs
+- ✅ Chuẩn hoá Android-first prebuild integration workflow (sync/check/run scripts + real-device checklist)
 - ⏳ Verify end-to-end runtime roundtrip trên app native thật (device/emulator) sau khi tích hợp vào prebuild output
 
 ### Done khi

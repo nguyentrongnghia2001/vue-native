@@ -801,3 +801,50 @@ Mục đích: Ghi lại phần đã làm để review nhanh trước khi vào Ph
 ### Decision / Next
 - Feature 7.3 hoàn tất.
 - Có thể tiếp tục Feature 7.4: mở rộng mapping edge-cases theo nhóm prop/event chuyên sâu hơn (ví dụ pointer/input submit/focus lifecycle).
+
+---
+
+## [2026-03-24 19:05] Phase 6 / Feature 6.5 Kickoff (Chuẩn hoá prebuild Android real-device flow)
+
+### Overview
+- Tổng kết trước kickoff: native bridge module source Android/iOS đã có, nhưng bước tích hợp vào prebuild output + checklist verify máy thật chưa chuẩn hoá.
+- Ưu tiên hiện tại: chốt flow Android trước (phù hợp môi trường Windows, dễ verify hơn iOS).
+- Mục tiêu Feature 6.5:
+  1. Chuẩn hoá quy trình copy/sync native module Android vào prebuild output.
+  2. Thêm checklist readiness để giảm sai sót khi chạy máy thật.
+  3. Thêm script chạy nhanh trong sandbox package.
+
+### Files changed
+- `docs/PHASE_FEATURE_LOG.md`
+
+### Validation
+- Trước triển khai: `pnpm test` pass (29/29), `pnpm typecheck` pass.
+
+### Decision / Next
+- Implement script + docs cho Android prebuild integration, sau đó chạy test/typecheck và cập nhật roadmap.
+
+---
+
+## [2026-03-24 19:20] Phase 6 / Feature 6.5 Hoàn tất (Android prebuild integration workflow)
+
+### Overview
+- Chuẩn hoá Android-first workflow để test máy thật trên Windows:
+  - thêm script sync native bridge module vào prebuild output Android,
+  - thêm script readiness check (detect file + package registration),
+  - thêm lệnh all-in-one để prebuild + sync + check + run.
+- Cập nhật tài liệu checklist verify máy thật theo Android trước.
+
+### Files changed
+- `apps/sandbox/scripts/sync-native-android.mjs` (new)
+- `apps/sandbox/scripts/check-android-readiness.mjs` (new)
+- `apps/sandbox/package.json`
+- `apps/sandbox/native/README.md`
+- `docs/PHASE_FEATURE_LOG.md`
+
+### Validation
+- ✅ `pnpm test` pass (29/29 tests).
+- ✅ `pnpm typecheck` pass cho `runtime-native` + `sandbox`.
+
+### Decision / Next
+- Đã có quy trình chuẩn để verify runtime native trên Android device/emulator.
+- Có thể ưu tiên chạy verification thực tế trước khi tiếp tục Feature 7.4.

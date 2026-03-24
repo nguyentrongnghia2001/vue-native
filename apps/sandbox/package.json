@@ -6,6 +6,10 @@
   "main": "./index.js",
   "scripts": {
     "start": "expo start",
+    "prebuild:android": "expo prebuild --platform android",
+    "native:sync:android": "node ./scripts/sync-native-android.mjs",
+    "native:check:android": "node ./scripts/check-android-readiness.mjs",
+    "native:run:android": "pnpm prebuild:android && pnpm native:sync:android && pnpm native:check:android && expo run:android",
     "android": "expo run:android",
     "ios": "expo run:ios",
     "web": "expo start --web",
