@@ -77,6 +77,18 @@ pnpm build
 - replace the in-memory debug tree with a real JS ↔ native bridge
 - support `.vue` single-file components in the sandbox
 
-## Next-step architecture doc
+## Documentation
 
-- See `docs/NEXT_STEPS_ARCHITECTURE.md`
+### Phase 1 Complete ✅
+
+Phase 1 focuses on stabilizing the native host contract with 3 key features:
+
+1. [Feature 1: patchProp Normalization](./docs/PHASE_1_FEATURE_1_patchProp.md) — Event key standardization and listener cleanup
+2. [Feature 2: Serializable Snapshot Model](./docs/PHASE_1_FEATURE_2_snapshot_model.md) — JSON-safe tree snapshots for debugging and bridge communication
+3. [Feature 3: Debug Instrumentation Separation](./docs/PHASE_1_FEATURE_3_instrumentation.md) — Isolated telemetry module for operation recording
+
+**[→ Phase 1 Overview](./docs/PHASE_1_OVERVIEW.md)** — Summary of all features, tests, and integration points
+
+### Roadmap
+
+- See [NEXT_STEPS_ARCHITECTURE.md](./docs/NEXT_STEPS_ARCHITECTURE.md) for Phase 2 (Mutation Bridge) and Phase 3 (Primitives Expansion)
