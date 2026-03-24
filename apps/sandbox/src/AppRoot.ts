@@ -10,7 +10,7 @@ export function incrementCount() {
 
 export const AppRoot = defineComponent({
   setup() {
-    return { state }
+    return { incrementCount, state }
   },
   template: `
     <View testID="root">
@@ -18,6 +18,18 @@ export const AppRoot = defineComponent({
       <Text :style="{ fontSize: 14, opacity: 0.8 }">
         This tree is rendered by the Vue native host scaffold.
       </Text>
+
+      <ScrollView testID="feed" :style="{ maxHeight: 220 }">
+        <Pressable testID="increment" @press="incrementCount">
+          <Text :style="{ fontSize: 16 }">Tap to increment</Text>
+        </Pressable>
+
+        <Image
+          testID="preview"
+          source="https://example.com/preview.png"
+          :style="{ width: 160, height: 90 }"
+        />
+      </ScrollView>
     </View>
   `,
 })

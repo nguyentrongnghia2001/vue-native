@@ -194,3 +194,21 @@ Mục đích: Ghi lại phần đã làm để review nhanh trước khi vào Ph
 
 ### Decision / Next
 - Tiếp tục **Feature 3.3**: cập nhật sandbox/docs để làm usage reference cho primitives mới.
+
+---
+
+## [2026-03-24 12:08] Phase 3 / Feature 3.3 (Sandbox + docs usage)
+
+### Overview
+- Cập nhật sandbox `AppRoot` để demo thực tế `ScrollView`, `Pressable`, `Image` bằng template syntax.
+- Cập nhật `README.md` cho development notes và next work theo trạng thái Phase 3.
+
+### Files changed
+- `apps/sandbox/src/AppRoot.ts`
+- `README.md`
+
+### Validation
+- Test: ✅ `pnpm test` → 10/10 tests pass.
+
+### Decision / Next
+- Chạy `pnpm typecheck` để chốt toàn bộ Phase 3.
