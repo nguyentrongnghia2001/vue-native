@@ -848,3 +848,23 @@ Mục đích: Ghi lại phần đã làm để review nhanh trước khi vào Ph
 ### Decision / Next
 - Đã có quy trình chuẩn để verify runtime native trên Android device/emulator.
 - Có thể ưu tiên chạy verification thực tế trước khi tiếp tục Feature 7.4.
+
+---
+
+## [2026-03-24 19:35] Phase 6 / Feature 6.6 Kickoff (Verify native runtime roundtrip)
+
+### Overview
+- Mục tiêu: chạy verify end-to-end native runtime roundtrip trên Android device/emulator bằng workflow prebuild đã chuẩn hoá.
+- Scope:
+  1. chạy prebuild + sync + readiness check + run native Android,
+  2. xử lý blocker tích hợp nếu có,
+  3. ghi nhận bằng chứng verify thành công/không thành công và bước tiếp theo.
+
+### Files changed
+- `docs/PHASE_FEATURE_LOG.md`
+
+### Validation
+- Trước khi verify: `pnpm test` pass (29/29), `pnpm typecheck` pass.
+
+### Decision / Next
+- Thực thi verify pipeline trên Android trước (ưu tiên môi trường Windows).
