@@ -16,9 +16,15 @@ const mutationQueue: NativeMutationRecord[] = []
 
 let mutationSink: MutationSink | null = null
 let eventDispatcher: EventDispatcher | null = null
+let flushScheduled = false
+
+function queueMicrotaskFlush(job: () => void) {
+  Promise.resolve().then(job)
+}
 
 export function enqueue(op: NativeMutationRecord): void {
   mutationQueue.push(op)
+  scheduleFlush()
 }
 
 export function flush(): NativeMutationRecord[] {
@@ -41,6 +47,16 @@ export function setEventDispatcher(dispatcher: EventDispatcher | null): void {
   eventDispatcher = dispatcher
 }
 
+export function scheduleFlush(): void {
+  if (flushScheduled) return
+
+  flushScheduled = true
+  queueMicrotaskFlush(() => {
+    flushScheduled = false
+    flush()
+  })
+}
+
 export function dispatchNativeEvent(event: NativeEventRecord): void {
   eventDispatcher?.(event)
 }
@@ -53,4 +69,5 @@ export function resetBridgeState(): void {
   mutationQueue.length = 0
   mutationSink = null
   eventDispatcher = null
+  flushScheduled = false
 }

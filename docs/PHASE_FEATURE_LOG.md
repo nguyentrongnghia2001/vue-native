@@ -94,3 +94,22 @@ Mục đích: Ghi lại phần đã làm để review nhanh trước khi vào Ph
 
 ### Decision / Next
 - Tiếp tục **Feature 2.3**: thêm batching strategy flush theo tick.
+
+---
+
+## [2026-03-24 11:23] Phase 2 / Feature 2.3 (Batching flush theo tick)
+
+### Overview
+- Thêm cơ chế batching microtask trong bridge để gom nhiều `enqueue` vào 1 lần flush.
+- `enqueue` giờ tự schedule flush theo tick, giảm chattering giữa JS host ops và adapter sink.
+- Bổ sung test async xác nhận nhiều ops trong cùng tick được forward thành 1 batch.
+
+### Files changed
+- `packages/runtime-native/src/bridge.ts`
+- `packages/runtime-native/__tests__/bridge.spec.ts`
+
+### Validation
+- Test: ✅ `pnpm test` → 9/9 tests pass.
+
+### Decision / Next
+- Chạy `pnpm typecheck` để chốt toàn bộ Phase 2.

@@ -55,4 +55,23 @@ describe('bridge queue contract', () => {
       args: ['payload'],
     })
   })
+
+  it('batches multiple enqueues into a single microtask flush', async () => {
+    const sink = vi.fn()
+    setMutationSink(sink)
+
+    enqueue({ type: 'insert', childId: 1, parentId: 0 })
+    enqueue({ type: 'setText', nodeId: 2, text: 'batched' })
+
+    expect(sink).not.toHaveBeenCalled()
+
+    await Promise.resolve()
+
+    expect(sink).toHaveBeenCalledTimes(1)
+    expect(sink).toHaveBeenCalledWith([
+      { type: 'insert', childId: 1, parentId: 0 },
+      { type: 'setText', nodeId: 2, text: 'batched' },
+    ])
+    expect(getPendingMutationCount()).toBe(0)
+  })
 })
