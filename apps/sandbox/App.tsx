@@ -9,13 +9,34 @@ import {
 } from 'react-native'
 import {
   createNativeApp,
+  createNativeTransportBridgeAdapter,
   createNativeRoot,
   dumpDebugOps,
+  registerBridgeAdapter,
   snapshotNativeTree,
 } from '@vue-native/runtime-native'
 import { AppRoot, incrementCount } from './src/AppRoot'
+import { createSandboxNativeTransport } from './src/sandboxNativeTransport'
+
+function findNodeByTag(snapshot: any, tag: string): any | null {
+  if (!snapshot || typeof snapshot !== 'object') return null
+  if (snapshot.tag === tag) return snapshot
+
+  if (!Array.isArray(snapshot.children)) return null
+  for (const child of snapshot.children) {
+    const found = findNodeByTag(child, tag)
+    if (found) return found
+  }
+
+  return null
+}
 
 const root = createNativeRoot()
+const sandboxTransport = createSandboxNativeTransport()
+const transportAdapter = createNativeTransportBridgeAdapter(sandboxTransport, {
+  id: 'sandbox-native-transport',
+})
+registerBridgeAdapter(transportAdapter.adapter)
 const app = createNativeApp(AppRoot)
 app.mount(root)
 
@@ -24,9 +45,22 @@ export default function SandboxApp() {
 
   const tree = useMemo(() => snapshotNativeTree(root), [version])
   const ops = useMemo(() => dumpDebugOps().slice(-20), [version])
+  const transportStats = useMemo(() => transportAdapter.getStats(), [version])
+  const transportBatches = useMemo(
+    () => sandboxTransport.getRecentBatches().slice(0, 5),
+    [version],
+  )
 
   const increment = () => {
     incrementCount()
+    setVersion(v => v + 1)
+  }
+
+  const simulateNativePress = () => {
+    const pressable = findNodeByTag(snapshotNativeTree(root), 'Pressable')
+    if (!pressable?.id) return
+
+    sandboxTransport.emitEvent({ nodeId: pressable.id, event: 'onPress' })
     setVersion(v => v + 1)
   }
 
@@ -44,6 +78,10 @@ export default function SandboxApp() {
             <RNText style={styles.buttonText}>Increment count</RNText>
           </Pressable>
 
+          <Pressable onPress={simulateNativePress} style={styles.secondaryButton}>
+            <RNText style={styles.buttonText}>Simulate native onPress</RNText>
+          </Pressable>
+
           <RNView style={styles.section}>
             <RNText style={styles.sectionTitle}>Native tree snapshot</RNText>
             <RNText style={styles.mono}>{JSON.stringify(tree, null, 2)}</RNText>
@@ -52,6 +90,16 @@ export default function SandboxApp() {
           <RNView style={styles.section}>
             <RNText style={styles.sectionTitle}>Recent debug ops</RNText>
             <RNText style={styles.mono}>{JSON.stringify(ops, null, 2)}</RNText>
+          </RNView>
+
+          <RNView style={styles.section}>
+            <RNText style={styles.sectionTitle}>Native transport stats</RNText>
+            <RNText style={styles.mono}>{JSON.stringify(transportStats, null, 2)}</RNText>
+          </RNView>
+
+          <RNView style={styles.section}>
+            <RNText style={styles.sectionTitle}>Recent transport batches</RNText>
+            <RNText style={styles.mono}>{JSON.stringify(transportBatches, null, 2)}</RNText>
           </RNView>
         </RNView>
       </ScrollView>
@@ -87,6 +135,13 @@ const styles = StyleSheet.create({
   button: {
     alignSelf: 'flex-start',
     backgroundColor: '#4c6fff',
+    borderRadius: 999,
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+  },
+  secondaryButton: {
+    alignSelf: 'flex-start',
+    backgroundColor: '#2e8b57',
     borderRadius: 999,
     paddingHorizontal: 16,
     paddingVertical: 10,

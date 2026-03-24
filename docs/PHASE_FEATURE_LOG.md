@@ -509,3 +509,44 @@ Mục đích: Ghi lại phần đã làm để review nhanh trước khi vào Ph
 ### Decision / Next
 - Phase 6 đã có adapter target thực thi native thật ở mức runtime contract.
 - Bước tiếp theo: gắn transport implementation cụ thể theo môi trường native thực tế (bridge runtime của app).
+
+---
+
+## [2026-03-24 14:35] Phase 6 / Feature 6.2 (Sandbox transport integration)
+
+### Overview
+- Tạo sandbox transport implementation để mô phỏng native execution layer trong host app.
+- Gắn `createNativeTransportBridgeAdapter` vào `apps/sandbox/App.tsx`.
+- Hiển thị stats + recent batches từ transport trong UI sandbox.
+- Bổ sung integration test xác nhận mutation forwarding + receiver event roundtrip qua native transport adapter.
+
+### Files changed
+- `apps/sandbox/src/sandboxNativeTransport.ts` (new)
+- `apps/sandbox/App.tsx`
+- `packages/runtime-native/__tests__/bridge-adapter.integration.spec.ts`
+- `docs/PHASE_FEATURE_LOG.md`
+
+### Validation
+- Test: ✅ `pnpm test` → 24/24 tests pass.
+- Typecheck: ✅ `pnpm typecheck` pass cho `runtime-native` + `sandbox`.
+
+### Decision / Next
+- Feature 6.2 hoàn tất.
+- Có thể tiếp tục với Feature 6.3 (gắn transport implementation native runtime thực sự theo target app cụ thể).
+
+---
+
+## [2026-03-24 14:45] Phase 6 / Feature 6.2 Kickoff (Sandbox transport integration)
+
+### Overview
+- Mục tiêu: gắn `native transport adapter` vào sandbox host app như một target runtime cụ thể.
+- Scope feature: tạo transport implementation cho sandbox + hiển thị stats/last batches để quan sát flow.
+
+### Files changed
+- `docs/PHASE_FEATURE_LOG.md`
+
+### Validation
+- Trước khi triển khai: test/typecheck pass ở Feature 6.1.
+
+### Decision / Next
+- Triển khai sandbox transport module, wiring adapter trong `apps/sandbox/App.tsx`, và thêm test cho transport behavior.

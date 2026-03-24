@@ -93,6 +93,7 @@ Tài liệu này là **nguồn tổng hợp duy nhất** cho:
 - Adapter implementation cho native target cụ thể (in-memory target): ✅
 - Bridge adapter integration tests: ✅
 - Native transport adapter contract (ack/error/event receiver): ✅
+- Sandbox transport integration (adapter wiring + telemetry): ✅
 
 ---
 
@@ -106,6 +107,7 @@ Tài liệu này là **nguồn tổng hợp duy nhất** cho:
 - ✅ Tạo adapter implementation theo target cụ thể: `createNativeTransportBridgeAdapter`
 - ✅ Chuẩn hoá contract payload giữa JS mutation record và native execution layer (transport contract)
 - ✅ Theo dõi error/ack path cho applyMutations
+- ✅ Gắn sandbox transport implementation để kiểm chứng wiring trong host app
 - ⏳ Tích hợp transport implementation thật theo từng host app/runtime
 
 ### Done khi
