@@ -441,3 +441,31 @@ Mục đích: Ghi lại phần đã làm để review nhanh trước khi vào Ph
 
 ### Decision / Next
 - Chạy `pnpm typecheck` và tổng kết hoàn tất Phase 5.
+
+---
+
+## [2026-03-24 14:20] Phase 5 / Completion Checkpoint
+
+### Overview
+- Hoàn thành 3 feature Phase 5:
+  1. Primitive expansion nâng cao (`TextInput`, `FlatList`, `KeyboardAvoidingView`)
+  2. Chuẩn hoá prop mapping (`class`, `style`, boolean semantics)
+  3. Cập nhật sandbox/docs reference usage
+
+### Files changed
+- `packages/runtime-native/src/primitives.ts`
+- `packages/runtime-native/src/nativeApp.ts`
+- `packages/runtime-native/src/index.ts`
+- `packages/runtime-native/src/patchProp.ts`
+- `packages/runtime-native/__tests__/runtime-native.spec.ts`
+- `apps/sandbox/src/AppRoot.ts`
+- `README.md`
+- `docs/ROADMAP_STATUS.md`
+
+### Validation
+- Test: ✅ `pnpm test` → 20/20 tests pass.
+- Typecheck: ✅ `pnpm typecheck` pass cho `runtime-native` + `sandbox`.
+
+### Decision / Next
+- Phase 5 hoàn tất.
+- Next: Phase 6 (adapter target thực thi native thật) theo `docs/ROADMAP_STATUS.md`.

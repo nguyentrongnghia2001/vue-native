@@ -56,50 +56,66 @@ Tài liệu này là **nguồn tổng hợp duy nhất** cho:
 
 ---
 
+### Phase 4.2 — Concrete Adapter Implementation
+
+- Thêm `createInMemoryBridgeAdapter` làm target implementation cụ thể
+- Map mutation records vào in-memory target state (node tree/props/listeners)
+- Hỗ trợ bridge runtime event emit hook từ adapter
+
+**Kết quả:** adapter cụ thể đầu tiên đã hoạt động và test pass.
+
+---
+
+### Phase 4.3 — Bridge Adapter Integration Tests
+
+- Bổ sung integration tests cho batch order, adapter replacement, event roundtrip
+- Nối runtime event dispatcher ổn định sau bridge reset
+
+**Kết quả:** flow adapter end-to-end đã được verify bằng integration tests.
+
+---
+
+### Phase 5 — Primitive Expansion + Prop Mapping Refinement
+
+- Mở rộng primitives: `TextInput`, `FlatList`, `KeyboardAvoidingView`
+- Chuẩn hoá prop mapping: `class -> className`, merge style object/array, boolean semantics
+- Cập nhật sandbox/docs làm reference cho usage mới
+
+**Kết quả:** primitive coverage nâng cao + mapping behavior nhất quán, đã test/typecheck pass.
+
+---
+
 ## 2) Trạng thái hiện tại 📍
 
 - Bridge queue + batching: ✅
-- Primitives core (`View`, `Text`, `Image`, `ScrollView`, `Pressable`): ✅
+- Primitives core + advanced (`View`, `Text`, `Image`, `ScrollView`, `Pressable`, `TextInput`, `FlatList`, `KeyboardAvoidingView`): ✅
 - Adapter skeleton: ✅
-- Adapter implementation cho native target cụ thể: ⏳ chưa làm
+- Adapter implementation cho native target cụ thể (in-memory target): ✅
+- Bridge adapter integration tests: ✅
 
 ---
 
 ## 3) Cần làm tiếp (ưu tiên) 🔜
 
-## Phase 4.2 — Adapter implementation (target cụ thể)
+## Phase 6 — Adapter target thực thi native thật
 
-**Mục tiêu:** biến adapter skeleton thành adapter chạy thật cho target đang dùng.
+**Mục tiêu:** ngoài in-memory target, thêm adapter cho môi trường native thực tế.
 
 ### Việc cần làm
-- Tạo adapter implementation module riêng (ví dụ: `bridgeAdapterSandbox` hoặc `bridgeAdapterRN`)
-- Map mutation records (`create/insert/remove/setText/patchProp`) sang thao tác host tương ứng
-- Wire event native -> `dispatchNativeEvent`
+- Tạo adapter implementation theo target cụ thể (ví dụ native bridge runtime thực)
+- Chuẩn hoá contract payload giữa JS mutation record và native execution layer
+- Theo dõi error/ack path cho applyMutations
 
 ### Done khi
-- Adapter nhận được mutation batch và apply ổn định
-- Event round-trip hoạt động (`@press` -> native -> Vue handler)
-- Test + typecheck pass
+- Adapter chạy được trên target thật với mutation + event roundtrip
+- Test integration + typecheck pass
 
 ---
 
-## Phase 4.3 — Integration tests cho bridge adapter
+## Phase 7 — Primitive expansion nâng cao (tiếp)
 
 ### Việc cần làm
-- Test thứ tự mutation theo batch
-- Test behavior khi thay adapter runtime (`registerBridgeAdapter` replace)
-- Test event dispatch qua runtime hook
-
-### Done khi
-- Có test integration riêng cho adapter flow
-- Giảm phụ thuộc vào debug snapshot để xác nhận logic bridge
-
----
-
-## Phase 5 — Primitive expansion nâng cao
-
-### Việc cần làm
-- Thêm primitives nâng cao: `TextInput`, list wrappers, layout wrappers
+- Mở rộng thêm primitives app-level (input/form/list sâu hơn)
 - Chuẩn hoá prop/event mapping chi tiết hơn
 - Bổ sung docs usage theo từng primitive
 
