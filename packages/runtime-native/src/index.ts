@@ -3,10 +3,13 @@ export * from './bridge.js'
 export { createInMemoryBridgeAdapter } from './adapters/inMemoryBridgeAdapter.js'
 export { createNativeTransportBridgeAdapter } from './adapters/nativeTransportBridgeAdapter.js'
 export {
+	ActivityIndicator,
 	FlatList,
 	Image,
 	KeyboardAvoidingView,
+	Modal,
 	Pressable,
+	SafeAreaView,
 	ScrollView,
 	Text,
 	TextInput,

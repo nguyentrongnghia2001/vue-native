@@ -20,6 +20,10 @@ export const AppRoot = defineComponent({
       </Text>
 
       <ScrollView testID="feed" :style="{ maxHeight: 220 }">
+        <SafeAreaView testID="safe-zone" :style="{ paddingBottom: 6 }">
+          <ActivityIndicator testID="loading-indicator" :animating="true" size="small" />
+        </SafeAreaView>
+
         <Pressable testID="increment" @press="incrementCount">
           <Text :style="{ fontSize: 16 }">Tap to increment</Text>
         </Pressable>
@@ -48,6 +52,14 @@ export const AppRoot = defineComponent({
             :style="[{ marginTop: 8 }, { maxHeight: 120 }]"
           />
         </KeyboardAvoidingView>
+
+        <Modal testID="demo-modal" :visible="state.count % 2 === 0" :transparent="true">
+          <View testID="modal-body" :style="{ padding: 10 }">
+            <Text :style="{ fontSize: 13, opacity: 0.85 }">
+              Modal sample is visible when count is even.
+            </Text>
+          </View>
+        </Modal>
       </ScrollView>
     </View>
   `,

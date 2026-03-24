@@ -663,3 +663,48 @@ Mục đích: Ghi lại phần đã làm để review nhanh trước khi vào Ph
 ### Decision / Next
 - Hoàn tất backlog kỹ thuật “implement native bridge module source cho Android/iOS”.
 - Có thể chuyển sang Phase 7; đồng thời giữ một task follow-up để verify E2E native runtime trên thiết bị thật/emulator.
+
+---
+
+## [2026-03-24 17:35] Phase 7 / Feature 7.1 Kickoff (App-level primitives batch 1)
+
+### Overview
+- Tổng kết trước kickoff: Phase 6 đã hoàn tất adapter + transport + native bridge module source Android/iOS; test/typecheck xanh.
+- Scope mở đầu Phase 7: mở rộng thêm primitives app-level và cập nhật test/sandbox/docs tương ứng.
+- Mục tiêu Feature 7.1: bổ sung nhóm primitives phổ biến cho screen-level UX (`SafeAreaView`, `ActivityIndicator`, `Modal`).
+
+### Files changed
+- `docs/PHASE_FEATURE_LOG.md`
+
+### Validation
+- Trước triển khai: `pnpm test` pass (24/24), `pnpm typecheck` pass.
+
+### Decision / Next
+- Implement primitives + global register + exports + runtime tests + sandbox usage/docs.
+
+---
+
+## [2026-03-24 17:48] Phase 7 / Feature 7.1 Hoàn tất (App-level primitives batch 1)
+
+### Overview
+- Bổ sung 3 primitives mới cho app-level UX: `SafeAreaView`, `ActivityIndicator`, `Modal`.
+- Đăng ký global trong `createNativeApp` và export ở public API `runtime-native`.
+- Bổ sung runtime test xác nhận render/resolve component cho primitives mới.
+- Cập nhật sandbox `AppRoot` để có usage thực tế và cập nhật README.
+
+### Files changed
+- `packages/runtime-native/src/primitives.ts`
+- `packages/runtime-native/src/nativeApp.ts`
+- `packages/runtime-native/src/index.ts`
+- `packages/runtime-native/__tests__/runtime-native.spec.ts`
+- `apps/sandbox/src/AppRoot.ts`
+- `README.md`
+- `docs/PHASE_FEATURE_LOG.md`
+
+### Validation
+- ✅ `pnpm test` pass (25/25 tests).
+- ✅ `pnpm typecheck` pass cho `runtime-native` + `sandbox`.
+
+### Decision / Next
+- Feature 7.1 hoàn tất.
+- Có thể tiếp tục Feature 7.2: mở rộng input/form/list primitives sâu hơn và refine mapping theo case thực tế.

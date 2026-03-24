@@ -310,4 +310,69 @@ describe('@vue-native/runtime-native', () => {
     )
     warnSpy.mockRestore()
   })
+
+  it('renders app-level primitives (SafeAreaView, ActivityIndicator, Modal)', () => {
+    const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {})
+    const root = createNativeRoot()
+    const App = {
+      setup() {
+        return {
+          loading: true,
+          modalVisible: true,
+        }
+      },
+      template: `
+        <SafeAreaView testID="safe-root">
+          <ActivityIndicator :animating="loading" size="large" testID="spinner" />
+          <Modal :visible="modalVisible" :transparent="true" testID="confirm-modal">
+            <View testID="modal-content">
+              <Text>Modal body</Text>
+            </View>
+          </Modal>
+        </SafeAreaView>
+      `,
+    }
+
+    createNativeApp(App).mount(root)
+
+    expect(snapshotNativeTree(root)).toMatchObject({
+      children: [
+        {
+          tag: 'SafeAreaView',
+          props: { testID: 'safe-root' },
+          children: [
+            {
+              tag: 'ActivityIndicator',
+              props: {
+                animating: true,
+                size: 'large',
+                testID: 'spinner',
+              },
+            },
+            {
+              tag: 'Modal',
+              props: {
+                visible: true,
+                transparent: true,
+                testID: 'confirm-modal',
+              },
+              children: [
+                {
+                  tag: 'View',
+                  props: {
+                    testID: 'modal-content',
+                  },
+                },
+              ],
+            },
+          ],
+        },
+      ],
+    })
+
+    expect(warnSpy).not.toHaveBeenCalledWith(
+      expect.stringContaining('Failed to resolve component'),
+    )
+    warnSpy.mockRestore()
+  })
 })

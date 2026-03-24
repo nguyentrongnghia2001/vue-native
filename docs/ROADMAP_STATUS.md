@@ -88,7 +88,7 @@ Tài liệu này là **nguồn tổng hợp duy nhất** cho:
 ## 2) Trạng thái hiện tại 📍
 
 - Bridge queue + batching: ✅
-- Primitives core + advanced (`View`, `Text`, `Image`, `ScrollView`, `Pressable`, `TextInput`, `FlatList`, `KeyboardAvoidingView`): ✅
+- Primitives core + advanced (`View`, `Text`, `Image`, `ScrollView`, `Pressable`, `TextInput`, `FlatList`, `KeyboardAvoidingView`, `SafeAreaView`, `ActivityIndicator`, `Modal`): ✅
 - Adapter skeleton: ✅
 - Adapter implementation cho native target cụ thể (in-memory target): ✅
 - Bridge adapter integration tests: ✅
@@ -122,7 +122,8 @@ Tài liệu này là **nguồn tổng hợp duy nhất** cho:
 ## Phase 7 — Primitive expansion nâng cao (tiếp)
 
 ### Việc cần làm
-- Mở rộng thêm primitives app-level (input/form/list sâu hơn)
+- ✅ Feature 7.1: thêm app-level primitives batch 1 (`SafeAreaView`, `ActivityIndicator`, `Modal`)
+- ⏳ Mở rộng thêm primitives app-level (input/form/list sâu hơn)
 - Chuẩn hoá prop/event mapping chi tiết hơn
 - Bổ sung docs usage theo từng primitive
 
