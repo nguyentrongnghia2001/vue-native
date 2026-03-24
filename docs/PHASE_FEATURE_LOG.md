@@ -590,3 +590,76 @@ Mục đích: Ghi lại phần đã làm để review nhanh trước khi vào Ph
 ### Decision / Next
 - Feature 6.3 hoàn tất ở mức JS host integration.
 - Bước tiếp theo: implement native module thật trong target app (Android/iOS) để đường transport chạy end-to-end với runtime host thực.
+
+---
+
+## [2026-03-24 16:58] Phase 7 / Kickoff Checkpoint (Chờ duyệt)
+
+### Overview
+- Tổng kết Phase 6:
+  - Hoàn tất `createNativeTransportBridgeAdapter` với ack/error/event receiver contract.
+  - Hoàn tất sandbox transport integration + telemetry và integration test roundtrip.
+  - Hoàn tất runtime-aware transport trong host app (`NativeModules` + `NativeEventEmitter`/`DeviceEventEmitter` fallback).
+  - Trạng thái scope còn mở của Phase 6: **chưa có native bridge module thật ở Android/iOS target app**, nên chưa đạt end-to-end native runtime hoàn chỉnh.
+- Validation mới nhất (re-check): `pnpm test` pass 24/24, `pnpm typecheck` pass cho `runtime-native` + `sandbox`.
+
+### Files changed
+- `docs/PHASE_FEATURE_LOG.md`
+
+### Validation
+- ✅ `pnpm test` (24/24)
+- ✅ `pnpm typecheck`
+
+### Decision / Next
+- Kết luận readiness: có thể bắt đầu triển khai **Phase 7** song song backlog native module thật của Phase 6.
+- Scope đề xuất bắt đầu: **Feature 7.1 — Primitive app-level bổ sung + test coverage + docs usage**.
+- Chờ checkpoint review/approval của user trước khi code Phase 7.
+
+---
+
+## [2026-03-24 17:10] Phase 6 / Feature 6.4 Kickoff (Native bridge module Android/iOS)
+
+### Overview
+- Tổng kết trước kickoff: Phase 6.1-6.3 đã hoàn tất ở mức runtime JS + transport adapter + sandbox wiring, test/typecheck đều xanh.
+- Gap còn lại của Phase 6: chưa có native bridge module thật ở Android/iOS để nhận mutation batch và phát event ngược về JS.
+- Mục tiêu Feature 6.4: triển khai module `VueNativeHostBridge` cho cả Android/iOS, khớp contract với `runtimeNativeTransport`.
+
+### Files changed
+- `docs/PHASE_FEATURE_LOG.md`
+
+### Validation
+- Trước triển khai: `pnpm test` pass (24/24), `pnpm typecheck` pass.
+
+### Decision / Next
+- Implement native module source cho Android/iOS + tài liệu tích hợp vào prebuild runtime của Expo sandbox.
+
+---
+
+## [2026-03-24 17:20] Phase 6 / Feature 6.4 Hoàn tất (Native bridge module source)
+
+### Overview
+- Đã thêm native bridge module `VueNativeHostBridge` cho Android/iOS với đầy đủ contract method:
+  - `applyMutations`
+  - `applyMutationBatch`
+  - `sendMutations`
+  - `emitEvent`
+  - `getStats`
+- Event channel native -> JS dùng `vue-native:bridge-event`, khớp với `runtimeNativeTransport`.
+- Bổ sung tài liệu tích hợp vào output của Expo prebuild để chạy trên target runtime thật.
+
+### Files changed
+- `apps/sandbox/native/android/src/main/java/com/vuenative/bridge/VueNativeHostBridgeModule.kt` (new)
+- `apps/sandbox/native/android/src/main/java/com/vuenative/bridge/VueNativeHostBridgePackage.kt` (new)
+- `apps/sandbox/native/ios/VueNativeHostBridge.swift` (new)
+- `apps/sandbox/native/ios/VueNativeHostBridge.m` (new)
+- `apps/sandbox/native/README.md` (new)
+- `docs/PHASE_FEATURE_LOG.md`
+
+### Validation
+- ✅ `pnpm test` pass (24/24 tests).
+- ✅ `pnpm typecheck` pass cho `runtime-native` + `sandbox`.
+- ℹ️ Native E2E (run app Android/iOS với module đã copy vào prebuild output) cần verify thủ công trên môi trường thiết bị/emulator.
+
+### Decision / Next
+- Hoàn tất backlog kỹ thuật “implement native bridge module source cho Android/iOS”.
+- Có thể chuyển sang Phase 7; đồng thời giữ một task follow-up để verify E2E native runtime trên thiết bị thật/emulator.

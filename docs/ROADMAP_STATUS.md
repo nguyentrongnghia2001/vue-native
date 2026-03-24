@@ -110,10 +110,11 @@ Tài liệu này là **nguồn tổng hợp duy nhất** cho:
 - ✅ Theo dõi error/ack path cho applyMutations
 - ✅ Gắn sandbox transport implementation để kiểm chứng wiring trong host app
 - ✅ Bổ sung runtime-aware transport layer ưu tiên native module + event subscription
-- ⏳ Implement native bridge module thật ở từng target app/runtime (Android/iOS) để chạy end-to-end
+- ✅ Implement native bridge module source cho Android/iOS (`VueNativeHostBridge`) + integration docs
+- ⏳ Verify end-to-end runtime roundtrip trên app native thật (device/emulator) sau khi tích hợp vào prebuild output
 
 ### Done khi
-- Adapter chạy được trên target thật với mutation + event roundtrip
+- Adapter chạy được trên target thật với mutation + event roundtrip (đang chờ verify runtime)
 - Test integration + typecheck pass
 
 ---
