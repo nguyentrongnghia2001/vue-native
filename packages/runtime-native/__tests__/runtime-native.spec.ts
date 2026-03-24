@@ -176,4 +176,53 @@ describe('@vue-native/runtime-native', () => {
       'patchProp:event',
     ]))
   })
+
+  it('renders new native primitives (Image, ScrollView, Pressable)', () => {
+    const root = createNativeRoot()
+    const App = {
+      setup() {
+        return {
+          src: 'https://example.com/a.png',
+          noop: () => {},
+        }
+      },
+      template: `
+        <View>
+          <ScrollView testID="list">
+            <Pressable @press="noop" testID="pressable">
+              <Text>Tap</Text>
+            </Pressable>
+            <Image :source="src" testID="thumb" />
+          </ScrollView>
+        </View>
+      `,
+    }
+
+    createNativeApp(App).mount(root)
+
+    expect(snapshotNativeTree(root)).toMatchObject({
+      children: [
+        {
+          tag: 'View',
+          children: [
+            {
+              tag: 'ScrollView',
+              props: { testID: 'list' },
+              children: [
+                {
+                  tag: 'Pressable',
+                  listeners: ['onPress'],
+                  props: { testID: 'pressable' },
+                },
+                {
+                  tag: 'Image',
+                  props: { source: 'https://example.com/a.png', testID: 'thumb' },
+                },
+              ],
+            },
+          ],
+        },
+      ],
+    })
+  })
 })

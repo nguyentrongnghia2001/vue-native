@@ -12,3 +12,6 @@ function createNativePrimitive(tag: string) {
 
 export const View = createNativePrimitive('View')
 export const Text = createNativePrimitive('Text')
+export const Image = createNativePrimitive('Image')
+export const ScrollView = createNativePrimitive('ScrollView')
+export const Pressable = createNativePrimitive('Pressable')

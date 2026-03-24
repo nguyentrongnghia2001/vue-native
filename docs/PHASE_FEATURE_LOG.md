@@ -156,3 +156,23 @@ Mục đích: Ghi lại phần đã làm để review nhanh trước khi vào Ph
 
 ### Decision / Next
 - Từ Phase 3 trở đi, implementation chỉ dùng abstractions của `runtime-native`, không gọi trực tiếp React Native native APIs/components.
+
+---
+
+## [2026-03-24 12:06] Phase 3 / Feature 3.1 (Thêm primitives mới)
+
+### Overview
+- Bổ sung 3 primitives mới trong `runtime-native`: `Image`, `ScrollView`, `Pressable`.
+- Export các primitives mới ra public API package.
+- Bổ sung test xác nhận template có thể render các tag primitives mới.
+
+### Files changed
+- `packages/runtime-native/src/primitives.ts`
+- `packages/runtime-native/src/index.ts`
+- `packages/runtime-native/__tests__/runtime-native.spec.ts`
+
+### Validation
+- Test: ✅ `pnpm test` → 10/10 tests pass.
+
+### Decision / Next
+- Tiếp tục **Feature 3.2**: register global các primitives mới trong `createNativeApp` để bỏ cảnh báo resolve component.
