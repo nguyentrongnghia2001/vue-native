@@ -2,15 +2,20 @@ import { defineComponent, reactive } from '@vue-native/runtime-native'
 
 export const state = reactive({
   count: 0,
+  enabled: true,
 })
 
 export function incrementCount() {
   state.count += 1
 }
 
+export function toggleEnabled() {
+  state.enabled = !state.enabled
+}
+
 export const AppRoot = defineComponent({
   setup() {
-    return { incrementCount, state }
+    return { incrementCount, state, toggleEnabled }
   },
   template: `
     <View testID="root">
@@ -39,17 +44,32 @@ export const AppRoot = defineComponent({
             testID="draft-input"
             class="input primary"
             placeholder="Type a draft title"
+            placeholder-text-color="#8aa1ff"
+            max-length="32"
             :editable="true"
+            @change-text="() => {}"
             :style="[
               { marginTop: 10, padding: 8 },
               { borderWidth: 1, borderColor: '#4c6fff', opacity: 0.95 }
             ]"
           />
 
+          <Switch testID="enable-flag" :value="state.enabled" @change="toggleEnabled" />
+
           <FlatList
             testID="demo-list"
             :data="[state.count, state.count + 1, state.count + 2]"
             :style="[{ marginTop: 8 }, { maxHeight: 120 }]"
+          />
+
+          <RefreshControl testID="refresh-control" :refreshing="state.count % 3 === 0" />
+
+          <SectionList
+            testID="section-list"
+            :sections="[
+              { title: 'Main', data: [state.count, state.count + 1] },
+              { title: 'Extra', data: [state.count + 2] }
+            ]"
           />
         </KeyboardAvoidingView>
 

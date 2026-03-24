@@ -66,7 +66,7 @@ pnpm build
 
 ## Development notes
 
-- Use primitives from `@vue-native/runtime-native`: `View`, `Text`, `Image`, `ScrollView`, `Pressable`, `TextInput`, `FlatList`, `KeyboardAvoidingView`, `SafeAreaView`, `ActivityIndicator`, `Modal`.
+- Use primitives from `@vue-native/runtime-native`: `View`, `Text`, `Image`, `ScrollView`, `Pressable`, `TextInput`, `FlatList`, `KeyboardAvoidingView`, `SafeAreaView`, `ActivityIndicator`, `Modal`, `Switch`, `SectionList`, `RefreshControl`.
 - Vue component syntax is template-first, similar to Vue on the web.
 - The sandbox shows the native tree snapshot and debug ops so you can inspect
 	renderer behavior while iterating.

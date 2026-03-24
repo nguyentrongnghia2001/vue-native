@@ -7,8 +7,11 @@ import {
 	KeyboardAvoidingView,
 	Modal,
 	Pressable,
+	RefreshControl,
 	SafeAreaView,
+	SectionList,
 	ScrollView,
+	Switch,
 	Text,
 	TextInput,
 	View,
@@ -27,5 +30,8 @@ export function createNativeApp(rootComponent: Component) {
 	app.component('SafeAreaView', SafeAreaView)
 	app.component('ActivityIndicator', ActivityIndicator)
 	app.component('Modal', Modal)
+	app.component('Switch', Switch)
+	app.component('SectionList', SectionList)
+	app.component('RefreshControl', RefreshControl)
 	return app
 }

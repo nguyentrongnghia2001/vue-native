@@ -21,3 +21,6 @@ export const KeyboardAvoidingView = createNativePrimitive('KeyboardAvoidingView'
 export const SafeAreaView = createNativePrimitive('SafeAreaView')
 export const ActivityIndicator = createNativePrimitive('ActivityIndicator')
 export const Modal = createNativePrimitive('Modal')
+export const Switch = createNativePrimitive('Switch')
+export const SectionList = createNativePrimitive('SectionList')
+export const RefreshControl = createNativePrimitive('RefreshControl')

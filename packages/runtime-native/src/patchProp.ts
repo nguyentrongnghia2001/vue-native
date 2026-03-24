@@ -1,4 +1,4 @@
-import { isOn } from '@vue/shared'
+import { camelize, isOn } from '@vue/shared'
 import type { RendererOptions } from '@vue/runtime-core'
 import { enqueue } from './bridge.js'
 import type { NativeElement } from './types'
@@ -41,13 +41,31 @@ function isEventKey(key: string): boolean {
 function normalizeEventKey(key: string): string {
   if (!isEventKey(key)) return key
 
-  const eventName = key.slice(2)
+  const rawEventName = key.startsWith('on-') || key.startsWith('on:')
+    ? key.slice(3)
+    : key.slice(2)
+
+  if (!rawEventName) return key
+
+  const eventName = camelize(rawEventName.replace(/^[-:]+/, ''))
   if (!eventName) return key
 
   const normalizedEventName =
     eventName.charAt(0).toUpperCase() + eventName.slice(1)
 
   return `on${normalizedEventName}`
+}
+
+function normalizePropKey(key: string): string {
+  if (key === 'class') {
+    return 'className'
+  }
+
+  if (key.includes('-')) {
+    return camelize(key)
+  }
+
+  return key
 }
 
 export const patchProp: NativeRendererOptions['patchProp'] = (
@@ -81,7 +99,7 @@ export const patchProp: NativeRendererOptions['patchProp'] = (
     return
   }
 
-  const mappedKey = key === 'class' ? 'className' : key
+  const mappedKey = normalizePropKey(key)
   const mappedValue = mappedKey === 'style'
     ? normalizeStyleValue(nextValue as NativeStyleValue)
     : nextValue

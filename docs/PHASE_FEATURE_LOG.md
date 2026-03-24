@@ -708,3 +708,52 @@ Mục đích: Ghi lại phần đã làm để review nhanh trước khi vào Ph
 ### Decision / Next
 - Feature 7.1 hoàn tất.
 - Có thể tiếp tục Feature 7.2: mở rộng input/form/list primitives sâu hơn và refine mapping theo case thực tế.
+
+---
+
+## [2026-03-24 18:05] Phase 7 / Feature 7.2 Kickoff (Input/Form/List batch 2 + mapping refine)
+
+### Overview
+- Tổng kết scope trước: Feature 7.1 đã thêm `SafeAreaView`, `ActivityIndicator`, `Modal` và test/typecheck pass.
+- Mục tiêu Feature 7.2:
+  1. Mở rộng primitives theo hướng input/form/list sâu hơn.
+  2. Refine prop/event mapping cho template authoring thân thiện hơn (đặc biệt dạng kebab-case).
+
+### Files changed
+- `docs/PHASE_FEATURE_LOG.md`
+
+### Validation
+- Trước triển khai: `pnpm test` pass (25/25), `pnpm typecheck` pass.
+
+### Decision / Next
+- Implement primitives batch 2 + update register/export + test + sandbox/docs + commit riêng cho Feature 7.2.
+
+---
+
+## [2026-03-24 18:22] Phase 7 / Feature 7.2 Hoàn tất (Input/Form/List batch 2 + mapping refine)
+
+### Overview
+- Bổ sung thêm primitives batch 2 cho input/form/list use case: `Switch`, `SectionList`, `RefreshControl`.
+- Đăng ký global các primitives mới trong `createNativeApp` và export qua public API.
+- Refine `patchProp`:
+  - Hỗ trợ normalize kebab-case prop key -> camelCase (ví dụ `max-length` -> `maxLength`, `placeholder-text-color` -> `placeholderTextColor`).
+  - Hỗ trợ normalize kebab-case event key (ví dụ `@change-text` -> `onChangeText`).
+- Cập nhật test coverage + sandbox demo + README.
+
+### Files changed
+- `packages/runtime-native/src/primitives.ts`
+- `packages/runtime-native/src/nativeApp.ts`
+- `packages/runtime-native/src/index.ts`
+- `packages/runtime-native/src/patchProp.ts`
+- `packages/runtime-native/__tests__/runtime-native.spec.ts`
+- `apps/sandbox/src/AppRoot.ts`
+- `README.md`
+- `docs/PHASE_FEATURE_LOG.md`
+
+### Validation
+- ✅ `pnpm test` pass (27/27 tests).
+- ✅ `pnpm typecheck` pass cho `runtime-native` + `sandbox`.
+
+### Decision / Next
+- Feature 7.2 hoàn tất.
+- Có thể tiếp tục Feature 7.3 để mở rộng thêm primitives chuyên sâu và chuẩn hoá mapping edge-cases theo component-specific behavior.

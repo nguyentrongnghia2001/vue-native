@@ -131,6 +131,34 @@ describe('@vue-native/runtime-native', () => {
 
     patchProp(el, 'editable', true, false)
     expect(el.props.editable).toBeUndefined()
+
+    patchProp(el, 'max-length', null, 120)
+    expect(el.props.maxLength).toBe(120)
+
+    patchProp(el, 'placeholder-text-color', null, '#999')
+    expect(el.props.placeholderTextColor).toBe('#999')
+  })
+
+  it('normalizes kebab-case event keys', () => {
+    const el = {
+      id: 3,
+      type: 'element',
+      tag: 'TextInput',
+      children: [],
+      props: {},
+      parentNode: null,
+      eventListeners: null,
+    } as any
+
+    const onChangeText = () => 'changed'
+    patchProp(el, 'on-change-text', null, onChangeText)
+
+    expect(el.eventListeners).toMatchObject({
+      onChangeText,
+    })
+
+    patchProp(el, 'on-change-text', onChangeText, undefined)
+    expect(el.eventListeners).toBeNull()
   })
 
   it('serializes snapshot props and listener names safely', () => {
@@ -364,6 +392,72 @@ describe('@vue-native/runtime-native', () => {
                   },
                 },
               ],
+            },
+          ],
+        },
+      ],
+    })
+
+    expect(warnSpy).not.toHaveBeenCalledWith(
+      expect.stringContaining('Failed to resolve component'),
+    )
+    warnSpy.mockRestore()
+  })
+
+  it('renders input/form/list primitives batch 2 (Switch, SectionList, RefreshControl)', () => {
+    const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {})
+    const root = createNativeRoot()
+    const App = {
+      setup() {
+        return {
+          enabled: true,
+          sections: [
+            { title: 'A', data: [1, 2] },
+            { title: 'B', data: [3] },
+          ],
+          refreshing: true,
+        }
+      },
+      template: `
+        <View testID="batch-2-root">
+          <Switch testID="flag" :value="enabled" />
+          <RefreshControl testID="refresh" :refreshing="refreshing" />
+          <SectionList testID="section-list" :sections="sections" />
+        </View>
+      `,
+    }
+
+    createNativeApp(App).mount(root)
+
+    expect(snapshotNativeTree(root)).toMatchObject({
+      children: [
+        {
+          tag: 'View',
+          props: { testID: 'batch-2-root' },
+          children: [
+            {
+              tag: 'Switch',
+              props: {
+                testID: 'flag',
+                value: true,
+              },
+            },
+            {
+              tag: 'RefreshControl',
+              props: {
+                testID: 'refresh',
+                refreshing: true,
+              },
+            },
+            {
+              tag: 'SectionList',
+              props: {
+                testID: 'section-list',
+                sections: [
+                  { title: 'A', data: [1, 2] },
+                  { title: 'B', data: [3] },
+                ],
+              },
             },
           ],
         },
