@@ -3,19 +3,16 @@ import { defineComponent, reactive } from '@vue-native/runtime-native'
 export const state = reactive({
   count: 0,
   enabled: true,
+  draft: '',
 })
 
 export function incrementCount() {
   state.count += 1
 }
 
-export function toggleEnabled() {
-  state.enabled = !state.enabled
-}
-
 export const AppRoot = defineComponent({
   setup() {
-    return { incrementCount, state, toggleEnabled }
+    return { incrementCount, state }
   },
   template: `
     <View testID="root">
@@ -42,19 +39,19 @@ export const AppRoot = defineComponent({
         <KeyboardAvoidingView testID="input-zone" behavior="padding">
           <TextInput
             testID="draft-input"
+            v-model="state.draft"
             class="input primary"
             placeholder="Type a draft title"
             placeholder-text-color="#8aa1ff"
             max-length="32"
             :editable="true"
-            @change-text="() => {}"
             :style="[
               { marginTop: 10, padding: 8 },
               { borderWidth: 1, borderColor: '#4c6fff', opacity: 0.95 }
             ]"
           />
 
-          <Switch testID="enable-flag" :value="state.enabled" @change="toggleEnabled" />
+          <Switch testID="enable-flag" v-model="state.enabled" />
 
           <FlatList
             testID="demo-list"

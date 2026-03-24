@@ -38,7 +38,19 @@ function isEventKey(key: string): boolean {
   return isOn(key) || /^on[a-z]/.test(key)
 }
 
-function normalizeEventKey(key: string): string {
+function resolveModelUpdateEventKey(tag: string): string {
+  if (tag === 'TextInput') {
+    return 'onChangeText'
+  }
+
+  if (tag === 'Switch') {
+    return 'onValueChange'
+  }
+
+  return 'onUpdateModelValue'
+}
+
+function normalizeEventKey(key: string, tag: string): string {
   if (!isEventKey(key)) return key
 
   const rawEventName = key.startsWith('on-') || key.startsWith('on:')
@@ -47,8 +59,14 @@ function normalizeEventKey(key: string): string {
 
   if (!rawEventName) return key
 
-  const eventName = camelize(rawEventName.replace(/^[-:]+/, ''))
+  const eventName = camelize(rawEventName.replace(/^[-:]+/, '').replace(/:/g, '-'))
   if (!eventName) return key
+
+  const normalizedEventToken = eventName.charAt(0).toLowerCase() + eventName.slice(1)
+
+  if (normalizedEventToken === 'updateModelValue') {
+    return resolveModelUpdateEventKey(tag)
+  }
 
   const normalizedEventName =
     eventName.charAt(0).toUpperCase() + eventName.slice(1)
@@ -56,16 +74,40 @@ function normalizeEventKey(key: string): string {
   return `on${normalizedEventName}`
 }
 
-function normalizePropKey(key: string): string {
-  if (key === 'class') {
+function normalizePropKey(key: string, tag: string): string {
+  const normalizedKey = key.includes('-') ? camelize(key) : key
+
+  if (normalizedKey === 'modelValue') {
+    if (tag === 'TextInput' || tag === 'Switch') {
+      return 'value'
+    }
+  }
+
+  if (normalizedKey === 'class') {
     return 'className'
   }
 
-  if (key.includes('-')) {
-    return camelize(key)
+  return normalizedKey
+}
+
+function shouldKeepFalseValue(tag: string, mappedKey: string): boolean {
+  return (
+    (tag === 'Switch' && mappedKey === 'value') ||
+    (tag === 'Modal' && mappedKey === 'visible') ||
+    (tag === 'RefreshControl' && mappedKey === 'refreshing')
+  )
+}
+
+function shouldRemoveProp(tag: string, mappedKey: string, value: unknown): boolean {
+  if (value == null) {
+    return true
   }
 
-  return key
+  if (value === false && !shouldKeepFalseValue(tag, mappedKey)) {
+    return true
+  }
+
+  return false
 }
 
 export const patchProp: NativeRendererOptions['patchProp'] = (
@@ -76,7 +118,7 @@ export const patchProp: NativeRendererOptions['patchProp'] = (
 ) => {
   if (isEventKey(key)) {
     const listeners = (el.eventListeners ||= Object.create(null))
-    const eventKey = normalizeEventKey(key)
+    const eventKey = normalizeEventKey(key, el.tag)
     const action = nextValue == null ? 'remove' : 'set'
 
     if (nextValue == null) {
@@ -99,12 +141,12 @@ export const patchProp: NativeRendererOptions['patchProp'] = (
     return
   }
 
-  const mappedKey = normalizePropKey(key)
+  const mappedKey = normalizePropKey(key, el.tag)
   const mappedValue = mappedKey === 'style'
     ? normalizeStyleValue(nextValue as NativeStyleValue)
     : nextValue
 
-  if (mappedValue == null || mappedValue === false) {
+  if (shouldRemoveProp(el.tag, mappedKey, mappedValue)) {
     delete el.props[mappedKey]
     enqueue({
       type: 'patchProp:prop',

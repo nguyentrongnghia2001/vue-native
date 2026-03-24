@@ -757,3 +757,47 @@ Mục đích: Ghi lại phần đã làm để review nhanh trước khi vào Ph
 ### Decision / Next
 - Feature 7.2 hoàn tất.
 - Có thể tiếp tục Feature 7.3 để mở rộng thêm primitives chuyên sâu và chuẩn hoá mapping edge-cases theo component-specific behavior.
+
+---
+
+## [2026-03-24 18:35] Phase 7 / Feature 7.3 Kickoff (Component-specific mapping edge-cases)
+
+### Overview
+- Tổng kết trước kickoff: Feature 7.2 đã mở rộng primitives batch 2 và normalize kebab-case props/events.
+- Mục tiêu Feature 7.3: xử lý edge-cases theo component-specific behavior để tăng DX cho template authoring, đặc biệt với `v-model` trên input controls.
+
+### Files changed
+- `docs/PHASE_FEATURE_LOG.md`
+
+### Validation
+- Trước triển khai: `pnpm test` pass (27/27), `pnpm typecheck` pass.
+
+### Decision / Next
+- Implement mapping aliases cho `TextInput`/`Switch` + giữ `false` cho một số boolean props cần preserve + test roundtrip.
+
+---
+
+## [2026-03-24 18:45] Phase 7 / Feature 7.3 Hoàn tất (Component-specific mapping edge-cases)
+
+### Overview
+- Refine `patchProp` theo component-specific behavior:
+  - `modelValue -> value` cho `TextInput` và `Switch`.
+  - `onUpdate:modelValue -> onChangeText` (`TextInput`) và `onValueChange` (`Switch`).
+  - Preserve giá trị boolean `false` cho các props cần thiết theo component (`Switch.value`, `Modal.visible`, `RefreshControl.refreshing`).
+- Cập nhật sandbox demo dùng `v-model` trực tiếp cho `TextInput` và `Switch`.
+- Bổ sung test coverage cho mapping alias và v-model roundtrip qua runtime event dispatch.
+
+### Files changed
+- `packages/runtime-native/src/patchProp.ts`
+- `packages/runtime-native/__tests__/runtime-native.spec.ts`
+- `apps/sandbox/src/AppRoot.ts`
+- `README.md`
+- `docs/PHASE_FEATURE_LOG.md`
+
+### Validation
+- ✅ `pnpm test` pass (29/29 tests).
+- ✅ `pnpm typecheck` pass cho `runtime-native` + `sandbox`.
+
+### Decision / Next
+- Feature 7.3 hoàn tất.
+- Có thể tiếp tục Feature 7.4: mở rộng mapping edge-cases theo nhóm prop/event chuyên sâu hơn (ví dụ pointer/input submit/focus lifecycle).

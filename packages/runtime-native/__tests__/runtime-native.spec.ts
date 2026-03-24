@@ -2,6 +2,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import {
   createNativeApp,
   createNativeRoot,
+  dispatchEventToNativeNode,
   flush,
   dumpDebugOps,
   getPendingMutationCount,
@@ -132,6 +133,32 @@ describe('@vue-native/runtime-native', () => {
     patchProp(el, 'editable', true, false)
     expect(el.props.editable).toBeUndefined()
 
+    const switchEl = {
+      id: 20,
+      type: 'element',
+      tag: 'Switch',
+      children: [],
+      props: {},
+      parentNode: null,
+      eventListeners: null,
+    } as any
+
+    patchProp(switchEl, 'modelValue', null, false)
+    expect(switchEl.props.value).toBe(false)
+
+    const refreshEl = {
+      id: 21,
+      type: 'element',
+      tag: 'RefreshControl',
+      children: [],
+      props: {},
+      parentNode: null,
+      eventListeners: null,
+    } as any
+
+    patchProp(refreshEl, 'refreshing', null, false)
+    expect(refreshEl.props.refreshing).toBe(false)
+
     patchProp(el, 'max-length', null, 120)
     expect(el.props.maxLength).toBe(120)
 
@@ -159,6 +186,40 @@ describe('@vue-native/runtime-native', () => {
 
     patchProp(el, 'on-change-text', onChangeText, undefined)
     expect(el.eventListeners).toBeNull()
+  })
+
+  it('maps onUpdate:modelValue listeners for TextInput and Switch', () => {
+    const textInputEl = {
+      id: 30,
+      type: 'element',
+      tag: 'TextInput',
+      children: [],
+      props: {},
+      parentNode: null,
+      eventListeners: null,
+    } as any
+
+    const onTextUpdate = () => 'text-updated'
+    patchProp(textInputEl, 'onUpdate:modelValue', null, onTextUpdate)
+    expect(textInputEl.eventListeners).toMatchObject({
+      onChangeText: onTextUpdate,
+    })
+
+    const switchEl = {
+      id: 31,
+      type: 'element',
+      tag: 'Switch',
+      children: [],
+      props: {},
+      parentNode: null,
+      eventListeners: null,
+    } as any
+
+    const onSwitchUpdate = () => 'switch-updated'
+    patchProp(switchEl, 'onUpdate:modelValue', null, onSwitchUpdate)
+    expect(switchEl.eventListeners).toMatchObject({
+      onValueChange: onSwitchUpdate,
+    })
   })
 
   it('serializes snapshot props and listener names safely', () => {
@@ -468,5 +529,43 @@ describe('@vue-native/runtime-native', () => {
       expect.stringContaining('Failed to resolve component'),
     )
     warnSpy.mockRestore()
+  })
+
+  it('supports v-model roundtrip for TextInput and Switch', () => {
+    const root = createNativeRoot()
+    const state = reactive({
+      text: 'hello',
+      enabled: false,
+    })
+
+    const App = {
+      setup() {
+        return { state }
+      },
+      template: `
+        <View>
+          <TextInput v-model="state.text" testID="vm-text" />
+          <Switch v-model="state.enabled" testID="vm-switch" />
+        </View>
+      `,
+    }
+
+    createNativeApp(App).mount(root)
+
+    const snapshot = snapshotNativeTree(root)
+    const vmText = snapshot.children?.[0]?.children?.[0] as any
+    const vmSwitch = snapshot.children?.[0]?.children?.[1] as any
+
+    expect(vmText.props.value).toBe('hello')
+    expect(vmText.listeners).toContain('onChangeText')
+
+    expect(vmSwitch.props.value).toBe(false)
+    expect(vmSwitch.listeners).toContain('onValueChange')
+
+    expect(dispatchEventToNativeNode(vmText.id, 'onChangeText', ['updated'])).toBe(true)
+    expect(dispatchEventToNativeNode(vmSwitch.id, 'onValueChange', [true])).toBe(true)
+
+    expect(state.text).toBe('updated')
+    expect(state.enabled).toBe(true)
   })
 })

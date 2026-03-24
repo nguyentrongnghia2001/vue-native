@@ -75,6 +75,10 @@ pnpm build
 	- `class` is normalized to `className`
 	- `style` supports object/array and is merged into a single host style object
 	- boolean props follow native semantics (`true` set, `false` remove)
+	- component-specific mapping edge-cases:
+		- `TextInput` supports `v-model` via `modelValue -> value` and `onUpdate:modelValue -> onChangeText`
+		- `Switch` supports `v-model` via `modelValue -> value` and `onUpdate:modelValue -> onValueChange`
+		- kebab-case props/events are normalized (`max-length`, `placeholder-text-color`, `@change-text`)
 
 ## Suggested next work
 
