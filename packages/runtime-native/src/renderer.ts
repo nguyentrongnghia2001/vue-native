@@ -9,6 +9,7 @@ import {
   createRenderer,
 } from '@vue/runtime-core'
 import {
+  dispatchEventToNativeNode,
   nodeOps,
   createNativeRoot,
   dumpDebugOps,
@@ -16,6 +17,7 @@ import {
   snapshotNativeTree,
 } from './host'
 import './compiler'
+import { setEventDispatcher } from './bridge'
 import { patchProp } from './patchProp'
 import type { NativeElement, NativeNodeSnapshot, NativeRoot } from './types'
 
@@ -24,11 +26,19 @@ const rendererOptions = /* @__PURE__ */ extend({ patchProp }, nodeOps)
 let renderer: Renderer<NativeElement> | HydrationRenderer | undefined
 let hydrationRenderer: HydrationRenderer | undefined
 
+function ensureBridgeEventDispatcher() {
+  setEventDispatcher(event => {
+    dispatchEventToNativeNode(event.nodeId, event.event, event.args ?? [])
+  })
+}
+
 function ensureRenderer() {
+  ensureBridgeEventDispatcher()
   return (renderer ||= createRenderer(rendererOptions))
 }
 
 function ensureHydrationRenderer() {
+  ensureBridgeEventDispatcher()
   return (hydrationRenderer ||= createHydrationRenderer(rendererOptions as any))
 }
 
@@ -54,6 +64,7 @@ export function createNativeHydrationRenderer(): HydrationRenderer {
 
 export {
   createNativeRoot,
+  dispatchEventToNativeNode,
   dumpDebugOps,
   resetDebugOps,
   snapshotNativeTree,

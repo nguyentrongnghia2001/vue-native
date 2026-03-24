@@ -337,3 +337,28 @@ Mục đích: Ghi lại phần đã làm để review nhanh trước khi vào Ph
 
 ### Decision / Next
 - Tiếp tục **Phase 4.3**: integration test adapter flow end-to-end với event dispatch runtime.
+
+---
+
+## [2026-03-24 14:06] Phase 4.3 / Feature (Bridge adapter integration tests)
+
+### Overview
+- Bổ sung integration tests cho adapter flow end-to-end:
+  - mutation batch order sau mount
+  - replace adapter runtime
+  - event dispatch từ adapter runtime về Vue handler
+- Nối lại bridge event dispatcher mỗi lần đảm bảo renderer để tránh mất dispatcher sau `resetBridgeState`.
+- Thêm host helper dispatch event theo `nodeId + event` để phục vụ roundtrip.
+
+### Files changed
+- `packages/runtime-native/src/host.ts`
+- `packages/runtime-native/src/renderer.ts`
+- `packages/runtime-native/__tests__/bridge-adapter.integration.spec.ts` (new)
+- `docs/PHASE_FEATURE_LOG.md`
+
+### Validation
+- Test: ✅ `pnpm test` → 18/18 tests pass.
+- Typecheck: ✅ `pnpm typecheck` pass cho `runtime-native` + `sandbox`.
+
+### Decision / Next
+- Phase 4.2 + 4.3 đã hoàn tất; có thể chuyển sang Phase 5 (primitive expansion nâng cao).

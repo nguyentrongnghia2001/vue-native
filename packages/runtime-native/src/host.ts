@@ -13,6 +13,7 @@ import type {
 } from './types'
 
 let nextId = 0
+const nodeRegistry = new Map<number, NativeChildNode>()
 
 export { dumpDebugOps, resetDebugOps }
 
@@ -78,6 +79,48 @@ export function createNativeRoot(): NativeRoot {
   return createElement('root') as NativeRoot
 }
 
+function normalizeEventName(event: string): string {
+  if (!event.startsWith('on') || event.length < 3) {
+    return event
+  }
+
+  const tail = event.slice(2)
+  return `on${tail.charAt(0).toUpperCase()}${tail.slice(1)}`
+}
+
+export function dispatchEventToNativeNode(
+  nodeId: number,
+  event: string,
+  args: unknown[] = [],
+): boolean {
+  const node = nodeRegistry.get(nodeId)
+  if (!node || node.type === 'text' || node.type === 'comment') {
+    return false
+  }
+
+  const normalizedEvent = normalizeEventName(event)
+  const listener = node.eventListeners?.[normalizedEvent]
+  if (!listener) {
+    return false
+  }
+
+  if (Array.isArray(listener)) {
+    for (const handler of listener) {
+      handler(...args)
+    }
+  } else {
+    listener(...args)
+  }
+
+  recordDebugOp('dispatchNativeEvent', {
+    nodeId,
+    event: normalizedEvent,
+    argCount: args.length,
+  })
+
+  return true
+}
+
 function createElement(tag: string): NativeElement {
   const node: NativeElement = {
     id: nextId++,
@@ -94,6 +137,7 @@ function createElement(tag: string): NativeElement {
     tag: node.tag,
     nodeType: node.type,
   })
+  nodeRegistry.set(node.id, node)
   recordDebugOp('create', { tag, id: node.id })
   markRaw(node)
   return node
@@ -111,6 +155,7 @@ function createText(text: string): NativeText {
     id: node.id,
     text,
   })
+  nodeRegistry.set(node.id, node)
   recordDebugOp('createText', { text, id: node.id })
   markRaw(node)
   return node
@@ -128,6 +173,7 @@ function createComment(text: string): NativeComment {
     id: node.id,
     text,
   })
+  nodeRegistry.set(node.id, node)
   recordDebugOp('createComment', { text, id: node.id })
   markRaw(node)
   return node
