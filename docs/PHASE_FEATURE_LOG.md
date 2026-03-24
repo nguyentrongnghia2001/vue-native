@@ -469,3 +469,43 @@ Mục đích: Ghi lại phần đã làm để review nhanh trước khi vào Ph
 ### Decision / Next
 - Phase 5 hoàn tất.
 - Next: Phase 6 (adapter target thực thi native thật) theo `docs/ROADMAP_STATUS.md`.
+
+---
+
+## [2026-03-24 14:35] Phase 6 / Kickoff Checkpoint
+
+### Overview
+- Review trạng thái hiện tại: Phase 5 đã hoàn tất, bridge + adapter in-memory + integration tests ổn định.
+- Mục tiêu Phase 6: thêm adapter target cho native execution layer thật với `ack/error` path rõ ràng.
+
+### Files changed
+- `docs/PHASE_FEATURE_LOG.md`
+
+### Validation
+- Trạng thái trước khi làm Phase 6: test/typecheck pass.
+
+### Decision / Next
+- Bắt đầu **Feature 6.1**: `native transport bridge adapter` + test contract.
+
+---
+
+## [2026-03-24 14:28] Phase 6 / Feature 6.1 (Native transport adapter)
+
+### Overview
+- Thêm `createNativeTransportBridgeAdapter` cho target native execution layer thật.
+- Hỗ trợ đầy đủ `ack/error` path và thống kê runtime (`sentBatches`, `sentMutations`, `ackCount`, `errorCount`).
+- Hỗ trợ wiring event receiver từ transport về bridge dispatcher (`setEventReceiver`).
+
+### Files changed
+- `packages/runtime-native/src/adapters/nativeTransportBridgeAdapter.ts` (new)
+- `packages/runtime-native/src/index.ts`
+- `packages/runtime-native/__tests__/native-transport-adapter.spec.ts` (new)
+- `docs/PHASE_FEATURE_LOG.md`
+
+### Validation
+- Test: ✅ `pnpm test` → 23/23 tests pass.
+- Typecheck: ✅ `pnpm typecheck` pass cho `runtime-native` + `sandbox`.
+
+### Decision / Next
+- Phase 6 đã có adapter target thực thi native thật ở mức runtime contract.
+- Bước tiếp theo: gắn transport implementation cụ thể theo môi trường native thực tế (bridge runtime của app).

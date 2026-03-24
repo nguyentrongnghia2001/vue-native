@@ -92,6 +92,7 @@ Tài liệu này là **nguồn tổng hợp duy nhất** cho:
 - Adapter skeleton: ✅
 - Adapter implementation cho native target cụ thể (in-memory target): ✅
 - Bridge adapter integration tests: ✅
+- Native transport adapter contract (ack/error/event receiver): ✅
 
 ---
 
@@ -102,9 +103,10 @@ Tài liệu này là **nguồn tổng hợp duy nhất** cho:
 **Mục tiêu:** ngoài in-memory target, thêm adapter cho môi trường native thực tế.
 
 ### Việc cần làm
-- Tạo adapter implementation theo target cụ thể (ví dụ native bridge runtime thực)
-- Chuẩn hoá contract payload giữa JS mutation record và native execution layer
-- Theo dõi error/ack path cho applyMutations
+- ✅ Tạo adapter implementation theo target cụ thể: `createNativeTransportBridgeAdapter`
+- ✅ Chuẩn hoá contract payload giữa JS mutation record và native execution layer (transport contract)
+- ✅ Theo dõi error/ack path cho applyMutations
+- ⏳ Tích hợp transport implementation thật theo từng host app/runtime
 
 ### Done khi
 - Adapter chạy được trên target thật với mutation + event roundtrip
