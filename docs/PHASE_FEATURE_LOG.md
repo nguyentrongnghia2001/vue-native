@@ -54,3 +54,23 @@ Mục đích: Ghi lại phần đã làm để review nhanh trước khi vào Ph
 ### Decision / Next
 - Bắt đầu **Phase 2 - Feature 2.1**.
 - Quy trình bắt buộc: mỗi feature phải `pnpm test` rồi commit riêng.
+
+---
+
+## [2026-03-24 11:21] Phase 2 / Feature 2.1 (Bridge interface + queue)
+
+### Overview
+- Tạo bridge adapter contract cơ bản cho mutation flow JS -> Native.
+- Hoàn thành API: `enqueue`, `flush`, `setMutationSink`, `setEventDispatcher`, `dispatchNativeEvent`.
+- Thêm utility reset/inspect queue để test ổn định.
+
+### Files changed
+- `packages/runtime-native/src/bridge.ts` (new)
+- `packages/runtime-native/src/index.ts`
+- `packages/runtime-native/__tests__/bridge.spec.ts` (new)
+
+### Validation
+- Test: ✅ `pnpm test` → 7/7 tests pass.
+
+### Decision / Next
+- Tiếp tục **Feature 2.2**: chuyển host ops/patchProp sang emit mutation vào bridge queue.
