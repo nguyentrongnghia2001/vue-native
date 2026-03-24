@@ -212,3 +212,30 @@ Mục đích: Ghi lại phần đã làm để review nhanh trước khi vào Ph
 
 ### Decision / Next
 - Chạy `pnpm typecheck` để chốt toàn bộ Phase 3.
+
+---
+
+## [2026-03-24 12:09] Phase 3 / Completion Checkpoint
+
+### Overview
+- Hoàn thành 3 feature của Phase 3:
+  1. Thêm primitives `Image`, `ScrollView`, `Pressable`
+  2. Register global primitives trong `createNativeApp`
+  3. Cập nhật sandbox/docs usage reference
+- Tuân thủ rule mới: runtime layer không dùng trực tiếp React Native native APIs/components.
+
+### Files changed
+- `packages/runtime-native/src/primitives.ts`
+- `packages/runtime-native/src/index.ts`
+- `packages/runtime-native/src/nativeApp.ts`
+- `packages/runtime-native/__tests__/runtime-native.spec.ts`
+- `apps/sandbox/src/AppRoot.ts`
+- `README.md`
+
+### Validation
+- Test: ✅ `pnpm test` → 10/10 tests pass.
+- Typecheck: ✅ `pnpm typecheck` pass cho `runtime-native` + `sandbox`.
+
+### Decision / Next
+- Phase 3 hoàn tất theo roadmap ngắn hạn.
+- Có thể chuyển sang bước mở rộng primitives nâng cao và bridge adapter thực thi native target.
