@@ -239,3 +239,60 @@ Mục đích: Ghi lại phần đã làm để review nhanh trước khi vào Ph
 ### Decision / Next
 - Phase 3 hoàn tất theo roadmap ngắn hạn.
 - Có thể chuyển sang bước mở rộng primitives nâng cao và bridge adapter thực thi native target.
+
+---
+
+## [2026-03-24 12:15] Rule clarification / Runtime vs Sandbox scope
+
+### Overview
+- Theo feedback review, làm rõ phạm vi rule "không dùng direct React Native":
+  - **Cấm** trong runtime layer: `packages/runtime-native/**`.
+  - **Được phép** trong sandbox host shell: `apps/sandbox/App.tsx` để dựng UI demo/snapshot/debug panel.
+
+### Files changed
+- `.github/copilot-instructions.md`
+- `docs/PHASE_FEATURE_LOG.md`
+
+### Validation
+- Rule wording đã rõ ràng để tránh hiểu nhầm khi đọc `App.tsx`.
+
+### Decision / Next
+- Tiếp tục giữ nguyên nguyên tắc kiến trúc: runtime không phụ thuộc React Native built-ins; sandbox host shell có thể dùng `react-native`.
+
+---
+
+## [2026-03-24 12:30] Phase 4.1 / Kickoff Checkpoint (Native Bridge Adapter skeleton)
+
+### Overview
+- Review lại trạng thái hiện tại: Phase 1-3 đã hoàn tất, bridge queue/batching đã ổn định và test pass.
+- Mục tiêu Phase 4.1: thêm adapter skeleton để mutation batch có thể được forward qua một interface thay thế được.
+
+### Files changed
+- `docs/PHASE_FEATURE_LOG.md`
+
+### Validation
+- Trạng thái trước khi làm feature: workspace ổn định, test/typecheck pass ở checkpoint trước.
+
+### Decision / Next
+- Bắt đầu triển khai **Feature 4.1**: `NativeBridgeAdapter` + register/unregister flow + test contract.
+
+---
+
+## [2026-03-24 13:52] Phase 4.1 / Feature (Native Bridge Adapter skeleton)
+
+### Overview
+- Thêm adapter skeleton cho bridge layer để forward mutation batch qua interface thay thế được.
+- Hỗ trợ lifecycle `register/unregister` adapter và expose trạng thái adapter đang active.
+- Thêm runtime hook để adapter có thể phát event ngược vào bridge (`dispatchEvent`).
+
+### Files changed
+- `packages/runtime-native/src/bridge.ts`
+- `packages/runtime-native/__tests__/bridge.spec.ts`
+- `docs/PHASE_FEATURE_LOG.md`
+
+### Validation
+- Test: ✅ `pnpm test` → 13/13 tests pass.
+- Typecheck: ✅ `pnpm typecheck` pass cho `runtime-native` + `sandbox`.
+
+### Decision / Next
+- Feature 4.1 hoàn tất, sẵn sàng cho bước adapter implementation cụ thể theo từng native target.

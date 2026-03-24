@@ -3,7 +3,9 @@ import {
   dispatchNativeEvent,
   enqueue,
   flush,
+  getActiveBridgeAdapterId,
   getPendingMutationCount,
+  registerBridgeAdapter,
   resetBridgeState,
   setEventDispatcher,
   setMutationSink,
@@ -73,5 +75,76 @@ describe('bridge queue contract', () => {
       { type: 'setText', nodeId: 2, text: 'batched' },
     ])
     expect(getPendingMutationCount()).toBe(0)
+  })
+
+  it('registers adapter and forwards mutation batches through applyMutations', () => {
+    const applyMutations = vi.fn()
+    registerBridgeAdapter({
+      id: 'test-adapter',
+      applyMutations,
+    })
+
+    expect(getActiveBridgeAdapterId()).toBe('test-adapter')
+
+    enqueue({ type: 'insert', childId: 11, parentId: 2 })
+    const batch = flush()
+
+    expect(batch).toEqual([{ type: 'insert', childId: 11, parentId: 2 }])
+    expect(applyMutations).toHaveBeenCalledTimes(1)
+    expect(applyMutations).toHaveBeenCalledWith(batch)
+  })
+
+  it('wires adapter runtime dispatchEvent to bridge event dispatcher', () => {
+    const dispatcher = vi.fn()
+    setEventDispatcher(dispatcher)
+
+    let runtimeDispatch: ((event: { nodeId: number; event: string; args?: unknown[] }) => void) | undefined
+
+    registerBridgeAdapter({
+      id: 'event-adapter',
+      applyMutations: vi.fn(),
+      onAttach(runtime) {
+        runtimeDispatch = runtime.dispatchEvent
+      },
+    })
+
+    expect(runtimeDispatch).toBeTypeOf('function')
+    if (typeof runtimeDispatch !== 'function') {
+      throw new Error('runtimeDispatch should be assigned by adapter onAttach')
+    }
+
+    runtimeDispatch({ nodeId: 99, event: 'onPress', args: ['from-adapter'] })
+
+    expect(dispatcher).toHaveBeenCalledTimes(1)
+    expect(dispatcher).toHaveBeenCalledWith({
+      nodeId: 99,
+      event: 'onPress',
+      args: ['from-adapter'],
+    })
+  })
+
+  it('detaches previous adapter when replacing or clearing adapter', () => {
+    const detachA = vi.fn()
+    const detachB = vi.fn()
+
+    registerBridgeAdapter({
+      id: 'adapter-a',
+      applyMutations: vi.fn(),
+      onDetach: detachA,
+    })
+
+    registerBridgeAdapter({
+      id: 'adapter-b',
+      applyMutations: vi.fn(),
+      onDetach: detachB,
+    })
+
+    expect(detachA).toHaveBeenCalledTimes(1)
+    expect(getActiveBridgeAdapterId()).toBe('adapter-b')
+
+    registerBridgeAdapter(null)
+
+    expect(detachB).toHaveBeenCalledTimes(1)
+    expect(getActiveBridgeAdapterId()).toBeNull()
   })
 })

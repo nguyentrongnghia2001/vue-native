@@ -9,6 +9,17 @@ export interface NativeEventRecord {
   args?: unknown[]
 }
 
+export interface NativeBridgeAdapterRuntime {
+  dispatchEvent: (event: NativeEventRecord) => void
+}
+
+export interface NativeBridgeAdapter {
+  id: string
+  applyMutations: (batch: NativeMutationRecord[]) => void | Promise<void>
+  onAttach?: (runtime: NativeBridgeAdapterRuntime) => void
+  onDetach?: () => void
+}
+
 type MutationSink = (batch: NativeMutationRecord[]) => void
 type EventDispatcher = (event: NativeEventRecord) => void
 
@@ -16,6 +27,7 @@ const mutationQueue: NativeMutationRecord[] = []
 
 let mutationSink: MutationSink | null = null
 let eventDispatcher: EventDispatcher | null = null
+let activeAdapter: NativeBridgeAdapter | null = null
 let flushScheduled = false
 
 function queueMicrotaskFlush(job: () => void) {
@@ -43,6 +55,31 @@ export function setMutationSink(sink: MutationSink | null): void {
   mutationSink = sink
 }
 
+export function registerBridgeAdapter(adapter: NativeBridgeAdapter | null): void {
+  if (activeAdapter?.onDetach) {
+    activeAdapter.onDetach()
+  }
+
+  activeAdapter = adapter
+
+  if (!adapter) {
+    setMutationSink(null)
+    return
+  }
+
+  setMutationSink(batch => {
+    adapter.applyMutations(batch)
+  })
+
+  adapter.onAttach?.({
+    dispatchEvent: dispatchNativeEvent,
+  })
+}
+
+export function getActiveBridgeAdapterId(): string | null {
+  return activeAdapter?.id ?? null
+}
+
 export function setEventDispatcher(dispatcher: EventDispatcher | null): void {
   eventDispatcher = dispatcher
 }
@@ -66,8 +103,13 @@ export function getPendingMutationCount(): number {
 }
 
 export function resetBridgeState(): void {
+  if (activeAdapter?.onDetach) {
+    activeAdapter.onDetach()
+  }
+
   mutationQueue.length = 0
   mutationSink = null
   eventDispatcher = null
+  activeAdapter = null
   flushScheduled = false
 }
