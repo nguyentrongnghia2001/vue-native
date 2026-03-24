@@ -113,3 +113,29 @@ Mục đích: Ghi lại phần đã làm để review nhanh trước khi vào Ph
 
 ### Decision / Next
 - Chạy `pnpm typecheck` để chốt toàn bộ Phase 2.
+
+---
+
+## [2026-03-24 11:24] Phase 2 / Completion Checkpoint
+
+### Overview
+- Hoàn thành 3 feature của Phase 2:
+  1. Bridge interface + queue
+  2. Host/patchProp emit mutation records
+  3. Batching flush theo tick (microtask)
+
+### Files changed
+- `packages/runtime-native/src/bridge.ts`
+- `packages/runtime-native/src/host.ts`
+- `packages/runtime-native/src/patchProp.ts`
+- `packages/runtime-native/src/index.ts`
+- `packages/runtime-native/__tests__/bridge.spec.ts`
+- `packages/runtime-native/__tests__/runtime-native.spec.ts`
+
+### Validation
+- Test: ✅ `pnpm test` → 9/9 tests pass.
+- Typecheck: ✅ `pnpm typecheck` pass cho `runtime-native` + `sandbox`.
+
+### Decision / Next
+- Phase 2 đã đạt Done criteria cốt lõi cho mutation bridge nền tảng.
+- Có thể chuyển sang **Phase 3** (mở rộng primitives + authoring experience).
