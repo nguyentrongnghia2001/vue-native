@@ -362,3 +362,44 @@ Mục đích: Ghi lại phần đã làm để review nhanh trước khi vào Ph
 
 ### Decision / Next
 - Phase 4.2 + 4.3 đã hoàn tất; có thể chuyển sang Phase 5 (primitive expansion nâng cao).
+
+---
+
+## [2026-03-24 14:25] Phase 5 / Kickoff Checkpoint
+
+### Overview
+- Review trạng thái hiện tại: đã có bridge adapter skeleton + in-memory adapter + integration tests ổn định.
+- Mục tiêu Phase 5:
+  1. Mở rộng primitive coverage nâng cao.
+  2. Chuẩn hoá prop/event mapping chi tiết hơn.
+  3. Cập nhật sandbox/docs làm reference usage.
+
+### Files changed
+- `docs/PHASE_FEATURE_LOG.md`
+
+### Validation
+- Trạng thái trước khi làm Phase 5: test/typecheck đang pass.
+
+### Decision / Next
+- Bắt đầu **Feature 5.1**: thêm primitives nâng cao + register mặc định.
+
+---
+
+## [2026-03-24 14:14] Phase 5 / Feature 5.1 (Primitive expansion nâng cao)
+
+### Overview
+- Thêm primitives mới: `TextInput`, `FlatList`, `KeyboardAvoidingView`.
+- Register global mặc định trong `createNativeApp`.
+- Bổ sung test render/resolve component cho primitives mới.
+
+### Files changed
+- `packages/runtime-native/src/primitives.ts`
+- `packages/runtime-native/src/nativeApp.ts`
+- `packages/runtime-native/src/index.ts`
+- `packages/runtime-native/__tests__/runtime-native.spec.ts`
+
+### Validation
+- Test: ✅ `pnpm test` → 19/19 tests pass.
+
+### Decision / Next
+- Tiếp tục **Feature 5.2**: chuẩn hoá prop mapping chi tiết hơn (`class`/`style`/boolean props).

@@ -231,4 +231,58 @@ describe('@vue-native/runtime-native', () => {
     )
     warnSpy.mockRestore()
   })
+
+  it('renders advanced primitives (TextInput, FlatList, KeyboardAvoidingView)', () => {
+    const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {})
+    const root = createNativeRoot()
+    const App = {
+      setup() {
+        return {
+          data: [1, 2, 3],
+        }
+      },
+      template: `
+        <KeyboardAvoidingView behavior="padding" testID="kav-root">
+          <TextInput testID="input" placeholder="Type here" :editable="true" />
+          <FlatList testID="list" :data="data" />
+        </KeyboardAvoidingView>
+      `,
+    }
+
+    createNativeApp(App).mount(root)
+
+    expect(snapshotNativeTree(root)).toMatchObject({
+      children: [
+        {
+          tag: 'KeyboardAvoidingView',
+          props: {
+            behavior: 'padding',
+            testID: 'kav-root',
+          },
+          children: [
+            {
+              tag: 'TextInput',
+              props: {
+                testID: 'input',
+                placeholder: 'Type here',
+                editable: true,
+              },
+            },
+            {
+              tag: 'FlatList',
+              props: {
+                testID: 'list',
+                data: [1, 2, 3],
+              },
+            },
+          ],
+        },
+      ],
+    })
+
+    expect(warnSpy).not.toHaveBeenCalledWith(
+      expect.stringContaining('Failed to resolve component'),
+    )
+    warnSpy.mockRestore()
+  })
 })
