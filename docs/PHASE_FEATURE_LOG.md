@@ -32,3 +32,25 @@ Mục đích: Ghi lại phần đã làm để review nhanh trước khi vào Ph
 ### Decision / Next
 - Sẵn sàng vào **Phase 2 (Mutation Bridge)**.
 - Rule bắt buộc từ bây giờ: trước mỗi Phase/Feature mới phải overview + log lại trong file này để review.
+
+---
+
+## [2026-03-24 11:20] Phase 2 / Kickoff Checkpoint
+
+### Overview
+- Trước khi triển khai Phase 2, đã review lại toàn bộ đầu ra Phase 1.
+- Scope Phase 2 sẽ gồm 3 feature chính:
+  1. Bridge interface + queue (`bridge.ts`)
+  2. Host ops/patchProp emit mutation vào bridge
+  3. Batching flush theo tick để giảm chattering
+
+### Files changed
+- `.github/copilot-instructions.md` (update rule bắt buộc test + commit mỗi feature)
+- `docs/PHASE_FEATURE_LOG.md` (entry checkpoint này)
+
+### Validation
+- Trạng thái hiện tại trước khi code Phase 2: Phase 1 test pass ổn định.
+
+### Decision / Next
+- Bắt đầu **Phase 2 - Feature 2.1**.
+- Quy trình bắt buộc: mỗi feature phải `pnpm test` rồi commit riêng.
