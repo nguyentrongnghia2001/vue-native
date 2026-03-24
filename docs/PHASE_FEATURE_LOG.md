@@ -74,3 +74,23 @@ Mục đích: Ghi lại phần đã làm để review nhanh trước khi vào Ph
 
 ### Decision / Next
 - Tiếp tục **Feature 2.2**: chuyển host ops/patchProp sang emit mutation vào bridge queue.
+
+---
+
+## [2026-03-24 11:22] Phase 2 / Feature 2.2 (Host + patchProp emit mutations)
+
+### Overview
+- Nối `host.ts` vào bridge queue để phát mutation records từ các host ops chính.
+- Nối `patchProp.ts` vào bridge queue cho cả props/events (`set`/`remove`).
+- Bổ sung test mount flow để assert mutation batch có đủ nhóm op quan trọng.
+
+### Files changed
+- `packages/runtime-native/src/host.ts`
+- `packages/runtime-native/src/patchProp.ts`
+- `packages/runtime-native/__tests__/runtime-native.spec.ts`
+
+### Validation
+- Test: ✅ `pnpm test` → 8/8 tests pass.
+
+### Decision / Next
+- Tiếp tục **Feature 2.3**: thêm batching strategy flush theo tick.

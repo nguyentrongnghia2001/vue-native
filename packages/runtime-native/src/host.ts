@@ -1,5 +1,6 @@
 import { markRaw } from '@vue/reactivity'
 import type { RendererOptions } from '@vue/runtime-core'
+import { enqueue } from './bridge.js'
 import { dumpDebugOps, recordDebugOp, resetDebugOps } from './instrumentation.js'
 import type {
   NativeChildNode,
@@ -87,6 +88,12 @@ function createElement(tag: string): NativeElement {
     parentNode: null,
     eventListeners: null,
   }
+  enqueue({
+    type: 'createElement',
+    id: node.id,
+    tag: node.tag,
+    nodeType: node.type,
+  })
   recordDebugOp('create', { tag, id: node.id })
   markRaw(node)
   return node
@@ -99,6 +106,11 @@ function createText(text: string): NativeText {
     text,
     parentNode: null,
   }
+  enqueue({
+    type: 'createText',
+    id: node.id,
+    text,
+  })
   recordDebugOp('createText', { text, id: node.id })
   markRaw(node)
   return node
@@ -111,6 +123,11 @@ function createComment(text: string): NativeComment {
     text,
     parentNode: null,
   }
+  enqueue({
+    type: 'createComment',
+    id: node.id,
+    text,
+  })
   recordDebugOp('createComment', { text, id: node.id })
   markRaw(node)
   return node
@@ -127,6 +144,12 @@ function insert(child: NativeChildNode, parent: NativeElement, anchor: NativeChi
     parent.children.splice(index, 0, child)
   }
   child.parentNode = parent
+  enqueue({
+    type: 'insert',
+    childId: child.id,
+    parentId: parent.id,
+    anchorId: anchor?.id ?? null,
+  })
   recordDebugOp('insert', {
     childId: child.id,
     parentId: parent.id,
@@ -140,17 +163,32 @@ function remove(child: NativeChildNode) {
   const index = parent.children.indexOf(child)
   if (index > -1) parent.children.splice(index, 1)
   child.parentNode = null
+  enqueue({
+    type: 'remove',
+    childId: child.id,
+    parentId: parent.id,
+  })
   recordDebugOp('remove', { childId: child.id, parentId: parent.id })
 }
 
 function setText(node: NativeText, text: string) {
   node.text = text
+  enqueue({
+    type: 'setText',
+    nodeId: node.id,
+    text,
+  })
   recordDebugOp('setText', { nodeId: node.id, text })
 }
 
 function setElementText(el: NativeElement, text: string) {
   el.children = text ? [createText(text)] : []
   el.children.forEach(child => (child.parentNode = el))
+  enqueue({
+    type: 'setElementText',
+    elId: el.id,
+    text,
+  })
   recordDebugOp('setElementText', { elId: el.id, text })
 }
 
@@ -167,6 +205,11 @@ function nextSibling(node: NativeChildNode) {
 
 function setScopeId(el: NativeElement, id: string) {
   el.props[id] = ''
+  enqueue({
+    type: 'setScopeId',
+    elId: el.id,
+    scopeId: id,
+  })
 }
 
 export const nodeOps: Omit<RendererOptions<NativeChildNode, NativeElement>, 'patchProp'> = {

@@ -1,5 +1,6 @@
 import { isOn } from '@vue/shared'
 import type { RendererOptions } from '@vue/runtime-core'
+import { enqueue } from './bridge.js'
 import type { NativeElement } from './types'
 
 type NativeRendererOptions = RendererOptions<NativeElement, NativeElement>
@@ -29,6 +30,7 @@ export const patchProp: NativeRendererOptions['patchProp'] = (
   if (isEventKey(key)) {
     const listeners = (el.eventListeners ||= Object.create(null))
     const eventKey = normalizeEventKey(key)
+    const action = nextValue == null ? 'remove' : 'set'
 
     if (nextValue == null) {
       delete listeners[eventKey]
@@ -40,13 +42,33 @@ export const patchProp: NativeRendererOptions['patchProp'] = (
       listeners[eventKey] = nextValue
     }
 
+    enqueue({
+      type: 'patchProp:event',
+      nodeId: el.id,
+      key: eventKey,
+      action,
+    })
+
     return
   }
 
   if (nextValue == null || nextValue === false) {
     delete el.props[key]
+    enqueue({
+      type: 'patchProp:prop',
+      nodeId: el.id,
+      key,
+      action: 'remove',
+    })
     return
   }
 
   el.props[key] = nextValue
+  enqueue({
+    type: 'patchProp:prop',
+    nodeId: el.id,
+    key,
+    action: 'set',
+    value: nextValue,
+  })
 }

@@ -2,8 +2,11 @@ import { describe, expect, it, beforeEach } from 'vitest'
 import {
   createNativeApp,
   createNativeRoot,
+  flush,
   dumpDebugOps,
+  getPendingMutationCount,
   reactive,
+  resetBridgeState,
   resetDebugOps,
   snapshotNativeTree,
 } from '../src'
@@ -12,6 +15,7 @@ import { patchProp } from '../src/patchProp'
 describe('@vue-native/runtime-native', () => {
   beforeEach(() => {
     resetDebugOps()
+    resetBridgeState()
   })
 
   it('creates and snapshots a native tree', () => {
@@ -143,5 +147,33 @@ describe('@vue-native/runtime-native', () => {
         },
       ],
     })
+  })
+
+  it('emits host and patchProp mutations to bridge queue during mount', () => {
+    const root = createNativeRoot()
+    const App = {
+      setup() {
+        return { noop: () => {}, visible: true }
+      },
+      template: `
+        <View testID="root" :accessible="visible" @press="noop">
+          <Text>Bridge</Text>
+        </View>
+      `,
+    }
+
+    createNativeApp(App).mount(root)
+
+    expect(getPendingMutationCount()).toBeGreaterThan(0)
+
+    const batch = flush()
+    const types = batch.map(op => op.type)
+
+    expect(types).toEqual(expect.arrayContaining([
+      'createElement',
+      'insert',
+      'patchProp:prop',
+      'patchProp:event',
+    ]))
   })
 })
