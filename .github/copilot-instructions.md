@@ -47,3 +47,5 @@ Use this structure in `docs/PHASE_FEATURE_LOG.md`:
 - Do not batch multiple features into one commit when user requests per-feature commits.
 - Starting from Phase 3, do NOT use any direct React native APIs/components in runtime implementation.
 - All native behavior must go through the project host contract/bridge/primitives (`runtime-native`), not React-native built-ins.
+- Scope clarification: this prohibition applies to `packages/runtime-native/**` (runtime layer), not to sandbox host shell files.
+- `apps/sandbox/App.tsx` is allowed to import from `react-native` for demo UI/chrome around snapshots/debug views.

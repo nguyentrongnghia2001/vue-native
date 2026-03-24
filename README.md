@@ -93,3 +93,4 @@ Phase 1 focuses on stabilizing the native host contract with 3 key features:
 ### Roadmap
 
 - See [NEXT_STEPS_ARCHITECTURE.md](./docs/NEXT_STEPS_ARCHITECTURE.md) for Phase 2 (Mutation Bridge) and Phase 3 (Primitives Expansion)
+- See [ROADMAP_STATUS.md](./docs/ROADMAP_STATUS.md) for consolidated status (done + next).
