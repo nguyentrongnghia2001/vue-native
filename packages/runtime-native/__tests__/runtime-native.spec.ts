@@ -7,6 +7,7 @@ import {
   resetDebugOps,
   snapshotNativeTree,
 } from '../src'
+import { patchProp } from '../src/patchProp'
 
 describe('@vue-native/runtime-native', () => {
   beforeEach(() => {
@@ -77,6 +78,70 @@ describe('@vue-native/runtime-native', () => {
       eventListeners: {
         onPress: expect.any(Function),
       },
+    })
+  })
+
+  it('normalizes listener keys and removes listener bucket when empty', () => {
+    const el = {
+      id: 1,
+      type: 'element',
+      tag: 'View',
+      children: [],
+      props: {},
+      parentNode: null,
+      eventListeners: null,
+    } as any
+    const onPress = () => 'ok'
+
+    patchProp(el, 'onpress', null, onPress)
+    expect(el).toMatchObject({
+      eventListeners: {
+        onPress,
+      },
+    })
+
+    patchProp(el, 'onpress', onPress, undefined)
+    expect(el.eventListeners).toBeNull()
+  })
+
+  it('serializes snapshot props and listener names safely', () => {
+    const root = createNativeRoot()
+    const App = {
+      setup() {
+        return {
+          payload: {
+            text: 'ok',
+            count: 2,
+            nested: { a: 1, run: () => 'nope' },
+          },
+          noop: () => {},
+        }
+      },
+      template: `
+        <View :data="payload" @press="noop">
+          <Text>Hello</Text>
+        </View>
+      `,
+    }
+
+    createNativeApp(App).mount(root)
+
+    const snapshot = snapshotNativeTree(root)
+    expect(snapshot).toMatchObject({
+      type: 'root',
+      children: [
+        {
+          tag: 'View',
+          props: {
+            data: {
+              text: 'ok',
+              count: 2,
+              nested: { a: 1 },
+            },
+          },
+          listeners: ['onPress'],
+        },
+      ],
     })
   })
 })

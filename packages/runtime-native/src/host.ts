@@ -1,23 +1,55 @@
 import { markRaw } from '@vue/reactivity'
 import type { RendererOptions } from '@vue/runtime-core'
+import { dumpDebugOps, recordDebugOp, resetDebugOps } from './instrumentation.js'
 import type {
   NativeChildNode,
   NativeComment,
   NativeElement,
   NativeNodeSnapshot,
+  NativeSnapshotValue,
   NativeRoot,
   NativeText,
 } from './types'
 
 let nextId = 0
-const debugOps: Array<{ type: string; [key: string]: any }> = []
 
-function log(type: string, payload: Record<string, any>) {
-  debugOps.push({ type, ...payload })
+export { dumpDebugOps, resetDebugOps }
+
+function toSnapshotValue(value: unknown): NativeSnapshotValue {
+  if (value == null) return null
+
+  const type = typeof value
+  if (type === 'string' || type === 'number' || type === 'boolean') {
+    return value as string | number | boolean
+  }
+
+  if (Array.isArray(value)) {
+    return value.map(item => toSnapshotValue(item))
+  }
+
+  if (type === 'object') {
+    const output: Record<string, NativeSnapshotValue> = {}
+    for (const [key, nestedValue] of Object.entries(value as Record<string, unknown>)) {
+      if (nestedValue === undefined) continue
+      if (typeof nestedValue === 'function') continue
+      output[key] = toSnapshotValue(nestedValue)
+    }
+    return output
+  }
+
+  return String(value)
 }
 
-export function dumpDebugOps() {
-  return debugOps.slice()
+function snapshotProps(props: Record<string, any>): Record<string, NativeSnapshotValue> {
+  const output: Record<string, NativeSnapshotValue> = {}
+
+  for (const [key, value] of Object.entries(props)) {
+    if (value === undefined) continue
+    if (typeof value === 'function') continue
+    output[key] = toSnapshotValue(value)
+  }
+
+  return output
 }
 
 export function snapshotNativeTree(node: NativeChildNode): NativeNodeSnapshot {
@@ -33,13 +65,12 @@ export function snapshotNativeTree(node: NativeChildNode): NativeNodeSnapshot {
     id: node.id,
     type: node.type,
     tag: node.tag,
-    props: { ...node.props },
+    props: snapshotProps(node.props),
+    listeners: node.eventListeners
+      ? Object.keys(node.eventListeners).sort()
+      : [],
     children: node.children.map(child => snapshotNativeTree(child)),
   }
-}
-
-export function resetDebugOps() {
-  debugOps.length = 0
 }
 
 export function createNativeRoot(): NativeRoot {
@@ -56,7 +87,7 @@ function createElement(tag: string): NativeElement {
     parentNode: null,
     eventListeners: null,
   }
-  log('create', { tag, id: node.id })
+  recordDebugOp('create', { tag, id: node.id })
   markRaw(node)
   return node
 }
@@ -68,7 +99,7 @@ function createText(text: string): NativeText {
     text,
     parentNode: null,
   }
-  log('createText', { text, id: node.id })
+  recordDebugOp('createText', { text, id: node.id })
   markRaw(node)
   return node
 }
@@ -80,7 +111,7 @@ function createComment(text: string): NativeComment {
     text,
     parentNode: null,
   }
-  log('createComment', { text, id: node.id })
+  recordDebugOp('createComment', { text, id: node.id })
   markRaw(node)
   return node
 }
@@ -96,7 +127,11 @@ function insert(child: NativeChildNode, parent: NativeElement, anchor: NativeChi
     parent.children.splice(index, 0, child)
   }
   child.parentNode = parent
-  log('insert', { childId: child.id, parentId: parent.id, anchorId: anchor?.id ?? null })
+  recordDebugOp('insert', {
+    childId: child.id,
+    parentId: parent.id,
+    anchorId: anchor?.id ?? null,
+  })
 }
 
 function remove(child: NativeChildNode) {
@@ -105,18 +140,18 @@ function remove(child: NativeChildNode) {
   const index = parent.children.indexOf(child)
   if (index > -1) parent.children.splice(index, 1)
   child.parentNode = null
-  log('remove', { childId: child.id, parentId: parent.id })
+  recordDebugOp('remove', { childId: child.id, parentId: parent.id })
 }
 
 function setText(node: NativeText, text: string) {
   node.text = text
-  log('setText', { nodeId: node.id, text })
+  recordDebugOp('setText', { nodeId: node.id, text })
 }
 
 function setElementText(el: NativeElement, text: string) {
   el.children = text ? [createText(text)] : []
   el.children.forEach(child => (child.parentNode = el))
-  log('setElementText', { elId: el.id, text })
+  recordDebugOp('setElementText', { elId: el.id, text })
 }
 
 function parentNode(node: NativeChildNode) {
