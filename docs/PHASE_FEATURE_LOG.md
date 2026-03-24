@@ -422,3 +422,22 @@ Mục đích: Ghi lại phần đã làm để review nhanh trước khi vào Ph
 
 ### Decision / Next
 - Tiếp tục **Feature 5.3**: cập nhật sandbox/docs làm reference cho primitives + prop mapping mới.
+
+---
+
+## [2026-03-24 14:19] Phase 5 / Feature 5.3 (Sandbox + docs reference)
+
+### Overview
+- Cập nhật sandbox `AppRoot` để demo primitives mới: `TextInput`, `FlatList`, `KeyboardAvoidingView`.
+- Cập nhật README để phản ánh primitive coverage mở rộng và prop mapping rules (`class/style/boolean`).
+
+### Files changed
+- `apps/sandbox/src/AppRoot.ts`
+- `README.md`
+- `docs/PHASE_FEATURE_LOG.md`
+
+### Validation
+- Test: ✅ `pnpm test` → 20/20 tests pass.
+
+### Decision / Next
+- Chạy `pnpm typecheck` và tổng kết hoàn tất Phase 5.

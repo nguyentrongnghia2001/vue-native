@@ -66,11 +66,15 @@ pnpm build
 
 ## Development notes
 
-- Use primitives from `@vue-native/runtime-native`: `View`, `Text`, `Image`, `ScrollView`, `Pressable`.
+- Use primitives from `@vue-native/runtime-native`: `View`, `Text`, `Image`, `ScrollView`, `Pressable`, `TextInput`, `FlatList`, `KeyboardAvoidingView`.
 - Vue component syntax is template-first, similar to Vue on the web.
 - The sandbox shows the native tree snapshot and debug ops so you can inspect
 	renderer behavior while iterating.
 - Runtime implementation should go through `runtime-native` host/bridge/primitives (from Phase 3 onward, no direct React Native native APIs/components in runtime layer).
+- Prop mapping highlights:
+	- `class` is normalized to `className`
+	- `style` supports object/array and is merged into a single host style object
+	- boolean props follow native semantics (`true` set, `false` remove)
 
 ## Suggested next work
 

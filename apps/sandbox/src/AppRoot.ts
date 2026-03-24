@@ -29,6 +29,25 @@ export const AppRoot = defineComponent({
           source="https://example.com/preview.png"
           :style="{ width: 160, height: 90 }"
         />
+
+        <KeyboardAvoidingView testID="input-zone" behavior="padding">
+          <TextInput
+            testID="draft-input"
+            class="input primary"
+            placeholder="Type a draft title"
+            :editable="true"
+            :style="[
+              { marginTop: 10, padding: 8 },
+              { borderWidth: 1, borderColor: '#4c6fff', opacity: 0.95 }
+            ]"
+          />
+
+          <FlatList
+            testID="demo-list"
+            :data="[state.count, state.count + 1, state.count + 2]"
+            :style="[{ marginTop: 8 }, { maxHeight: 120 }]"
+          />
+        </KeyboardAvoidingView>
       </ScrollView>
     </View>
   `,
