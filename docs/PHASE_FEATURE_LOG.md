@@ -550,3 +550,43 @@ Mục đích: Ghi lại phần đã làm để review nhanh trước khi vào Ph
 
 ### Decision / Next
 - Triển khai sandbox transport module, wiring adapter trong `apps/sandbox/App.tsx`, và thêm test cho transport behavior.
+
+---
+
+## [2026-03-24 15:30] Phase 6 / Feature 6.3 Kickoff (Native host transport integration)
+
+### Overview
+- Tổng kết scope trước (Feature 6.2): đã gắn transport adapter vào sandbox host app, có telemetry UI và integration test cho mutation forwarding + event roundtrip.
+- Validation trước khi vào Feature 6.3: `pnpm test` pass (24/24), `pnpm typecheck` pass.
+- Mục tiêu Feature 6.3: thêm transport implementation cho môi trường native runtime thực tế (qua host bridge module), đồng thời giữ fallback sandbox để dev/test.
+
+### Files changed
+- `docs/PHASE_FEATURE_LOG.md`
+
+### Validation
+- Checkpoint trước triển khai: dựa trên trạng thái green của Feature 6.2.
+
+### Decision / Next
+- Tiếp tục implement module transport runtime-aware (native module + event subscription), rồi wiring vào `apps/sandbox/App.tsx`.
+
+---
+
+## [2026-03-24 16:05] Phase 6 / Feature 6.3 Hoàn tất (Runtime-aware native host transport)
+
+### Overview
+- Triển khai transport mới trong sandbox host app để ưu tiên kết nối với native bridge module thực (`NativeModules`) khi có sẵn.
+- Bổ sung cơ chế subscribe native event channel (`NativeEventEmitter` + fallback `DeviceEventEmitter`) để nhận event từ host runtime.
+- Giữ fallback mode để vẫn chạy được trên môi trường chưa có native module thật.
+
+### Files changed
+- `apps/sandbox/src/runtimeNativeTransport.ts` (new)
+- `apps/sandbox/App.tsx`
+- `docs/PHASE_FEATURE_LOG.md`
+
+### Validation
+- ✅ `pnpm test` pass (24/24 tests).
+- ✅ `pnpm typecheck` pass cho `runtime-native` + `sandbox`.
+
+### Decision / Next
+- Feature 6.3 hoàn tất ở mức JS host integration.
+- Bước tiếp theo: implement native module thật trong target app (Android/iOS) để đường transport chạy end-to-end với runtime host thực.

@@ -94,6 +94,7 @@ Tài liệu này là **nguồn tổng hợp duy nhất** cho:
 - Bridge adapter integration tests: ✅
 - Native transport adapter contract (ack/error/event receiver): ✅
 - Sandbox transport integration (adapter wiring + telemetry): ✅
+- Runtime-aware host transport (NativeModules + native event channel + fallback): ✅
 
 ---
 
@@ -108,7 +109,8 @@ Tài liệu này là **nguồn tổng hợp duy nhất** cho:
 - ✅ Chuẩn hoá contract payload giữa JS mutation record và native execution layer (transport contract)
 - ✅ Theo dõi error/ack path cho applyMutations
 - ✅ Gắn sandbox transport implementation để kiểm chứng wiring trong host app
-- ⏳ Tích hợp transport implementation thật theo từng host app/runtime
+- ✅ Bổ sung runtime-aware transport layer ưu tiên native module + event subscription
+- ⏳ Implement native bridge module thật ở từng target app/runtime (Android/iOS) để chạy end-to-end
 
 ### Done khi
 - Adapter chạy được trên target thật với mutation + event roundtrip

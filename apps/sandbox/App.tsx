@@ -16,7 +16,7 @@ import {
   snapshotNativeTree,
 } from '@vue-native/runtime-native'
 import { AppRoot, incrementCount } from './src/AppRoot'
-import { createSandboxNativeTransport } from './src/sandboxNativeTransport'
+import { createRuntimeNativeTransport } from './src/runtimeNativeTransport'
 
 function findNodeByTag(snapshot: any, tag: string): any | null {
   if (!snapshot || typeof snapshot !== 'object') return null
@@ -32,9 +32,9 @@ function findNodeByTag(snapshot: any, tag: string): any | null {
 }
 
 const root = createNativeRoot()
-const sandboxTransport = createSandboxNativeTransport()
-const transportAdapter = createNativeTransportBridgeAdapter(sandboxTransport, {
-  id: 'sandbox-native-transport',
+const runtimeTransport = createRuntimeNativeTransport()
+const transportAdapter = createNativeTransportBridgeAdapter(runtimeTransport, {
+  id: 'runtime-native-transport',
 })
 registerBridgeAdapter(transportAdapter.adapter)
 const app = createNativeApp(AppRoot)
@@ -46,8 +46,13 @@ export default function SandboxApp() {
   const tree = useMemo(() => snapshotNativeTree(root), [version])
   const ops = useMemo(() => dumpDebugOps().slice(-20), [version])
   const transportStats = useMemo(() => transportAdapter.getStats(), [version])
+  const runtimeTransportStats = useMemo(() => runtimeTransport.getStats(), [version])
+  const runtimeTransportDiagnostics = useMemo(
+    () => runtimeTransport.getDiagnostics(),
+    [version],
+  )
   const transportBatches = useMemo(
-    () => sandboxTransport.getRecentBatches().slice(0, 5),
+    () => runtimeTransport.getRecentBatches().slice(0, 5),
     [version],
   )
 
@@ -60,7 +65,7 @@ export default function SandboxApp() {
     const pressable = findNodeByTag(snapshotNativeTree(root), 'Pressable')
     if (!pressable?.id) return
 
-    sandboxTransport.emitEvent({ nodeId: pressable.id, event: 'onPress' })
+    runtimeTransport.emitEvent({ nodeId: pressable.id, event: 'onPress' })
     setVersion(v => v + 1)
   }
 
@@ -95,6 +100,10 @@ export default function SandboxApp() {
           <RNView style={styles.section}>
             <RNText style={styles.sectionTitle}>Native transport stats</RNText>
             <RNText style={styles.mono}>{JSON.stringify(transportStats, null, 2)}</RNText>
+            <RNText style={styles.mono}>{JSON.stringify(runtimeTransportStats, null, 2)}</RNText>
+            <RNText style={styles.mono}>
+              {JSON.stringify(runtimeTransportDiagnostics, null, 2)}
+            </RNText>
           </RNView>
 
           <RNView style={styles.section}>
