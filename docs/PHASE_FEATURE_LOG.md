@@ -296,3 +296,44 @@ Mục đích: Ghi lại phần đã làm để review nhanh trước khi vào Ph
 
 ### Decision / Next
 - Feature 4.1 hoàn tất, sẵn sàng cho bước adapter implementation cụ thể theo từng native target.
+
+---
+
+## [2026-03-24 14:05] Phase 4.2 + 4.3 / Kickoff Checkpoint
+
+### Overview
+- Review lại trạng thái: Phase 4.1 đã có adapter skeleton + lifecycle register/unregister.
+- Mục tiêu tiếp theo:
+  - **Phase 4.2**: triển khai adapter cụ thể cho target in-memory/sandbox.
+  - **Phase 4.3**: bổ sung integration tests cho adapter flow (batch order, replace adapter, event dispatch).
+
+### Files changed
+- `docs/PHASE_FEATURE_LOG.md`
+
+### Validation
+- Trước khi triển khai: test/typecheck đều ổn định từ checkpoint trước.
+
+### Decision / Next
+- Bắt đầu **Phase 4.2** với module adapter implementation cụ thể + test mapping mutation.
+
+---
+
+## [2026-03-24 14:06] Phase 4.2 / Feature (In-memory adapter implementation)
+
+### Overview
+- Thêm adapter implementation cụ thể: `createInMemoryBridgeAdapter`.
+- Adapter map mutation records vào state in-memory (node tree data + props + listeners).
+- Adapter hỗ trợ lifecycle attach/detach và `emitEvent` để gọi ngược runtime dispatch hook.
+
+### Files changed
+- `packages/runtime-native/src/adapters/inMemoryBridgeAdapter.ts` (new)
+- `packages/runtime-native/src/index.ts`
+- `packages/runtime-native/__tests__/in-memory-adapter.spec.ts` (new)
+- `docs/PHASE_FEATURE_LOG.md`
+
+### Validation
+- Test: ✅ `pnpm test` → 15/15 tests pass.
+- Typecheck: ✅ `pnpm typecheck` pass cho `runtime-native` + `sandbox`.
+
+### Decision / Next
+- Tiếp tục **Phase 4.3**: integration test adapter flow end-to-end với event dispatch runtime.
