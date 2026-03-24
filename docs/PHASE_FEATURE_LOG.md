@@ -139,3 +139,20 @@ Mục đích: Ghi lại phần đã làm để review nhanh trước khi vào Ph
 ### Decision / Next
 - Phase 2 đã đạt Done criteria cốt lõi cho mutation bridge nền tảng.
 - Có thể chuyển sang **Phase 3** (mở rộng primitives + authoring experience).
+
+---
+
+## [2026-03-24 11:27] Phase 3 / Pre-checkpoint (Rule update)
+
+### Overview
+- Bổ sung rule mới trước khi vào Phase 3: **không được sử dụng bất cứ native của React** trong runtime implementation.
+- Native behavior bắt buộc đi qua host contract/bridge/primitives của `runtime-native`.
+
+### Files changed
+- `.github/copilot-instructions.md`
+
+### Validation
+- Rule đã được thêm ở workspace instruction (always-on cho toàn project).
+
+### Decision / Next
+- Từ Phase 3 trở đi, implementation chỉ dùng abstractions của `runtime-native`, không gọi trực tiếp React Native native APIs/components.

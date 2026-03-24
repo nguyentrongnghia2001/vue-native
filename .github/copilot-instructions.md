@@ -45,3 +45,5 @@ Use this structure in `docs/PHASE_FEATURE_LOG.md`:
 - Keep entries concise, review-friendly, and in Vietnamese if user communicates in Vietnamese.
 - If no prior log exists, create `docs/PHASE_FEATURE_LOG.md` before continuing implementation.
 - Do not batch multiple features into one commit when user requests per-feature commits.
+- Starting from Phase 3, do NOT use any direct React native APIs/components in runtime implementation.
+- All native behavior must go through the project host contract/bridge/primitives (`runtime-native`), not React-native built-ins.
