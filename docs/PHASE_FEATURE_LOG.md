@@ -403,3 +403,22 @@ Mục đích: Ghi lại phần đã làm để review nhanh trước khi vào Ph
 
 ### Decision / Next
 - Tiếp tục **Feature 5.2**: chuẩn hoá prop mapping chi tiết hơn (`class`/`style`/boolean props).
+
+---
+
+## [2026-03-24 14:17] Phase 5 / Feature 5.2 (Chuẩn hoá prop mapping)
+
+### Overview
+- Chuẩn hoá mapping `class` -> `className`.
+- Chuẩn hoá `style` array/object về object hợp nhất trước khi ghi vào host props.
+- Giữ semantics boolean props: `true` giữ lại, `false` remove.
+
+### Files changed
+- `packages/runtime-native/src/patchProp.ts`
+- `packages/runtime-native/__tests__/runtime-native.spec.ts`
+
+### Validation
+- Test: ✅ `pnpm test` → 20/20 tests pass.
+
+### Decision / Next
+- Tiếp tục **Feature 5.3**: cập nhật sandbox/docs làm reference cho primitives + prop mapping mới.

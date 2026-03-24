@@ -108,6 +108,31 @@ describe('@vue-native/runtime-native', () => {
     expect(el.eventListeners).toBeNull()
   })
 
+  it('normalizes class/style/boolean prop mapping', () => {
+    const el = {
+      id: 2,
+      type: 'element',
+      tag: 'View',
+      children: [],
+      props: {},
+      parentNode: null,
+      eventListeners: null,
+    } as any
+
+    patchProp(el, 'class', null, 'card primary')
+    expect(el.props.className).toBe('card primary')
+    expect(el.props.class).toBeUndefined()
+
+    patchProp(el, 'style', null, [{ width: 10 }, null, false, { opacity: 0.8 }])
+    expect(el.props.style).toEqual({ width: 10, opacity: 0.8 })
+
+    patchProp(el, 'editable', null, true)
+    expect(el.props.editable).toBe(true)
+
+    patchProp(el, 'editable', true, false)
+    expect(el.props.editable).toBeUndefined()
+  })
+
   it('serializes snapshot props and listener names safely', () => {
     const root = createNativeRoot()
     const App = {

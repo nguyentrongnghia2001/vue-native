@@ -5,6 +5,35 @@ import type { NativeElement } from './types'
 
 type NativeRendererOptions = RendererOptions<NativeElement, NativeElement>
 
+type NativeStyleValue =
+  | Record<string, unknown>
+  | Array<Record<string, unknown> | null | undefined | false>
+  | null
+  | undefined
+
+function normalizeStyleValue(value: NativeStyleValue): Record<string, unknown> | undefined {
+  if (value == null) {
+    return undefined
+  }
+
+  if (Array.isArray(value)) {
+    const merged: Record<string, unknown> = {}
+
+    for (const item of value) {
+      if (!item || typeof item !== 'object') continue
+      Object.assign(merged, item)
+    }
+
+    return Object.keys(merged).length > 0 ? merged : undefined
+  }
+
+  if (typeof value === 'object') {
+    return value
+  }
+
+  return undefined
+}
+
 function isEventKey(key: string): boolean {
   return isOn(key) || /^on[a-z]/.test(key)
 }
@@ -52,23 +81,28 @@ export const patchProp: NativeRendererOptions['patchProp'] = (
     return
   }
 
-  if (nextValue == null || nextValue === false) {
-    delete el.props[key]
+  const mappedKey = key === 'class' ? 'className' : key
+  const mappedValue = mappedKey === 'style'
+    ? normalizeStyleValue(nextValue as NativeStyleValue)
+    : nextValue
+
+  if (mappedValue == null || mappedValue === false) {
+    delete el.props[mappedKey]
     enqueue({
       type: 'patchProp:prop',
       nodeId: el.id,
-      key,
+      key: mappedKey,
       action: 'remove',
     })
     return
   }
 
-  el.props[key] = nextValue
+  el.props[mappedKey] = mappedValue
   enqueue({
     type: 'patchProp:prop',
     nodeId: el.id,
-    key,
+    key: mappedKey,
     action: 'set',
-    value: nextValue,
+    value: mappedValue,
   })
 }
