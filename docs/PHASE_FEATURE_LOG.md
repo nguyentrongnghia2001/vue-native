@@ -868,3 +868,75 @@ Mục đích: Ghi lại phần đã làm để review nhanh trước khi vào Ph
 
 ### Decision / Next
 - Thực thi verify pipeline trên Android trước (ưu tiên môi trường Windows).
+
+---
+
+## [2026-03-24 20:05] Phase 6 / Feature 6.6 Verification Attempt (Blocked by local Android SDK)
+
+### Overview
+- Đã chạy đầy đủ pipeline verify Android:
+  1. `pnpm --filter @vue-native/sandbox prebuild:android`
+  2. `pnpm --filter @vue-native/sandbox native:sync:android`
+  3. `pnpm --filter @vue-native/sandbox native:check:android` ✅ pass (đã detect registration trong `MainApplication.kt`)
+  4. `pnpm --filter @vue-native/sandbox android` / `expo run:android` ❌ fail do thiếu Android SDK/adb trong môi trường local.
+
+### Files changed
+- `docs/PHASE_FEATURE_LOG.md`
+
+### Validation
+- Bridge integration readiness: ✅ pass.
+- Native run result: ❌ blocked bởi môi trường local (`ANDROID_HOME`/`ANDROID_SDK_ROOT` chưa set, `adb` không tồn tại trong PATH).
+
+### Decision / Next
+- Cần setup Android SDK + `platform-tools` và export env vars trên máy trước khi có thể chốt verify end-to-end runtime roundtrip.
+- Sau khi setup xong, chạy lại `pnpm --filter @vue-native/sandbox native:run:android` để hoàn tất xác nhận trên device/emulator.
+
+---
+
+## [2026-03-25 10:26] Phase 7 / Feature 7.4 Kickoff (Event mapping edge-cases: Focus/Blur/Submit)
+
+### Overview
+- Sau khi tạm ngưng Phase 6.6 do môi trường local chưa cài đặt Android SDK/adb, project tiếp tục tập trung vào phần abstractions của Phase 7.
+- Mục tiêu Feature 7.4:
+  1. Bổ sung chuẩn hoá các event lifecycle của input/form (focus, blur, onSubmitEditing) trong `patchProp`.
+  2. Xác định các edge-cases mapping tên event cho React Native từ Vue template.
+  3. Đảm bảo toàn bộ test unit passing trước khi implement thêm component mới.
+
+### Files changed
+- `docs/PHASE_FEATURE_LOG.md`
+
+### Validation
+- Trước khi bắt đầu: `pnpm test` pass ổn định (29/29).
+- Không chạy native e2e lúc này, chỉ test TS/JS logic.
+
+### Decision / Next
+- Viết unit test & implement event handler normalization cho `TextInput` và `ScrollView` trong `patchProp.ts`.
+- Chờ user approve để bắt đầu code Feature 7.4.
+
+---
+
+## [2026-03-25 10:36] Phase 7 / Feature 7.4 Hoàn tất (Focus/Blur/Submit event alias normalization)
+
+### Overview
+- Bổ sung component-specific event alias cho `TextInput` trong `patchProp`:
+  - `@submit` / `onSubmit` -> `onSubmitEditing`
+  - `@focus` -> `onFocus`
+  - `@blur` -> `onBlur`
+- Giữ nguyên normalization hiện có cho `v-model`, kebab-case và các event key khác.
+- Bổ sung runtime tests cho alias mapping + roundtrip dispatch event.
+- Cập nhật sandbox demo để dùng trực tiếp `@focus`, `@blur`, `@submit` trên `TextInput`.
+
+### Files changed
+- `packages/runtime-native/src/patchProp.ts`
+- `packages/runtime-native/__tests__/runtime-native.spec.ts`
+- `apps/sandbox/src/AppRoot.ts`
+- `README.md`
+- `docs/PHASE_FEATURE_LOG.md`
+
+### Validation
+- ✅ `pnpm test` pass (31/31 tests).
+- ✅ `pnpm typecheck` pass cho `runtime-native` + `sandbox`.
+
+### Decision / Next
+- Feature 7.4 hoàn tất.
+- Có thể tiếp tục Feature 7.5 (nếu cần): mở rộng alias/mapping cho pointer/gesture/input lifecycle nâng cao.

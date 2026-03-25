@@ -50,6 +50,16 @@ function resolveModelUpdateEventKey(tag: string): string {
   return 'onUpdateModelValue'
 }
 
+function resolveComponentEventAlias(tag: string, normalizedEventToken: string): string | null {
+  if (tag === 'TextInput') {
+    if (normalizedEventToken === 'submit') {
+      return 'onSubmitEditing'
+    }
+  }
+
+  return null
+}
+
 function normalizeEventKey(key: string, tag: string): string {
   if (!isEventKey(key)) return key
 
@@ -66,6 +76,11 @@ function normalizeEventKey(key: string, tag: string): string {
 
   if (normalizedEventToken === 'updateModelValue') {
     return resolveModelUpdateEventKey(tag)
+  }
+
+  const componentEventAlias = resolveComponentEventAlias(tag, normalizedEventToken)
+  if (componentEventAlias) {
+    return componentEventAlias
   }
 
   const normalizedEventName =

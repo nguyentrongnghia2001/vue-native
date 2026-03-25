@@ -77,6 +77,7 @@ pnpm build
 	- boolean props follow native semantics (`true` set, `false` remove)
 	- component-specific mapping edge-cases:
 		- `TextInput` supports `v-model` via `modelValue -> value` and `onUpdate:modelValue -> onChangeText`
+		- `TextInput` event aliases: `@submit -> onSubmitEditing`, `@focus -> onFocus`, `@blur -> onBlur`
 		- `Switch` supports `v-model` via `modelValue -> value` and `onUpdate:modelValue -> onValueChange`
 		- kebab-case props/events are normalized (`max-length`, `placeholder-text-color`, `@change-text`)
 

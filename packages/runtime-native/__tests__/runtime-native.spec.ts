@@ -188,6 +188,32 @@ describe('@vue-native/runtime-native', () => {
     expect(el.eventListeners).toBeNull()
   })
 
+  it('normalizes TextInput focus/blur/submit event aliases', () => {
+    const el = {
+      id: 4,
+      type: 'element',
+      tag: 'TextInput',
+      children: [],
+      props: {},
+      parentNode: null,
+      eventListeners: null,
+    } as any
+
+    const onFocus = () => 'focus'
+    const onBlur = () => 'blur'
+    const onSubmit = () => 'submit'
+
+    patchProp(el, 'on-focus', null, onFocus)
+    patchProp(el, 'onBlur', null, onBlur)
+    patchProp(el, 'on-submit', null, onSubmit)
+
+    expect(el.eventListeners).toMatchObject({
+      onFocus,
+      onBlur,
+      onSubmitEditing: onSubmit,
+    })
+  })
+
   it('maps onUpdate:modelValue listeners for TextInput and Switch', () => {
     const textInputEl = {
       id: 30,
@@ -567,5 +593,34 @@ describe('@vue-native/runtime-native', () => {
 
     expect(state.text).toBe('updated')
     expect(state.enabled).toBe(true)
+  })
+
+  it('supports TextInput @submit roundtrip via onSubmitEditing alias', () => {
+    const root = createNativeRoot()
+    const state = reactive({ submitted: 0 })
+
+    const App = {
+      setup() {
+        const onSubmit = () => {
+          state.submitted += 1
+        }
+
+        return { onSubmit }
+      },
+      template: `
+        <View>
+          <TextInput @submit="onSubmit" testID="submit-input" />
+        </View>
+      `,
+    }
+
+    createNativeApp(App).mount(root)
+
+    const snapshot = snapshotNativeTree(root)
+    const input = snapshot.children?.[0]?.children?.[0] as any
+
+    expect(input.listeners).toContain('onSubmitEditing')
+    expect(dispatchEventToNativeNode(input.id, 'onSubmitEditing')).toBe(true)
+    expect(state.submitted).toBe(1)
   })
 })

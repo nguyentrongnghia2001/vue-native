@@ -4,15 +4,36 @@ export const state = reactive({
   count: 0,
   enabled: true,
   draft: '',
+  focusCount: 0,
+  blurCount: 0,
+  submitCount: 0,
 })
 
 export function incrementCount() {
   state.count += 1
 }
 
+export function onDraftFocus() {
+  state.focusCount += 1
+}
+
+export function onDraftBlur() {
+  state.blurCount += 1
+}
+
+export function onDraftSubmit() {
+  state.submitCount += 1
+}
+
 export const AppRoot = defineComponent({
   setup() {
-    return { incrementCount, state }
+    return {
+      incrementCount,
+      onDraftFocus,
+      onDraftBlur,
+      onDraftSubmit,
+      state,
+    }
   },
   template: `
     <View testID="root">
@@ -40,6 +61,9 @@ export const AppRoot = defineComponent({
           <TextInput
             testID="draft-input"
             v-model="state.draft"
+            @focus="onDraftFocus"
+            @blur="onDraftBlur"
+            @submit="onDraftSubmit"
             class="input primary"
             placeholder="Type a draft title"
             placeholder-text-color="#8aa1ff"
@@ -50,6 +74,10 @@ export const AppRoot = defineComponent({
               { borderWidth: 1, borderColor: '#4c6fff', opacity: 0.95 }
             ]"
           />
+
+          <Text :style="{ fontSize: 12, opacity: 0.75 }">
+            focus: {{ state.focusCount }} · blur: {{ state.blurCount }} · submit: {{ state.submitCount }}
+          </Text>
 
           <Switch testID="enable-flag" v-model="state.enabled" />
 
