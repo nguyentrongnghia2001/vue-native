@@ -78,7 +78,10 @@ pnpm build
 	- component-specific mapping edge-cases:
 		- `TextInput` supports `v-model` via `modelValue -> value` and `onUpdate:modelValue -> onChangeText`
 		- `TextInput` event aliases: `@submit -> onSubmitEditing`, `@focus -> onFocus`, `@blur -> onBlur`
+		- `TextInput` interaction alias: `@change -> onChangeText`
 		- `Switch` supports `v-model` via `modelValue -> value` and `onUpdate:modelValue -> onValueChange`
+		- `Switch` interaction alias: `@change -> onValueChange`
+		- `Pressable` interaction alias: `@tap -> onPress`
 		- kebab-case props/events are normalized (`max-length`, `placeholder-text-color`, `@change-text`)
 
 ## Suggested next work

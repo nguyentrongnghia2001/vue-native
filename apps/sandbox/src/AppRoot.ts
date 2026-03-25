@@ -2,15 +2,23 @@ import { defineComponent, reactive } from '@vue-native/runtime-native'
 
 export const state = reactive({
   count: 0,
+  tapCount: 0,
   enabled: true,
   draft: '',
   focusCount: 0,
   blurCount: 0,
   submitCount: 0,
+  draftChangeCount: 0,
+  switchChangeCount: 0,
 })
 
 export function incrementCount() {
   state.count += 1
+}
+
+export function onIncrementTap() {
+  state.count += 1
+  state.tapCount += 1
 }
 
 export function onDraftFocus() {
@@ -25,13 +33,23 @@ export function onDraftSubmit() {
   state.submitCount += 1
 }
 
+export function onDraftChange() {
+  state.draftChangeCount += 1
+}
+
+export function onEnabledChange() {
+  state.switchChangeCount += 1
+}
+
 export const AppRoot = defineComponent({
   setup() {
     return {
-      incrementCount,
+      onIncrementTap,
       onDraftFocus,
       onDraftBlur,
       onDraftSubmit,
+      onDraftChange,
+      onEnabledChange,
       state,
     }
   },
@@ -47,9 +65,11 @@ export const AppRoot = defineComponent({
           <ActivityIndicator testID="loading-indicator" :animating="true" size="small" />
         </SafeAreaView>
 
-        <Pressable testID="increment" @press="incrementCount">
+        <Pressable testID="increment" @tap="onIncrementTap">
           <Text :style="{ fontSize: 16 }">Tap to increment</Text>
         </Pressable>
+
+        <Text :style="{ fontSize: 12, opacity: 0.75 }">tap alias count: {{ state.tapCount }}</Text>
 
         <Image
           testID="preview"
@@ -64,6 +84,7 @@ export const AppRoot = defineComponent({
             @focus="onDraftFocus"
             @blur="onDraftBlur"
             @submit="onDraftSubmit"
+            @change="onDraftChange"
             class="input primary"
             placeholder="Type a draft title"
             placeholder-text-color="#8aa1ff"
@@ -76,10 +97,14 @@ export const AppRoot = defineComponent({
           />
 
           <Text :style="{ fontSize: 12, opacity: 0.75 }">
-            focus: {{ state.focusCount }} · blur: {{ state.blurCount }} · submit: {{ state.submitCount }}
+            focus: {{ state.focusCount }} · blur: {{ state.blurCount }} · submit: {{ state.submitCount }} · change: {{ state.draftChangeCount }}
           </Text>
 
-          <Switch testID="enable-flag" v-model="state.enabled" />
+          <Switch testID="enable-flag" v-model="state.enabled" @change="onEnabledChange" />
+
+          <Text :style="{ fontSize: 12, opacity: 0.75 }">
+            switch change alias count: {{ state.switchChangeCount }}
+          </Text>
 
           <FlatList
             testID="demo-list"

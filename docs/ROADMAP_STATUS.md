@@ -128,6 +128,7 @@ Tài liệu này là **nguồn tổng hợp duy nhất** cho:
 - ✅ Refine mapping: hỗ trợ kebab-case prop/event normalization (`max-length`, `placeholder-text-color`, `@change-text`)
 - ✅ Feature 7.3: component-specific mapping edge-cases (`TextInput`/`Switch` v-model aliases, preserve `false` cho một số boolean props)
 - ✅ Feature 7.4: event alias normalization cho `TextInput` (`@focus`, `@blur`, `@submit -> onSubmitEditing`)
+- ✅ Feature 7.5: interaction alias refinement (`TextInput @change`, `Switch @change`, `Pressable @tap`)
 - ⏳ Mở rộng thêm primitives app-level (batch tiếp theo theo nhu cầu)
 - ⏳ Chuẩn hoá prop/event mapping chi tiết hơn cho edge-cases theo component-specific behavior
 - Bổ sung docs usage theo từng primitive

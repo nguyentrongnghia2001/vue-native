@@ -52,8 +52,24 @@ function resolveModelUpdateEventKey(tag: string): string {
 
 function resolveComponentEventAlias(tag: string, normalizedEventToken: string): string | null {
   if (tag === 'TextInput') {
+    if (normalizedEventToken === 'change') {
+      return 'onChangeText'
+    }
+
     if (normalizedEventToken === 'submit') {
       return 'onSubmitEditing'
+    }
+  }
+
+  if (tag === 'Switch') {
+    if (normalizedEventToken === 'change') {
+      return 'onValueChange'
+    }
+  }
+
+  if (tag === 'Pressable') {
+    if (normalizedEventToken === 'tap') {
+      return 'onPress'
     }
   }
 

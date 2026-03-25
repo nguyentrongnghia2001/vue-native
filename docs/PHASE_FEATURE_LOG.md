@@ -940,3 +940,51 @@ Mục đích: Ghi lại phần đã làm để review nhanh trước khi vào Ph
 ### Decision / Next
 - Feature 7.4 hoàn tất.
 - Có thể tiếp tục Feature 7.5 (nếu cần): mở rộng alias/mapping cho pointer/gesture/input lifecycle nâng cao.
+
+---
+
+## [2026-03-25 10:50] Phase 7 / Feature 7.5 Kickoff (Interaction alias refinement)
+
+### Overview
+- Tổng kết trước kickoff: Feature 7.4 đã hoàn tất alias `@focus/@blur/@submit` cho `TextInput`, test/typecheck đều pass.
+- Mục tiêu Feature 7.5: bổ sung interaction aliases thân thiện hơn cho template authoring:
+  - `TextInput @change -> onChangeText`
+  - `Switch @change -> onValueChange`
+  - `Pressable @tap -> onPress`
+
+### Files changed
+- `docs/PHASE_FEATURE_LOG.md`
+
+### Validation
+- Trước triển khai: `pnpm test` pass (31/31), `pnpm typecheck` pass.
+
+### Decision / Next
+- Implement alias mapping trong `patchProp` + test roundtrip + cập nhật sandbox/docs.
+
+---
+
+## [2026-03-25 10:53] Phase 7 / Feature 7.5 Hoàn tất (Interaction alias refinement)
+
+### Overview
+- Mở rộng `patchProp` component event aliases để template authoring tự nhiên hơn:
+  - `TextInput @change -> onChangeText`
+  - `Switch @change -> onValueChange`
+  - `Pressable @tap -> onPress`
+- Bổ sung test coverage cho alias mapping trực tiếp và event roundtrip từ runtime dispatcher.
+- Cập nhật sandbox demo + README để phản ánh usage mới.
+
+### Files changed
+- `packages/runtime-native/src/patchProp.ts`
+- `packages/runtime-native/__tests__/runtime-native.spec.ts`
+- `apps/sandbox/src/AppRoot.ts`
+- `README.md`
+- `docs/ROADMAP_STATUS.md`
+- `docs/PHASE_FEATURE_LOG.md`
+
+### Validation
+- ✅ `pnpm test` pass (33/33 tests).
+- ✅ `pnpm typecheck` pass cho `runtime-native` + `sandbox`.
+
+### Decision / Next
+- Feature 7.5 hoàn tất.
+- Có thể tiếp tục Feature 7.6 để refine thêm interaction mapping theo component-specific gesture/input lifecycle nếu cần.

@@ -214,6 +214,50 @@ describe('@vue-native/runtime-native', () => {
     })
   })
 
+  it('normalizes interaction aliases for change and tap events', () => {
+    const textInputEl = {
+      id: 5,
+      type: 'element',
+      tag: 'TextInput',
+      children: [],
+      props: {},
+      parentNode: null,
+      eventListeners: null,
+    } as any
+
+    const switchEl = {
+      id: 6,
+      type: 'element',
+      tag: 'Switch',
+      children: [],
+      props: {},
+      parentNode: null,
+      eventListeners: null,
+    } as any
+
+    const pressableEl = {
+      id: 7,
+      type: 'element',
+      tag: 'Pressable',
+      children: [],
+      props: {},
+      parentNode: null,
+      eventListeners: null,
+    } as any
+
+    const onTextChange = () => 'text-change'
+    const onSwitchChange = () => 'switch-change'
+    const onTap = () => 'tap'
+
+    patchProp(textInputEl, 'on-change', null, onTextChange)
+    patchProp(switchEl, 'on-change', null, onSwitchChange)
+    patchProp(pressableEl, 'on-tap', null, onTap)
+
+    expect(textInputEl.eventListeners).toMatchObject({ onChangeText: onTextChange })
+    expect(switchEl.eventListeners).toMatchObject({ onValueChange: onSwitchChange })
+    expect(pressableEl.eventListeners).toMatchObject({ onPress: onTap })
+  })
+
   it('maps onUpdate:modelValue listeners for TextInput and Switch', () => {
     const textInputEl = {
       id: 30,
@@ -622,5 +666,55 @@ describe('@vue-native/runtime-native', () => {
     expect(input.listeners).toContain('onSubmitEditing')
     expect(dispatchEventToNativeNode(input.id, 'onSubmitEditing')).toBe(true)
     expect(state.submitted).toBe(1)
+  })
+
+  it('supports interaction alias roundtrip for @change and @tap', () => {
+    const root = createNativeRoot()
+    const state = reactive({ textChanges: 0, switchChanges: 0, taps: 0 })
+
+    const App = {
+      setup() {
+        const onTextChange = () => {
+          state.textChanges += 1
+        }
+        const onSwitchChange = () => {
+          state.switchChanges += 1
+        }
+        const onTap = () => {
+          state.taps += 1
+        }
+
+        return { onTextChange, onSwitchChange, onTap }
+      },
+      template: `
+        <View>
+          <TextInput @change="onTextChange" testID="alias-input" />
+          <Switch @change="onSwitchChange" testID="alias-switch" />
+          <Pressable @tap="onTap" testID="alias-pressable">
+            <Text>Tap alias</Text>
+          </Pressable>
+        </View>
+      `,
+    }
+
+    createNativeApp(App).mount(root)
+
+    const snapshot = snapshotNativeTree(root)
+    const children = snapshot.children?.[0]?.children as any[]
+    const input = children[0]
+    const toggle = children[1]
+    const pressable = children[2]
+
+    expect(input.listeners).toContain('onChangeText')
+    expect(toggle.listeners).toContain('onValueChange')
+    expect(pressable.listeners).toContain('onPress')
+
+    expect(dispatchEventToNativeNode(input.id, 'onChangeText', ['x'])).toBe(true)
+    expect(dispatchEventToNativeNode(toggle.id, 'onValueChange', [true])).toBe(true)
+    expect(dispatchEventToNativeNode(pressable.id, 'onPress')).toBe(true)
+
+    expect(state.textChanges).toBe(1)
+    expect(state.switchChanges).toBe(1)
+    expect(state.taps).toBe(1)
   })
 })
