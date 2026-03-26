@@ -5,7 +5,7 @@ Tài liệu này là **nguồn tổng hợp duy nhất** cho:
 - Những gì đang làm
 - Những gì cần làm tiếp
 
-> Cập nhật gần nhất: **2026-03-24**
+> Cập nhật gần nhất: **2026-03-26**
 
 ---
 
@@ -129,6 +129,7 @@ Tài liệu này là **nguồn tổng hợp duy nhất** cho:
 - ✅ Feature 7.3: component-specific mapping edge-cases (`TextInput`/`Switch` v-model aliases, preserve `false` cho một số boolean props)
 - ✅ Feature 7.4: event alias normalization cho `TextInput` (`@focus`, `@blur`, `@submit -> onSubmitEditing`)
 - ✅ Feature 7.5: interaction alias refinement (`TextInput @change`, `Switch @change`, `Pressable @tap`)
+- ✅ Feature 7.6: web-friendly interaction lifecycle aliases (`TextInput @input`, `Switch @input`, `Pressable @longpress/@pressin/@pressout`)
 - ⏳ Mở rộng thêm primitives app-level (batch tiếp theo theo nhu cầu)
 - ⏳ Chuẩn hoá prop/event mapping chi tiết hơn cho edge-cases theo component-specific behavior
 - Bổ sung docs usage theo từng primitive

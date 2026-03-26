@@ -3,6 +3,9 @@ import { defineComponent, reactive } from '@vue-native/runtime-native'
 export const state = reactive({
   count: 0,
   tapCount: 0,
+  longPressCount: 0,
+  pressInCount: 0,
+  pressOutCount: 0,
   enabled: true,
   draft: '',
   focusCount: 0,
@@ -10,6 +13,8 @@ export const state = reactive({
   submitCount: 0,
   draftChangeCount: 0,
   switchChangeCount: 0,
+  draftInputCount: 0,
+  switchInputCount: 0,
 })
 
 export function incrementCount() {
@@ -37,8 +42,28 @@ export function onDraftChange() {
   state.draftChangeCount += 1
 }
 
+export function onDraftInput() {
+  state.draftInputCount += 1
+}
+
 export function onEnabledChange() {
   state.switchChangeCount += 1
+}
+
+export function onEnabledInput() {
+  state.switchInputCount += 1
+}
+
+export function onIncrementLongPress() {
+  state.longPressCount += 1
+}
+
+export function onIncrementPressIn() {
+  state.pressInCount += 1
+}
+
+export function onIncrementPressOut() {
+  state.pressOutCount += 1
 }
 
 export const AppRoot = defineComponent({
@@ -49,7 +74,12 @@ export const AppRoot = defineComponent({
       onDraftBlur,
       onDraftSubmit,
       onDraftChange,
+      onDraftInput,
       onEnabledChange,
+      onEnabledInput,
+      onIncrementLongPress,
+      onIncrementPressIn,
+      onIncrementPressOut,
       state,
     }
   },
@@ -65,11 +95,20 @@ export const AppRoot = defineComponent({
           <ActivityIndicator testID="loading-indicator" :animating="true" size="small" />
         </SafeAreaView>
 
-        <Pressable testID="increment" @tap="onIncrementTap">
+        <Pressable
+          testID="increment"
+          @tap="onIncrementTap"
+          @longpress="onIncrementLongPress"
+          @pressin="onIncrementPressIn"
+          @pressout="onIncrementPressOut"
+        >
           <Text :style="{ fontSize: 16 }">Tap to increment</Text>
         </Pressable>
 
         <Text :style="{ fontSize: 12, opacity: 0.75 }">tap alias count: {{ state.tapCount }}</Text>
+        <Text :style="{ fontSize: 12, opacity: 0.75 }">
+          longpress: {{ state.longPressCount }} · pressin: {{ state.pressInCount }} · pressout: {{ state.pressOutCount }}
+        </Text>
 
         <Image
           testID="preview"
@@ -85,6 +124,7 @@ export const AppRoot = defineComponent({
             @blur="onDraftBlur"
             @submit="onDraftSubmit"
             @change="onDraftChange"
+            @input="onDraftInput"
             class="input primary"
             placeholder="Type a draft title"
             placeholder-text-color="#8aa1ff"
@@ -97,13 +137,18 @@ export const AppRoot = defineComponent({
           />
 
           <Text :style="{ fontSize: 12, opacity: 0.75 }">
-            focus: {{ state.focusCount }} · blur: {{ state.blurCount }} · submit: {{ state.submitCount }} · change: {{ state.draftChangeCount }}
+            focus: {{ state.focusCount }} · blur: {{ state.blurCount }} · submit: {{ state.submitCount }} · change: {{ state.draftChangeCount }} · input: {{ state.draftInputCount }}
           </Text>
 
-          <Switch testID="enable-flag" v-model="state.enabled" @change="onEnabledChange" />
+          <Switch
+            testID="enable-flag"
+            v-model="state.enabled"
+            @change="onEnabledChange"
+            @input="onEnabledInput"
+          />
 
           <Text :style="{ fontSize: 12, opacity: 0.75 }">
-            switch change alias count: {{ state.switchChangeCount }}
+            switch change alias count: {{ state.switchChangeCount }} · input alias count: {{ state.switchInputCount }}
           </Text>
 
           <FlatList

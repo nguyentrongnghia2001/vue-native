@@ -79,9 +79,12 @@ pnpm build
 		- `TextInput` supports `v-model` via `modelValue -> value` and `onUpdate:modelValue -> onChangeText`
 		- `TextInput` event aliases: `@submit -> onSubmitEditing`, `@focus -> onFocus`, `@blur -> onBlur`
 		- `TextInput` interaction alias: `@change -> onChangeText`
+		- `TextInput` web-friendly alias: `@input -> onChangeText`
 		- `Switch` supports `v-model` via `modelValue -> value` and `onUpdate:modelValue -> onValueChange`
 		- `Switch` interaction alias: `@change -> onValueChange`
+		- `Switch` web-friendly alias: `@input -> onValueChange`
 		- `Pressable` interaction alias: `@tap -> onPress`
+		- `Pressable` lifecycle shorthand aliases: `@longpress -> onLongPress`, `@pressin -> onPressIn`, `@pressout -> onPressOut`
 		- kebab-case props/events are normalized (`max-length`, `placeholder-text-color`, `@change-text`)
 
 ## Suggested next work

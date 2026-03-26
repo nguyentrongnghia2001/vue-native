@@ -258,6 +258,58 @@ describe('@vue-native/runtime-native', () => {
     expect(pressableEl.eventListeners).toMatchObject({ onPress: onTap })
   })
 
+  it('normalizes web-friendly interaction lifecycle aliases', () => {
+    const textInputEl = {
+      id: 8,
+      type: 'element',
+      tag: 'TextInput',
+      children: [],
+      props: {},
+      parentNode: null,
+      eventListeners: null,
+    } as any
+
+    const switchEl = {
+      id: 9,
+      type: 'element',
+      tag: 'Switch',
+      children: [],
+      props: {},
+      parentNode: null,
+      eventListeners: null,
+    } as any
+
+    const pressableEl = {
+      id: 10,
+      type: 'element',
+      tag: 'Pressable',
+      children: [],
+      props: {},
+      parentNode: null,
+      eventListeners: null,
+    } as any
+
+    const onInput = () => 'input'
+    const onSwitchInput = () => 'switch-input'
+    const onLongPress = () => 'long-press'
+    const onPressIn = () => 'press-in'
+    const onPressOut = () => 'press-out'
+
+    patchProp(textInputEl, 'on-input', null, onInput)
+    patchProp(switchEl, 'on-input', null, onSwitchInput)
+    patchProp(pressableEl, 'on-longpress', null, onLongPress)
+    patchProp(pressableEl, 'on-pressin', null, onPressIn)
+    patchProp(pressableEl, 'on-pressout', null, onPressOut)
+
+    expect(textInputEl.eventListeners).toMatchObject({ onChangeText: onInput })
+    expect(switchEl.eventListeners).toMatchObject({ onValueChange: onSwitchInput })
+    expect(pressableEl.eventListeners).toMatchObject({
+      onLongPress,
+      onPressIn,
+      onPressOut,
+    })
+  })
+
   it('maps onUpdate:modelValue listeners for TextInput and Switch', () => {
     const textInputEl = {
       id: 30,
@@ -716,5 +768,70 @@ describe('@vue-native/runtime-native', () => {
     expect(state.textChanges).toBe(1)
     expect(state.switchChanges).toBe(1)
     expect(state.taps).toBe(1)
+  })
+
+  it('supports web-friendly interaction lifecycle alias roundtrip', () => {
+    const root = createNativeRoot()
+    const state = reactive({ inputs: 0, switchInputs: 0, longPresses: 0, pressIns: 0, pressOuts: 0 })
+
+    const App = {
+      setup() {
+        return {
+          onInput: () => {
+            state.inputs += 1
+          },
+          onSwitchInput: () => {
+            state.switchInputs += 1
+          },
+          onLongPress: () => {
+            state.longPresses += 1
+          },
+          onPressIn: () => {
+            state.pressIns += 1
+          },
+          onPressOut: () => {
+            state.pressOuts += 1
+          },
+        }
+      },
+      template: `
+        <View>
+          <TextInput @input="onInput" testID="wf-input" />
+          <Switch @input="onSwitchInput" testID="wf-switch" />
+          <Pressable
+            @longpress="onLongPress"
+            @pressin="onPressIn"
+            @pressout="onPressOut"
+            testID="wf-pressable"
+          >
+            <Text>Gesture aliases</Text>
+          </Pressable>
+        </View>
+      `,
+    }
+
+    createNativeApp(App).mount(root)
+
+    const snapshot = snapshotNativeTree(root)
+    const children = snapshot.children?.[0]?.children as any[]
+    const input = children[0]
+    const toggle = children[1]
+    const pressable = children[2]
+
+    expect(input.listeners).toContain('onChangeText')
+    expect(toggle.listeners).toContain('onValueChange')
+    expect(pressable.listeners).toEqual(expect.arrayContaining(['onLongPress', 'onPressIn', 'onPressOut']))
+
+    expect(dispatchEventToNativeNode(input.id, 'onChangeText', ['hello'])).toBe(true)
+    expect(dispatchEventToNativeNode(toggle.id, 'onValueChange', [false])).toBe(true)
+    expect(dispatchEventToNativeNode(pressable.id, 'onLongPress')).toBe(true)
+    expect(dispatchEventToNativeNode(pressable.id, 'onPressIn')).toBe(true)
+    expect(dispatchEventToNativeNode(pressable.id, 'onPressOut')).toBe(true)
+
+    expect(state.inputs).toBe(1)
+    expect(state.switchInputs).toBe(1)
+    expect(state.longPresses).toBe(1)
+    expect(state.pressIns).toBe(1)
+    expect(state.pressOuts).toBe(1)
   })
 })

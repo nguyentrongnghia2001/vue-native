@@ -52,6 +52,10 @@ function resolveModelUpdateEventKey(tag: string): string {
 
 function resolveComponentEventAlias(tag: string, normalizedEventToken: string): string | null {
   if (tag === 'TextInput') {
+    if (normalizedEventToken === 'input') {
+      return 'onChangeText'
+    }
+
     if (normalizedEventToken === 'change') {
       return 'onChangeText'
     }
@@ -62,12 +66,28 @@ function resolveComponentEventAlias(tag: string, normalizedEventToken: string): 
   }
 
   if (tag === 'Switch') {
+    if (normalizedEventToken === 'input') {
+      return 'onValueChange'
+    }
+
     if (normalizedEventToken === 'change') {
       return 'onValueChange'
     }
   }
 
   if (tag === 'Pressable') {
+    if (normalizedEventToken === 'longpress') {
+      return 'onLongPress'
+    }
+
+    if (normalizedEventToken === 'pressin') {
+      return 'onPressIn'
+    }
+
+    if (normalizedEventToken === 'pressout') {
+      return 'onPressOut'
+    }
+
     if (normalizedEventToken === 'tap') {
       return 'onPress'
     }

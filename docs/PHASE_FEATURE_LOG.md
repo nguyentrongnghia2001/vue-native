@@ -988,3 +988,58 @@ Mục đích: Ghi lại phần đã làm để review nhanh trước khi vào Ph
 ### Decision / Next
 - Feature 7.5 hoàn tất.
 - Có thể tiếp tục Feature 7.6 để refine thêm interaction mapping theo component-specific gesture/input lifecycle nếu cần.
+
+---
+
+## [2026-03-26 09:05] Phase 7 / Feature 7.6 Kickoff (Web-friendly interaction lifecycle aliases)
+
+### Overview
+- Tổng kết trước kickoff:
+  - Feature 7.5 đã hoàn tất các alias interaction cơ bản (`TextInput @change`, `Switch @change`, `Pressable @tap`).
+  - Validation gần nhất: `pnpm test` pass (33/33), `pnpm typecheck` pass.
+- Mục tiêu Feature 7.6:
+  1. Bổ sung thêm alias theo thói quen Vue/Web cho input/interaction lifecycle.
+  2. Ưu tiên các alias dễ nhầm trong template authoring nhưng map rõ sang React Native handlers.
+
+### Files changed
+- `docs/PHASE_FEATURE_LOG.md`
+
+### Validation
+- Checkpoint trước triển khai: green từ Feature 7.5 (`pnpm test`, `pnpm typecheck`).
+
+### Decision / Next
+- Scope triển khai đề xuất:
+  - `TextInput @input -> onChangeText`
+  - `Switch @input -> onValueChange`
+  - `Pressable @longpress -> onLongPress`, `@pressin -> onPressIn`, `@pressout -> onPressOut`
+- Tiếp theo: implement mapping + test roundtrip + update sandbox/docs + commit riêng cho Feature 7.6.
+
+---
+
+## [2026-03-26 09:20] Phase 7 / Feature 7.6 Hoàn tất (Web-friendly interaction lifecycle aliases)
+
+### Overview
+- Mở rộng `patchProp` với aliases theo thói quen Vue/Web nhưng map sang React Native handlers chuẩn:
+  - `TextInput @input -> onChangeText`
+  - `Switch @input -> onValueChange`
+  - `Pressable @longpress -> onLongPress`
+  - `Pressable @pressin -> onPressIn`
+  - `Pressable @pressout -> onPressOut`
+- Bổ sung test coverage cho alias mapping trực tiếp và roundtrip dispatch event qua runtime.
+- Cập nhật sandbox demo + README + roadmap status.
+
+### Files changed
+- `packages/runtime-native/src/patchProp.ts`
+- `packages/runtime-native/__tests__/runtime-native.spec.ts`
+- `apps/sandbox/src/AppRoot.ts`
+- `README.md`
+- `docs/ROADMAP_STATUS.md`
+- `docs/PHASE_FEATURE_LOG.md`
+
+### Validation
+- ✅ `pnpm test` pass (35/35 tests).
+- ✅ `pnpm typecheck` pass cho `runtime-native` + `sandbox`.
+
+### Decision / Next
+- Feature 7.6 hoàn tất.
+- Có thể tiếp tục Feature 7.7 để mở rộng aliases theo nhóm component khác (ví dụ scroll lifecycle aliases) nếu cần.
