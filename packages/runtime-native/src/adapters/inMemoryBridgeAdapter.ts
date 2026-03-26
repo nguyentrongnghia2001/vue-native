@@ -3,7 +3,7 @@ import type {
   NativeBridgeAdapterRuntime,
   NativeEventRecord,
   NativeMutationRecord,
-} from '../bridge.js'
+} from '../bridge'
 
 interface InMemoryNode {
   id: number

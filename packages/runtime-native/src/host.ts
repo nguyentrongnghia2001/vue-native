@@ -1,7 +1,7 @@
 import { markRaw } from '@vue/reactivity'
 import type { RendererOptions } from '@vue/runtime-core'
-import { enqueue } from './bridge.js'
-import { dumpDebugOps, recordDebugOp, resetDebugOps } from './instrumentation.js'
+import { enqueue } from './bridge'
+import { dumpDebugOps, recordDebugOp, resetDebugOps } from './instrumentation'
 import type {
   NativeChildNode,
   NativeComment,

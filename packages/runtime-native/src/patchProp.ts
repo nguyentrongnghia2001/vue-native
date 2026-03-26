@@ -1,6 +1,6 @@
 import { camelize, isOn } from '@vue/shared'
 import type { RendererOptions } from '@vue/runtime-core'
-import { enqueue } from './bridge.js'
+import { enqueue } from './bridge'
 import type { NativeElement } from './types'
 
 type NativeRendererOptions = RendererOptions<NativeElement, NativeElement>

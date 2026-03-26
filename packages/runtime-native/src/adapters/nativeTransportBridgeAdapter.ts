@@ -3,7 +3,7 @@ import type {
   NativeBridgeAdapterRuntime,
   NativeEventRecord,
   NativeMutationRecord,
-} from '../bridge.js'
+} from '../bridge'
 
 export interface NativeTransportAck {
   ok: boolean

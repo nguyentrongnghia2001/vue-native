@@ -1,5 +1,5 @@
 import type { Component } from '@vue/runtime-core'
-import { createNativeRenderer } from './renderer.js'
+import { createNativeRenderer } from './renderer'
 import {
 	ActivityIndicator,
 	FlatList,
@@ -21,7 +21,7 @@ import {
 	TouchableWithoutFeedback,
 	View,
 	ImageBackground,
-} from './primitives.js'
+} from './primitives'
 
 export function createNativeApp(rootComponent: Component) {
 	const app = createNativeRenderer().createApp(rootComponent)
