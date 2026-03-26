@@ -17,7 +17,9 @@ import {
 	TextInput,
 	TouchableHighlight,
 	TouchableOpacity,
+	TouchableWithoutFeedback,
 	View,
+	ImageBackground,
 } from './primitives.js'
 
 export function createNativeApp(rootComponent: Component) {
@@ -38,6 +40,8 @@ export function createNativeApp(rootComponent: Component) {
 	app.component('RefreshControl', RefreshControl)
 	app.component('TouchableOpacity', TouchableOpacity)
 	app.component('TouchableHighlight', TouchableHighlight)
+	app.component('TouchableWithoutFeedback', TouchableWithoutFeedback)
 	app.component('StatusBar', StatusBar)
+	app.component('ImageBackground', ImageBackground)
 	return app
 }

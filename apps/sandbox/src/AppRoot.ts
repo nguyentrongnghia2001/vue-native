@@ -25,6 +25,9 @@ export const state = reactive({
   statusHidden: false,
   touchOpacityCount: 0,
   touchHighlightCount: 0,
+  touchWithoutFeedbackCount: 0,
+  touchWithoutPointerDownCount: 0,
+  touchWithoutPointerUpCount: 0,
 })
 
 export function incrementCount() {
@@ -113,6 +116,18 @@ export function onTouchableHighlightPress() {
   state.statusHidden = !state.statusHidden
 }
 
+export function onTouchableWithoutFeedbackPress() {
+  state.touchWithoutFeedbackCount += 1
+}
+
+export function onTouchableWithoutFeedbackPointerDown() {
+  state.touchWithoutPointerDownCount += 1
+}
+
+export function onTouchableWithoutFeedbackPointerUp() {
+  state.touchWithoutPointerUpCount += 1
+}
+
 export const AppRoot = defineComponent({
   setup() {
     return {
@@ -136,6 +151,9 @@ export const AppRoot = defineComponent({
       onIncrementPointerUp,
       onTouchableOpacityPress,
       onTouchableHighlightPress,
+      onTouchableWithoutFeedbackPress,
+      onTouchableWithoutFeedbackPointerDown,
+      onTouchableWithoutFeedbackPointerUp,
       state,
     }
   },
@@ -197,12 +215,31 @@ export const AppRoot = defineComponent({
         <TouchableHighlight
           testID="touch-highlight"
           :underlay-color="'#dbeafe'"
-          @press="onTouchableHighlightPress"
+          @click="onTouchableHighlightPress"
         >
           <Text :style="{ fontSize: 14 }">
             TouchableHighlight count: {{ state.touchHighlightCount }} · status hidden: {{ state.statusHidden }}
           </Text>
         </TouchableHighlight>
+
+        <ImageBackground
+          testID="hero-bg"
+          source="https://example.com/hero-bg.png"
+          :style="{ marginTop: 8, padding: 8 }"
+        >
+          <Text :style="{ fontSize: 13, opacity: 0.9 }">ImageBackground demo content</Text>
+        </ImageBackground>
+
+        <TouchableWithoutFeedback
+          testID="touch-without-feedback"
+          @tap="onTouchableWithoutFeedbackPress"
+          @pointerdown="onTouchableWithoutFeedbackPointerDown"
+          @pointerup="onTouchableWithoutFeedbackPointerUp"
+        >
+          <Text :style="{ fontSize: 14 }">
+            TouchableWithoutFeedback tap: {{ state.touchWithoutFeedbackCount }} · pointerdown: {{ state.touchWithoutPointerDownCount }} · pointerup: {{ state.touchWithoutPointerUpCount }}
+          </Text>
+        </TouchableWithoutFeedback>
 
         <Image
           testID="preview"

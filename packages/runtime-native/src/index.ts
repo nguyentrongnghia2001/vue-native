@@ -6,6 +6,7 @@ export {
 	ActivityIndicator,
 	FlatList,
 	Image,
+	ImageBackground,
 	KeyboardAvoidingView,
 	Modal,
 	Pressable,
@@ -19,6 +20,7 @@ export {
 	TextInput,
 	TouchableHighlight,
 	TouchableOpacity,
+	TouchableWithoutFeedback,
 	View,
 } from './primitives.js'
 export { createNativeApp } from './nativeApp.js'

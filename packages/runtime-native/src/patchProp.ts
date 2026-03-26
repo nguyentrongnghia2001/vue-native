@@ -75,7 +75,12 @@ function resolveComponentEventAlias(tag: string, normalizedEventToken: string): 
     }
   }
 
-  if (tag === 'Pressable') {
+  if (
+    tag === 'Pressable' ||
+    tag === 'TouchableOpacity' ||
+    tag === 'TouchableHighlight' ||
+    tag === 'TouchableWithoutFeedback'
+  ) {
     if (normalizedEventToken === 'click') {
       return 'onPress'
     }
@@ -191,7 +196,8 @@ function shouldKeepFalseValue(tag: string, mappedKey: string): boolean {
   return (
     (tag === 'Switch' && mappedKey === 'value') ||
     (tag === 'Modal' && mappedKey === 'visible') ||
-    (tag === 'RefreshControl' && mappedKey === 'refreshing')
+    (tag === 'RefreshControl' && mappedKey === 'refreshing') ||
+    (tag === 'StatusBar' && mappedKey === 'hidden')
   )
 }
 

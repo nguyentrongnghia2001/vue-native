@@ -1211,3 +1211,65 @@ Mục đích: Ghi lại phần đã làm để review nhanh trước khi vào Ph
 ### Decision / Next
 - Feature 7.9 hoàn tất.
 - Có thể tiếp tục Feature 7.10 theo hướng mở rộng primitives batch mới hoặc bổ sung mapping edge-cases theo nhu cầu app thực tế.
+
+---
+
+## [2026-03-26 18:05] Phase 7 / Feature 7.10 Kickoff (Phase completion batch)
+
+### Overview
+- Tổng kết trước kickoff:
+  - Feature 7.9 đã hoàn tất nhóm alias props nhận diện + accessibility.
+  - Validation gần nhất: `pnpm test` pass (39/39), `pnpm typecheck` pass.
+- Mục tiêu Feature 7.10 (chốt Phase 7):
+  1. Mở rộng primitive coverage batch cuối cho use case app cơ bản.
+  2. Chốt thêm mapping edge-cases component-specific còn lại để ổn định behavior.
+
+### Files changed
+- `docs/PHASE_FEATURE_LOG.md`
+
+### Validation
+- Checkpoint trước triển khai: green từ Feature 7.9 (`pnpm test`, `pnpm typecheck`).
+
+### Decision / Next
+- Scope triển khai đề xuất:
+  - Primitive batch cuối: `TouchableWithoutFeedback`, `ImageBackground`
+  - Mapping refine:
+    - touchable aliases (`@tap/@click/@pointerdown/@pointerup`) cho touchable family
+    - preserve `false` cho `StatusBar.hidden`
+- Tiếp theo: implement + tests + sandbox/docs + update roadmap/log completion cho toàn bộ Phase 7.
+
+---
+
+## [2026-03-26 18:20] Phase 7 / Feature 7.10 Hoàn tất (Phase completion batch)
+
+### Overview
+- Bổ sung primitive batch cuối cho Phase 7:
+  - `TouchableWithoutFeedback`
+  - `ImageBackground`
+- Refine mapping edge-cases còn lại:
+  - mở rộng touchable-family aliases (`TouchableOpacity`, `TouchableHighlight`, `TouchableWithoutFeedback`):
+    - `@tap/@click -> onPress`
+    - `@pointerdown -> onPressIn`
+    - `@pointerup -> onPressOut`
+  - preserve `false` cho `StatusBar.hidden`
+- Bổ sung test coverage normalize/render/roundtrip, cập nhật sandbox demo + README + roadmap.
+
+### Files changed
+- `packages/runtime-native/src/primitives.ts`
+- `packages/runtime-native/src/nativeApp.ts`
+- `packages/runtime-native/src/index.ts`
+- `packages/runtime-native/src/patchProp.ts`
+- `packages/runtime-native/__tests__/runtime-native.spec.ts`
+- `apps/sandbox/src/AppRoot.ts`
+- `README.md`
+- `docs/ROADMAP_STATUS.md`
+- `docs/PHASE_FEATURE_LOG.md`
+
+### Validation
+- ✅ `pnpm test` pass (42/42 tests).
+- ✅ `pnpm typecheck` pass cho `runtime-native` + `sandbox`.
+
+### Decision / Next
+- Feature 7.10 hoàn tất.
+- **Phase 7 hoàn tất** theo done criteria (primitive set đủ cho use case app cơ bản + mapping ổn định và test pass).
+- Next ưu tiên quay lại Phase 6.6 để verify runtime roundtrip trên thiết bị/emulator sau khi hoàn tất setup Android SDK/adb.
