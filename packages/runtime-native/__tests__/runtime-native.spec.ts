@@ -164,6 +164,23 @@ describe('@vue-native/runtime-native', () => {
 
     patchProp(el, 'placeholder-text-color', null, '#999')
     expect(el.props.placeholderTextColor).toBe('#999')
+
+    patchProp(el, 'test-id', null, 'kebab-test-id')
+    expect(el.props.testID).toBe('kebab-test-id')
+    expect(el.props.testId).toBeUndefined()
+
+    patchProp(el, 'native-id', null, 'native-node-id')
+    expect(el.props.nativeID).toBe('native-node-id')
+    expect(el.props.nativeId).toBeUndefined()
+
+    patchProp(el, 'aria-label', null, 'Profile card')
+    expect(el.props.accessibilityLabel).toBe('Profile card')
+
+    patchProp(el, 'role', null, 'button')
+    expect(el.props.accessibilityRole).toBe('button')
+
+    patchProp(el, 'aria-role', null, 'summary')
+    expect(el.props.accessibilityRole).toBe('summary')
   })
 
   it('normalizes kebab-case event keys', () => {
@@ -775,6 +792,47 @@ describe('@vue-native/runtime-native', () => {
       expect.stringContaining('Failed to resolve component'),
     )
     warnSpy.mockRestore()
+  })
+
+  it('normalizes identifier and accessibility prop aliases in templates', () => {
+    const root = createNativeRoot()
+    const App = {
+      template: `
+        <View
+          test-id="alias-root"
+          native-id="alias-native"
+          aria-label="Alias root"
+          role="summary"
+        >
+          <Text test-id="alias-text" aria-role="header">A11y aliases</Text>
+        </View>
+      `,
+    }
+
+    createNativeApp(App).mount(root)
+
+    expect(snapshotNativeTree(root)).toMatchObject({
+      children: [
+        {
+          tag: 'View',
+          props: {
+            testID: 'alias-root',
+            nativeID: 'alias-native',
+            accessibilityLabel: 'Alias root',
+            accessibilityRole: 'summary',
+          },
+          children: [
+            {
+              tag: 'Text',
+              props: {
+                testID: 'alias-text',
+                accessibilityRole: 'header',
+              },
+            },
+          ],
+        },
+      ],
+    })
   })
 
   it('supports v-model roundtrip for TextInput and Switch', () => {

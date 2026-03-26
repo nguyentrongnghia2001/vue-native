@@ -158,6 +158,22 @@ function normalizeEventKey(key: string, tag: string): string {
 function normalizePropKey(key: string, tag: string): string {
   const normalizedKey = key.includes('-') ? camelize(key) : key
 
+  if (normalizedKey === 'testId') {
+    return 'testID'
+  }
+
+  if (normalizedKey === 'nativeId') {
+    return 'nativeID'
+  }
+
+  if (normalizedKey === 'ariaLabel') {
+    return 'accessibilityLabel'
+  }
+
+  if (normalizedKey === 'ariaRole' || normalizedKey === 'role') {
+    return 'accessibilityRole'
+  }
+
   if (normalizedKey === 'modelValue') {
     if (tag === 'TextInput' || tag === 'Switch') {
       return 'value'

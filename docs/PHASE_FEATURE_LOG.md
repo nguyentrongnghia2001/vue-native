@@ -1156,3 +1156,58 @@ Mục đích: Ghi lại phần đã làm để review nhanh trước khi vào Ph
 ### Decision / Next
 - Feature 7.8 hoàn tất.
 - Có thể tiếp tục Feature 7.9 (batch primitives kế tiếp hoặc refine mapping chuyên sâu theo behavior component-specific).
+
+---
+
+## [2026-03-26 17:35] Phase 7 / Feature 7.9 Kickoff (A11y + identifier prop aliases)
+
+### Overview
+- Tổng kết trước kickoff:
+  - Feature 7.8 đã hoàn tất app-level primitives batch 3.
+  - Validation gần nhất: `pnpm test` pass (38/38), `pnpm typecheck` pass.
+- Mục tiêu Feature 7.9:
+  1. Refine prop mapping cho các alias thường dùng theo mindset web/template authoring.
+  2. Tăng độ thân thiện khi viết props nhận diện node + accessibility.
+
+### Files changed
+- `docs/PHASE_FEATURE_LOG.md`
+
+### Validation
+- Checkpoint trước triển khai: green từ Feature 7.8 (`pnpm test`, `pnpm typecheck`).
+
+### Decision / Next
+- Scope triển khai đề xuất:
+  - `test-id -> testID`
+  - `native-id -> nativeID`
+  - `aria-label -> accessibilityLabel`
+  - `role`/`aria-role -> accessibilityRole`
+- Tiếp theo: implement mapping + tests + sandbox/docs + commit riêng Feature 7.9.
+
+---
+
+## [2026-03-26 17:40] Phase 7 / Feature 7.9 Hoàn tất (A11y + identifier prop aliases)
+
+### Overview
+- Refine `patchProp` để chuẩn hoá thêm các prop aliases thân thiện với web/template authoring:
+  - `test-id -> testID`
+  - `native-id -> nativeID`
+  - `aria-label -> accessibilityLabel`
+  - `role`/`aria-role -> accessibilityRole`
+- Bổ sung test coverage cho normalize-level và render snapshot-level.
+- Cập nhật sandbox demo + README + roadmap status.
+
+### Files changed
+- `packages/runtime-native/src/patchProp.ts`
+- `packages/runtime-native/__tests__/runtime-native.spec.ts`
+- `apps/sandbox/src/AppRoot.ts`
+- `README.md`
+- `docs/ROADMAP_STATUS.md`
+- `docs/PHASE_FEATURE_LOG.md`
+
+### Validation
+- ✅ `pnpm test` pass (39/39 tests).
+- ✅ `pnpm typecheck` pass cho `runtime-native` + `sandbox`.
+
+### Decision / Next
+- Feature 7.9 hoàn tất.
+- Có thể tiếp tục Feature 7.10 theo hướng mở rộng primitives batch mới hoặc bổ sung mapping edge-cases theo nhu cầu app thực tế.

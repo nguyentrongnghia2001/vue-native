@@ -87,6 +87,7 @@ pnpm build
 		- `Pressable` lifecycle shorthand aliases: `@longpress -> onLongPress`, `@pressin -> onPressIn`, `@pressout -> onPressOut`
 		- `Pressable` pointer/web aliases: `@click -> onPress`, `@pointerdown -> onPressIn`, `@pointerup -> onPressOut`
 		- `ScrollView` lifecycle aliases: `@scrollstart -> onScrollBeginDrag`, `@scrollend -> onScrollEndDrag`, `@momentumstart -> onMomentumScrollBegin`, `@momentumend -> onMomentumScrollEnd`
+		- identifier/accessibility prop aliases: `test-id -> testID`, `native-id -> nativeID`, `aria-label -> accessibilityLabel`, `role`/`aria-role -> accessibilityRole`
 		- kebab-case props/events are normalized (`max-length`, `placeholder-text-color`, `@change-text`)
 
 ## Suggested next work

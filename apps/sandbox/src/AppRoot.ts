@@ -140,7 +140,13 @@ export const AppRoot = defineComponent({
     }
   },
   template: `
-    <View testID="root">
+    <View
+      testID="root"
+      test-id="root-kebab"
+      native-id="root-native"
+      aria-label="Root container"
+      role="summary"
+    >
       <StatusBar testID="status-bar" barStyle="dark-content" :hidden="state.statusHidden" />
 
       <Text :style="{ fontSize: 22 }">Count: {{ state.count }}</Text>
@@ -185,7 +191,7 @@ export const AppRoot = defineComponent({
         </Text>
 
         <TouchableOpacity testID="touch-opacity" :activeOpacity="0.75" @press="onTouchableOpacityPress">
-          <Text :style="{ fontSize: 14 }">TouchableOpacity count: {{ state.touchOpacityCount }}</Text>
+          <Text test-id="touch-opacity-text" aria-role="button" :style="{ fontSize: 14 }">TouchableOpacity count: {{ state.touchOpacityCount }}</Text>
         </TouchableOpacity>
 
         <TouchableHighlight
