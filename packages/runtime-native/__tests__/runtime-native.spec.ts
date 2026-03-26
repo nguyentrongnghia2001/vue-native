@@ -310,6 +310,58 @@ describe('@vue-native/runtime-native', () => {
     })
   })
 
+  it('normalizes ScrollView lifecycle and Pressable pointer aliases', () => {
+    const scrollEl = {
+      id: 11,
+      type: 'element',
+      tag: 'ScrollView',
+      children: [],
+      props: {},
+      parentNode: null,
+      eventListeners: null,
+    } as any
+
+    const pressableEl = {
+      id: 12,
+      type: 'element',
+      tag: 'Pressable',
+      children: [],
+      props: {},
+      parentNode: null,
+      eventListeners: null,
+    } as any
+
+    const onScrollStart = () => 'scroll-start'
+    const onScrollEnd = () => 'scroll-end'
+    const onMomentumStart = () => 'momentum-start'
+    const onMomentumEnd = () => 'momentum-end'
+    const onClick = () => 'click'
+    const onPointerDown = () => 'pointer-down'
+    const onPointerUp = () => 'pointer-up'
+
+    patchProp(scrollEl, 'on-scrollstart', null, onScrollStart)
+    patchProp(scrollEl, 'on-scrollend', null, onScrollEnd)
+    patchProp(scrollEl, 'on-momentumstart', null, onMomentumStart)
+    patchProp(scrollEl, 'on-momentumend', null, onMomentumEnd)
+
+    patchProp(pressableEl, 'on-click', null, onClick)
+    patchProp(pressableEl, 'on-pointerdown', null, onPointerDown)
+    patchProp(pressableEl, 'on-pointerup', null, onPointerUp)
+
+    expect(scrollEl.eventListeners).toMatchObject({
+      onScrollBeginDrag: onScrollStart,
+      onScrollEndDrag: onScrollEnd,
+      onMomentumScrollBegin: onMomentumStart,
+      onMomentumScrollEnd: onMomentumEnd,
+    })
+
+    expect(pressableEl.eventListeners).toMatchObject({
+      onPress: onClick,
+      onPressIn: onPointerDown,
+      onPressOut: onPointerUp,
+    })
+  })
+
   it('maps onUpdate:modelValue listeners for TextInput and Switch', () => {
     const textInputEl = {
       id: 30,
@@ -833,5 +885,100 @@ describe('@vue-native/runtime-native', () => {
     expect(state.longPresses).toBe(1)
     expect(state.pressIns).toBe(1)
     expect(state.pressOuts).toBe(1)
+  })
+
+  it('supports ScrollView lifecycle and Pressable pointer alias roundtrip', () => {
+    const root = createNativeRoot()
+    const state = reactive({
+      scrollStarts: 0,
+      scrollEnds: 0,
+      momentumStarts: 0,
+      momentumEnds: 0,
+      clicks: 0,
+      pointerDowns: 0,
+      pointerUps: 0,
+    })
+
+    const App = {
+      setup() {
+        return {
+          onScrollStart: () => {
+            state.scrollStarts += 1
+          },
+          onScrollEnd: () => {
+            state.scrollEnds += 1
+          },
+          onMomentumStart: () => {
+            state.momentumStarts += 1
+          },
+          onMomentumEnd: () => {
+            state.momentumEnds += 1
+          },
+          onClick: () => {
+            state.clicks += 1
+          },
+          onPointerDown: () => {
+            state.pointerDowns += 1
+          },
+          onPointerUp: () => {
+            state.pointerUps += 1
+          },
+        }
+      },
+      template: `
+        <View>
+          <ScrollView
+            @scrollstart="onScrollStart"
+            @scrollend="onScrollEnd"
+            @momentumstart="onMomentumStart"
+            @momentumend="onMomentumEnd"
+            testID="wf-scroll"
+          >
+            <Text>Scrollable content</Text>
+          </ScrollView>
+
+          <Pressable
+            @click="onClick"
+            @pointerdown="onPointerDown"
+            @pointerup="onPointerUp"
+            testID="wf-pointer-pressable"
+          >
+            <Text>Pointer aliases</Text>
+          </Pressable>
+        </View>
+      `,
+    }
+
+    createNativeApp(App).mount(root)
+
+    const snapshot = snapshotNativeTree(root)
+    const children = snapshot.children?.[0]?.children as any[]
+    const scroll = children[0]
+    const pressable = children[1]
+
+    expect(scroll.listeners).toEqual(expect.arrayContaining([
+      'onScrollBeginDrag',
+      'onScrollEndDrag',
+      'onMomentumScrollBegin',
+      'onMomentumScrollEnd',
+    ]))
+    expect(pressable.listeners).toEqual(expect.arrayContaining(['onPress', 'onPressIn', 'onPressOut']))
+
+    expect(dispatchEventToNativeNode(scroll.id, 'onScrollBeginDrag')).toBe(true)
+    expect(dispatchEventToNativeNode(scroll.id, 'onScrollEndDrag')).toBe(true)
+    expect(dispatchEventToNativeNode(scroll.id, 'onMomentumScrollBegin')).toBe(true)
+    expect(dispatchEventToNativeNode(scroll.id, 'onMomentumScrollEnd')).toBe(true)
+
+    expect(dispatchEventToNativeNode(pressable.id, 'onPress')).toBe(true)
+    expect(dispatchEventToNativeNode(pressable.id, 'onPressIn')).toBe(true)
+    expect(dispatchEventToNativeNode(pressable.id, 'onPressOut')).toBe(true)
+
+    expect(state.scrollStarts).toBe(1)
+    expect(state.scrollEnds).toBe(1)
+    expect(state.momentumStarts).toBe(1)
+    expect(state.momentumEnds).toBe(1)
+    expect(state.clicks).toBe(1)
+    expect(state.pointerDowns).toBe(1)
+    expect(state.pointerUps).toBe(1)
   })
 })

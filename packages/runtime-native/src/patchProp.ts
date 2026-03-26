@@ -76,6 +76,18 @@ function resolveComponentEventAlias(tag: string, normalizedEventToken: string): 
   }
 
   if (tag === 'Pressable') {
+    if (normalizedEventToken === 'click') {
+      return 'onPress'
+    }
+
+    if (normalizedEventToken === 'pointerdown') {
+      return 'onPressIn'
+    }
+
+    if (normalizedEventToken === 'pointerup') {
+      return 'onPressOut'
+    }
+
     if (normalizedEventToken === 'longpress') {
       return 'onLongPress'
     }
@@ -90,6 +102,24 @@ function resolveComponentEventAlias(tag: string, normalizedEventToken: string): 
 
     if (normalizedEventToken === 'tap') {
       return 'onPress'
+    }
+  }
+
+  if (tag === 'ScrollView') {
+    if (normalizedEventToken === 'scrollstart') {
+      return 'onScrollBeginDrag'
+    }
+
+    if (normalizedEventToken === 'scrollend') {
+      return 'onScrollEndDrag'
+    }
+
+    if (normalizedEventToken === 'momentumstart') {
+      return 'onMomentumScrollBegin'
+    }
+
+    if (normalizedEventToken === 'momentumend') {
+      return 'onMomentumScrollEnd'
     }
   }
 

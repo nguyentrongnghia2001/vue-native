@@ -15,6 +15,13 @@ export const state = reactive({
   switchChangeCount: 0,
   draftInputCount: 0,
   switchInputCount: 0,
+  scrollStartCount: 0,
+  scrollEndCount: 0,
+  momentumStartCount: 0,
+  momentumEndCount: 0,
+  clickCount: 0,
+  pointerDownCount: 0,
+  pointerUpCount: 0,
 })
 
 export function incrementCount() {
@@ -66,6 +73,34 @@ export function onIncrementPressOut() {
   state.pressOutCount += 1
 }
 
+export function onFeedScrollStart() {
+  state.scrollStartCount += 1
+}
+
+export function onFeedScrollEnd() {
+  state.scrollEndCount += 1
+}
+
+export function onFeedMomentumStart() {
+  state.momentumStartCount += 1
+}
+
+export function onFeedMomentumEnd() {
+  state.momentumEndCount += 1
+}
+
+export function onIncrementClick() {
+  state.clickCount += 1
+}
+
+export function onIncrementPointerDown() {
+  state.pointerDownCount += 1
+}
+
+export function onIncrementPointerUp() {
+  state.pointerUpCount += 1
+}
+
 export const AppRoot = defineComponent({
   setup() {
     return {
@@ -80,6 +115,13 @@ export const AppRoot = defineComponent({
       onIncrementLongPress,
       onIncrementPressIn,
       onIncrementPressOut,
+      onFeedScrollStart,
+      onFeedScrollEnd,
+      onFeedMomentumStart,
+      onFeedMomentumEnd,
+      onIncrementClick,
+      onIncrementPointerDown,
+      onIncrementPointerUp,
       state,
     }
   },
@@ -90,7 +132,14 @@ export const AppRoot = defineComponent({
         This tree is rendered by the Vue native host scaffold.
       </Text>
 
-      <ScrollView testID="feed" :style="{ maxHeight: 220 }">
+      <ScrollView
+        testID="feed"
+        :style="{ maxHeight: 220 }"
+        @scrollstart="onFeedScrollStart"
+        @scrollend="onFeedScrollEnd"
+        @momentumstart="onFeedMomentumStart"
+        @momentumend="onFeedMomentumEnd"
+      >
         <SafeAreaView testID="safe-zone" :style="{ paddingBottom: 6 }">
           <ActivityIndicator testID="loading-indicator" :animating="true" size="small" />
         </SafeAreaView>
@@ -98,6 +147,9 @@ export const AppRoot = defineComponent({
         <Pressable
           testID="increment"
           @tap="onIncrementTap"
+          @click="onIncrementClick"
+          @pointerdown="onIncrementPointerDown"
+          @pointerup="onIncrementPointerUp"
           @longpress="onIncrementLongPress"
           @pressin="onIncrementPressIn"
           @pressout="onIncrementPressOut"
@@ -108,6 +160,12 @@ export const AppRoot = defineComponent({
         <Text :style="{ fontSize: 12, opacity: 0.75 }">tap alias count: {{ state.tapCount }}</Text>
         <Text :style="{ fontSize: 12, opacity: 0.75 }">
           longpress: {{ state.longPressCount }} · pressin: {{ state.pressInCount }} · pressout: {{ state.pressOutCount }}
+        </Text>
+        <Text :style="{ fontSize: 12, opacity: 0.75 }">
+          click: {{ state.clickCount }} · pointerdown: {{ state.pointerDownCount }} · pointerup: {{ state.pointerUpCount }}
+        </Text>
+        <Text :style="{ fontSize: 12, opacity: 0.75 }">
+          scrollstart: {{ state.scrollStartCount }} · scrollend: {{ state.scrollEndCount }} · momentumstart: {{ state.momentumStartCount }} · momentumend: {{ state.momentumEndCount }}
         </Text>
 
         <Image

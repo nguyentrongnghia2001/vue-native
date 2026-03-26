@@ -1043,3 +1043,60 @@ Mục đích: Ghi lại phần đã làm để review nhanh trước khi vào Ph
 ### Decision / Next
 - Feature 7.6 hoàn tất.
 - Có thể tiếp tục Feature 7.7 để mở rộng aliases theo nhóm component khác (ví dụ scroll lifecycle aliases) nếu cần.
+
+---
+
+## [2026-03-26 16:58] Phase 7 / Feature 7.7 Kickoff (Scroll + pointer lifecycle aliases)
+
+### Overview
+- Tổng kết trước kickoff:
+  - Feature 7.6 đã hoàn tất nhóm aliases web-friendly cho input + press lifecycle.
+  - Validation gần nhất: `pnpm test` pass (35/35), `pnpm typecheck` pass.
+- Mục tiêu Feature 7.7:
+  1. Bổ sung aliases cho `ScrollView` lifecycle theo tên ngắn gọn khi viết template.
+  2. Bổ sung aliases pointer-style cho `Pressable` để tăng tính tương thích mindset web.
+
+### Files changed
+- `docs/PHASE_FEATURE_LOG.md`
+
+### Validation
+- Checkpoint trước triển khai: green từ Feature 7.6 (`pnpm test`, `pnpm typecheck`).
+
+### Decision / Next
+- Scope triển khai đề xuất:
+  - `ScrollView @scrollstart -> onScrollBeginDrag`
+  - `ScrollView @scrollend -> onScrollEndDrag`
+  - `ScrollView @momentumstart -> onMomentumScrollBegin`
+  - `ScrollView @momentumend -> onMomentumScrollEnd`
+  - `Pressable @click -> onPress`, `@pointerdown -> onPressIn`, `@pointerup -> onPressOut`
+- Tiếp theo: implement mapping + roundtrip tests + sandbox/docs + commit riêng cho Feature 7.7.
+
+---
+
+## [2026-03-26 17:00] Phase 7 / Feature 7.7 Hoàn tất (Scroll + pointer lifecycle aliases)
+
+### Overview
+- Mở rộng alias mapping theo component-specific lifecycle:
+  - `ScrollView @scrollstart -> onScrollBeginDrag`
+  - `ScrollView @scrollend -> onScrollEndDrag`
+  - `ScrollView @momentumstart -> onMomentumScrollBegin`
+  - `ScrollView @momentumend -> onMomentumScrollEnd`
+  - `Pressable @click -> onPress`, `@pointerdown -> onPressIn`, `@pointerup -> onPressOut`
+- Bổ sung test coverage cho cả normalize-level và roundtrip dispatch-level.
+- Cập nhật sandbox demo + README + roadmap status.
+
+### Files changed
+- `packages/runtime-native/src/patchProp.ts`
+- `packages/runtime-native/__tests__/runtime-native.spec.ts`
+- `apps/sandbox/src/AppRoot.ts`
+- `README.md`
+- `docs/ROADMAP_STATUS.md`
+- `docs/PHASE_FEATURE_LOG.md`
+
+### Validation
+- ✅ `pnpm test` pass (37/37 tests).
+- ✅ `pnpm typecheck` pass cho `runtime-native` + `sandbox`.
+
+### Decision / Next
+- Feature 7.7 hoàn tất.
+- Có thể tiếp tục Feature 7.8 để mở rộng primitives app-level batch mới hoặc chốt thêm mapping edge-cases theo nhu cầu app thật.

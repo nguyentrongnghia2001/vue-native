@@ -85,6 +85,8 @@ pnpm build
 		- `Switch` web-friendly alias: `@input -> onValueChange`
 		- `Pressable` interaction alias: `@tap -> onPress`
 		- `Pressable` lifecycle shorthand aliases: `@longpress -> onLongPress`, `@pressin -> onPressIn`, `@pressout -> onPressOut`
+		- `Pressable` pointer/web aliases: `@click -> onPress`, `@pointerdown -> onPressIn`, `@pointerup -> onPressOut`
+		- `ScrollView` lifecycle aliases: `@scrollstart -> onScrollBeginDrag`, `@scrollend -> onScrollEndDrag`, `@momentumstart -> onMomentumScrollBegin`, `@momentumend -> onMomentumScrollEnd`
 		- kebab-case props/events are normalized (`max-length`, `placeholder-text-color`, `@change-text`)
 
 ## Suggested next work

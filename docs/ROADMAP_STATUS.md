@@ -130,6 +130,7 @@ Tài liệu này là **nguồn tổng hợp duy nhất** cho:
 - ✅ Feature 7.4: event alias normalization cho `TextInput` (`@focus`, `@blur`, `@submit -> onSubmitEditing`)
 - ✅ Feature 7.5: interaction alias refinement (`TextInput @change`, `Switch @change`, `Pressable @tap`)
 - ✅ Feature 7.6: web-friendly interaction lifecycle aliases (`TextInput @input`, `Switch @input`, `Pressable @longpress/@pressin/@pressout`)
+- ✅ Feature 7.7: scroll + pointer lifecycle aliases (`ScrollView @scrollstart/@scrollend/@momentumstart/@momentumend`, `Pressable @click/@pointerdown/@pointerup`)
 - ⏳ Mở rộng thêm primitives app-level (batch tiếp theo theo nhu cầu)
 - ⏳ Chuẩn hoá prop/event mapping chi tiết hơn cho edge-cases theo component-specific behavior
 - Bổ sung docs usage theo từng primitive
