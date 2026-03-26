@@ -28,6 +28,7 @@ export const state = reactive({
   touchWithoutFeedbackCount: 0,
   touchWithoutPointerDownCount: 0,
   touchWithoutPointerUpCount: 0,
+  touchNativeFeedbackCount: 0,
 })
 
 export function incrementCount() {
@@ -128,6 +129,10 @@ export function onTouchableWithoutFeedbackPointerUp() {
   state.touchWithoutPointerUpCount += 1
 }
 
+export function onTouchableNativeFeedbackPress() {
+  state.touchNativeFeedbackCount += 1
+}
+
 export const AppRoot = defineComponent({
   setup() {
     return {
@@ -154,6 +159,7 @@ export const AppRoot = defineComponent({
       onTouchableWithoutFeedbackPress,
       onTouchableWithoutFeedbackPointerDown,
       onTouchableWithoutFeedbackPointerUp,
+      onTouchableNativeFeedbackPress,
       state,
     }
   },
@@ -240,6 +246,15 @@ export const AppRoot = defineComponent({
             TouchableWithoutFeedback tap: {{ state.touchWithoutFeedbackCount }} · pointerdown: {{ state.touchWithoutPointerDownCount }} · pointerup: {{ state.touchWithoutPointerUpCount }}
           </Text>
         </TouchableWithoutFeedback>
+
+        <TouchableNativeFeedback
+          testID="touch-native-feedback"
+          @click="onTouchableNativeFeedbackPress"
+        >
+          <Text :style="{ fontSize: 14 }">
+            TouchableNativeFeedback click: {{ state.touchNativeFeedbackCount }}
+          </Text>
+        </TouchableNativeFeedback>
 
         <Image
           testID="preview"

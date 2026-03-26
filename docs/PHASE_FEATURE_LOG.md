@@ -1273,3 +1273,63 @@ Mục đích: Ghi lại phần đã làm để review nhanh trước khi vào Ph
 - Feature 7.10 hoàn tất.
 - **Phase 7 hoàn tất** theo done criteria (primitive set đủ cho use case app cơ bản + mapping ổn định và test pass).
 - Next ưu tiên quay lại Phase 6.6 để verify runtime roundtrip trên thiết bị/emulator sau khi hoàn tất setup Android SDK/adb.
+
+---
+
+## [2026-03-26 18:35] Phase 7 / Feature 7.11 Kickoff (TouchableNativeFeedback + alias parity)
+
+### Overview
+- Tổng kết trước kickoff:
+  - Feature 7.10 đã hoàn tất batch primitive/mapping cuối của Phase 7 (`TouchableWithoutFeedback`, `ImageBackground`, touchable-family aliases, preserve `StatusBar.hidden=false`).
+  - Validation gần nhất: `pnpm test` pass (42/42), `pnpm typecheck` pass.
+- Mục tiêu Feature 7.11:
+  1. Mở rộng thêm primitive touchable còn thiếu trong nhóm touchable app-level: `TouchableNativeFeedback`.
+  2. Giữ parity alias mapping cho toàn touchable family để template authoring nhất quán.
+
+### Files changed
+- `docs/PHASE_FEATURE_LOG.md`
+
+### Validation
+- Checkpoint trước triển khai: green từ Feature 7.10 (`pnpm test`, `pnpm typecheck`).
+
+### Decision / Next
+- Scope triển khai đề xuất:
+  - Thêm primitive `TouchableNativeFeedback` (create primitive + register global + export public API)
+  - Mở rộng alias mapping touchable-family cho `TouchableNativeFeedback`:
+    - `@tap/@click -> onPress`
+    - `@pointerdown -> onPressIn`
+    - `@pointerup -> onPressOut`
+- Tiếp theo: implement + test normalize/roundtrip/render + cập nhật sandbox/docs + commit riêng cho Feature 7.11.
+
+---
+
+## [2026-03-26 18:45] Phase 7 / Feature 7.11 Hoàn tất (TouchableNativeFeedback + alias parity)
+
+### Overview
+- Bổ sung primitive app-level mới: `TouchableNativeFeedback`.
+- Đăng ký global primitive trong `createNativeApp` và export qua public API `runtime-native`.
+- Mở rộng touchable-family alias parity cho `TouchableNativeFeedback`:
+  - `@tap/@click -> onPress`
+  - `@pointerdown -> onPressIn`
+  - `@pointerup -> onPressOut`
+- Bổ sung test coverage normalize-level, render-level và roundtrip dispatch-level.
+- Cập nhật sandbox demo + README + roadmap status.
+
+### Files changed
+- `packages/runtime-native/src/primitives.ts`
+- `packages/runtime-native/src/nativeApp.ts`
+- `packages/runtime-native/src/index.ts`
+- `packages/runtime-native/src/patchProp.ts`
+- `packages/runtime-native/__tests__/runtime-native.spec.ts`
+- `apps/sandbox/src/AppRoot.ts`
+- `README.md`
+- `docs/ROADMAP_STATUS.md`
+- `docs/PHASE_FEATURE_LOG.md`
+
+### Validation
+- ✅ `pnpm test` pass (42/42 tests).
+- ✅ `pnpm typecheck` pass cho `runtime-native` + `sandbox`.
+
+### Decision / Next
+- Feature 7.11 hoàn tất.
+- Next ưu tiên vẫn là quay lại Phase 6.6 để verify end-to-end runtime roundtrip sau khi môi trường Android SDK/adb sẵn sàng.

@@ -79,7 +79,8 @@ function resolveComponentEventAlias(tag: string, normalizedEventToken: string): 
     tag === 'Pressable' ||
     tag === 'TouchableOpacity' ||
     tag === 'TouchableHighlight' ||
-    tag === 'TouchableWithoutFeedback'
+    tag === 'TouchableWithoutFeedback' ||
+    tag === 'TouchableNativeFeedback'
   ) {
     if (normalizedEventToken === 'click') {
       return 'onPress'

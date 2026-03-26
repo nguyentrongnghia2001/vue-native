@@ -66,7 +66,7 @@ pnpm build
 
 ## Development notes
 
-- Use primitives from `@vue-native/runtime-native`: `View`, `Text`, `Image`, `ImageBackground`, `ScrollView`, `Pressable`, `TextInput`, `FlatList`, `KeyboardAvoidingView`, `SafeAreaView`, `ActivityIndicator`, `Modal`, `Switch`, `SectionList`, `RefreshControl`, `TouchableOpacity`, `TouchableHighlight`, `TouchableWithoutFeedback`, `StatusBar`.
+- Use primitives from `@vue-native/runtime-native`: `View`, `Text`, `Image`, `ImageBackground`, `ScrollView`, `Pressable`, `TextInput`, `FlatList`, `KeyboardAvoidingView`, `SafeAreaView`, `ActivityIndicator`, `Modal`, `Switch`, `SectionList`, `RefreshControl`, `TouchableOpacity`, `TouchableHighlight`, `TouchableWithoutFeedback`, `TouchableNativeFeedback`, `StatusBar`.
 - Vue component syntax is template-first, similar to Vue on the web.
 - The sandbox shows the native tree snapshot and debug ops so you can inspect
 	renderer behavior while iterating.
@@ -86,7 +86,7 @@ pnpm build
 		- `Pressable` interaction alias: `@tap -> onPress`
 		- `Pressable` lifecycle shorthand aliases: `@longpress -> onLongPress`, `@pressin -> onPressIn`, `@pressout -> onPressOut`
 		- `Pressable` pointer/web aliases: `@click -> onPress`, `@pointerdown -> onPressIn`, `@pointerup -> onPressOut`
-		- touchable-family aliases (`TouchableOpacity`, `TouchableHighlight`, `TouchableWithoutFeedback`): `@tap/@click -> onPress`, `@pointerdown -> onPressIn`, `@pointerup -> onPressOut`
+		- touchable-family aliases (`TouchableOpacity`, `TouchableHighlight`, `TouchableWithoutFeedback`, `TouchableNativeFeedback`): `@tap/@click -> onPress`, `@pointerdown -> onPressIn`, `@pointerup -> onPressOut`
 		- `ScrollView` lifecycle aliases: `@scrollstart -> onScrollBeginDrag`, `@scrollend -> onScrollEndDrag`, `@momentumstart -> onMomentumScrollBegin`, `@momentumend -> onMomentumScrollEnd`
 		- identifier/accessibility prop aliases: `test-id -> testID`, `native-id -> nativeID`, `aria-label -> accessibilityLabel`, `role`/`aria-role -> accessibilityRole`
 		- preserve `false` cho component-specific boolean props: `Switch.value`, `Modal.visible`, `RefreshControl.refreshing`, `StatusBar.hidden`

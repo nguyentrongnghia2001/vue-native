@@ -16,6 +16,7 @@ import {
 	Text,
 	TextInput,
 	TouchableHighlight,
+	TouchableNativeFeedback,
 	TouchableOpacity,
 	TouchableWithoutFeedback,
 	View,
@@ -41,6 +42,7 @@ export function createNativeApp(rootComponent: Component) {
 	app.component('TouchableOpacity', TouchableOpacity)
 	app.component('TouchableHighlight', TouchableHighlight)
 	app.component('TouchableWithoutFeedback', TouchableWithoutFeedback)
+	app.component('TouchableNativeFeedback', TouchableNativeFeedback)
 	app.component('StatusBar', StatusBar)
 	app.component('ImageBackground', ImageBackground)
 	return app

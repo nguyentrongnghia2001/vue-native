@@ -423,15 +423,27 @@ describe('@vue-native/runtime-native', () => {
       eventListeners: null,
     } as any
 
+    const touchableNativeFeedbackEl = {
+      id: 16,
+      type: 'element',
+      tag: 'TouchableNativeFeedback',
+      children: [],
+      props: {},
+      parentNode: null,
+      eventListeners: null,
+    } as any
+
     const onTap = () => 'tap'
     const onClick = () => 'click'
     const onPointerDown = () => 'pointer-down'
     const onPointerUp = () => 'pointer-up'
+    const onNativeClick = () => 'native-click'
 
     patchProp(touchableOpacityEl, 'on-tap', null, onTap)
     patchProp(touchableHighlightEl, 'on-click', null, onClick)
     patchProp(touchableWithoutFeedbackEl, 'on-pointerdown', null, onPointerDown)
     patchProp(touchableWithoutFeedbackEl, 'on-pointerup', null, onPointerUp)
+    patchProp(touchableNativeFeedbackEl, 'on-click', null, onNativeClick)
 
     expect(touchableOpacityEl.eventListeners).toMatchObject({ onPress: onTap })
     expect(touchableHighlightEl.eventListeners).toMatchObject({ onPress: onClick })
@@ -439,6 +451,7 @@ describe('@vue-native/runtime-native', () => {
       onPressIn: onPointerDown,
       onPressOut: onPointerUp,
     })
+    expect(touchableNativeFeedbackEl.eventListeners).toMatchObject({ onPress: onNativeClick })
   })
 
   it('maps onUpdate:modelValue listeners for TextInput and Switch', () => {
@@ -856,7 +869,7 @@ describe('@vue-native/runtime-native', () => {
     warnSpy.mockRestore()
   })
 
-  it('renders app-level primitives batch 4 (TouchableWithoutFeedback, ImageBackground)', () => {
+  it('renders app-level primitives batch 4 (TouchableWithoutFeedback, TouchableNativeFeedback, ImageBackground)', () => {
     const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {})
     const root = createNativeRoot()
     const App = {
@@ -875,6 +888,10 @@ describe('@vue-native/runtime-native', () => {
           <TouchableWithoutFeedback testID="touch-without" @press="noop">
             <Text>Without feedback action</Text>
           </TouchableWithoutFeedback>
+
+          <TouchableNativeFeedback testID="touch-native" @press="noop">
+            <Text>Native feedback action</Text>
+          </TouchableNativeFeedback>
         </View>
       `,
     }
@@ -898,6 +915,13 @@ describe('@vue-native/runtime-native', () => {
               tag: 'TouchableWithoutFeedback',
               props: {
                 testID: 'touch-without',
+              },
+              listeners: ['onPress'],
+            },
+            {
+              tag: 'TouchableNativeFeedback',
+              props: {
+                testID: 'touch-native',
               },
               listeners: ['onPress'],
             },
@@ -1232,7 +1256,7 @@ describe('@vue-native/runtime-native', () => {
 
   it('supports touchable family alias roundtrip', () => {
     const root = createNativeRoot()
-    const state = reactive({ opacityTaps: 0, highlightClicks: 0, withoutPointerDown: 0, withoutPointerUp: 0 })
+    const state = reactive({ opacityTaps: 0, highlightClicks: 0, withoutPointerDown: 0, withoutPointerUp: 0, nativeClicks: 0 })
 
     const App = {
       setup() {
@@ -1248,6 +1272,9 @@ describe('@vue-native/runtime-native', () => {
           },
           onWithoutPointerUp: () => {
             state.withoutPointerUp += 1
+          },
+          onNativeClick: () => {
+            state.nativeClicks += 1
           },
         }
       },
@@ -1268,6 +1295,13 @@ describe('@vue-native/runtime-native', () => {
           >
             <Text>Without pointer aliases</Text>
           </TouchableWithoutFeedback>
+
+          <TouchableNativeFeedback
+            @click="onNativeClick"
+            testID="alias-touch-native"
+          >
+            <Text>Native click</Text>
+          </TouchableNativeFeedback>
         </View>
       `,
     }
@@ -1279,19 +1313,23 @@ describe('@vue-native/runtime-native', () => {
     const opacity = children[0]
     const highlight = children[1]
     const without = children[2]
+    const native = children[3]
 
     expect(opacity.listeners).toContain('onPress')
     expect(highlight.listeners).toContain('onPress')
     expect(without.listeners).toEqual(expect.arrayContaining(['onPressIn', 'onPressOut']))
+    expect(native.listeners).toContain('onPress')
 
     expect(dispatchEventToNativeNode(opacity.id, 'onPress')).toBe(true)
     expect(dispatchEventToNativeNode(highlight.id, 'onPress')).toBe(true)
     expect(dispatchEventToNativeNode(without.id, 'onPressIn')).toBe(true)
     expect(dispatchEventToNativeNode(without.id, 'onPressOut')).toBe(true)
+    expect(dispatchEventToNativeNode(native.id, 'onPress')).toBe(true)
 
     expect(state.opacityTaps).toBe(1)
     expect(state.highlightClicks).toBe(1)
     expect(state.withoutPointerDown).toBe(1)
     expect(state.withoutPointerUp).toBe(1)
+    expect(state.nativeClicks).toBe(1)
   })
 })

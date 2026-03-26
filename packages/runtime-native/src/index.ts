@@ -19,6 +19,7 @@ export {
 	Text,
 	TextInput,
 	TouchableHighlight,
+	TouchableNativeFeedback,
 	TouchableOpacity,
 	TouchableWithoutFeedback,
 	View,

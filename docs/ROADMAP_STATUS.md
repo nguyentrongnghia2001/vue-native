@@ -134,6 +134,7 @@ Tài liệu này là **nguồn tổng hợp duy nhất** cho:
 - ✅ Feature 7.8: app-level primitives batch 3 (`TouchableOpacity`, `TouchableHighlight`, `StatusBar`)
 - ✅ Feature 7.9: identifier + accessibility prop aliases (`test-id`, `native-id`, `aria-label`, `role`/`aria-role`)
 - ✅ Feature 7.10: finalization batch (`TouchableWithoutFeedback`, `ImageBackground`, touchable-family aliases, preserve `StatusBar.hidden=false`)
+- ✅ Feature 7.11: touchable parity expansion (`TouchableNativeFeedback` primitive + touchable-family alias parity)
 - ✅ Primitive set mở rộng đủ cho use case app cơ bản
 - ✅ Mapping component-specific ổn định, có test coverage cho edge-cases chính
 - ✅ Docs usage đã được bổ sung theo từng nhóm primitive/mapping
