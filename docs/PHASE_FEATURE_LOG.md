@@ -1100,3 +1100,59 @@ Mục đích: Ghi lại phần đã làm để review nhanh trước khi vào Ph
 ### Decision / Next
 - Feature 7.7 hoàn tất.
 - Có thể tiếp tục Feature 7.8 để mở rộng primitives app-level batch mới hoặc chốt thêm mapping edge-cases theo nhu cầu app thật.
+
+---
+
+## [2026-03-26 17:15] Phase 7 / Feature 7.8 Kickoff (App-level primitives batch 3)
+
+### Overview
+- Tổng kết trước kickoff:
+  - Feature 7.7 đã hoàn tất alias mở rộng cho ScrollView + Pressable pointer lifecycle.
+  - Validation gần nhất: `pnpm test` pass (37/37), `pnpm typecheck` pass.
+- Mục tiêu Feature 7.8:
+  1. Mở rộng thêm app-level primitives có giá trị thực tế cho UI shell/status/interaction.
+  2. Tiếp tục tăng primitive coverage để tiến gần done criteria của Phase 7.
+
+### Files changed
+- `docs/PHASE_FEATURE_LOG.md`
+
+### Validation
+- Checkpoint trước triển khai: green từ Feature 7.7 (`pnpm test`, `pnpm typecheck`).
+
+### Decision / Next
+- Scope triển khai đề xuất:
+  - Thêm primitives: `TouchableOpacity`, `TouchableHighlight`, `StatusBar`
+  - Register global trong `createNativeApp`
+  - Export trong public API `runtime-native`
+  - Bổ sung tests + sandbox demo + docs + commit riêng Feature 7.8.
+
+---
+
+## [2026-03-26 17:20] Phase 7 / Feature 7.8 Hoàn tất (App-level primitives batch 3)
+
+### Overview
+- Bổ sung 3 primitives app-level mới:
+  - `TouchableOpacity`
+  - `TouchableHighlight`
+  - `StatusBar`
+- Đăng ký global cả 3 primitives trong `createNativeApp` và export ra public API package.
+- Bổ sung runtime tests xác nhận render/resolve component cho batch 3.
+- Cập nhật sandbox `AppRoot` và README để có usage reference.
+
+### Files changed
+- `packages/runtime-native/src/primitives.ts`
+- `packages/runtime-native/src/nativeApp.ts`
+- `packages/runtime-native/src/index.ts`
+- `packages/runtime-native/__tests__/runtime-native.spec.ts`
+- `apps/sandbox/src/AppRoot.ts`
+- `README.md`
+- `docs/ROADMAP_STATUS.md`
+- `docs/PHASE_FEATURE_LOG.md`
+
+### Validation
+- ✅ `pnpm test` pass (38/38 tests).
+- ✅ `pnpm typecheck` pass cho `runtime-native` + `sandbox`.
+
+### Decision / Next
+- Feature 7.8 hoàn tất.
+- Có thể tiếp tục Feature 7.9 (batch primitives kế tiếp hoặc refine mapping chuyên sâu theo behavior component-specific).

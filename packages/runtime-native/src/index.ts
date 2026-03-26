@@ -13,9 +13,12 @@ export {
 	SafeAreaView,
 	SectionList,
 	ScrollView,
+	StatusBar,
 	Switch,
 	Text,
 	TextInput,
+	TouchableHighlight,
+	TouchableOpacity,
 	View,
 } from './primitives.js'
 export { createNativeApp } from './nativeApp.js'

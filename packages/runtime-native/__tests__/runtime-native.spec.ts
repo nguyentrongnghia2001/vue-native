@@ -705,6 +705,78 @@ describe('@vue-native/runtime-native', () => {
     warnSpy.mockRestore()
   })
 
+  it('renders app-level primitives batch 3 (TouchableOpacity, TouchableHighlight, StatusBar)', () => {
+    const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {})
+    const root = createNativeRoot()
+    const App = {
+      setup() {
+        return {
+          hidden: false,
+          contentBg: '#e9f2ff',
+          noop: () => {},
+        }
+      },
+      template: `
+        <View testID="batch-3-root">
+          <StatusBar testID="status-bar" barStyle="dark-content" :hidden="hidden" />
+
+          <TouchableOpacity testID="touch-opacity" :activeOpacity="0.7" @press="noop">
+            <Text>Opacity action</Text>
+          </TouchableOpacity>
+
+          <TouchableHighlight
+            testID="touch-highlight"
+            :underlayColor="contentBg"
+            @press="noop"
+          >
+            <Text>Highlight action</Text>
+          </TouchableHighlight>
+        </View>
+      `,
+    }
+
+    createNativeApp(App).mount(root)
+
+    expect(snapshotNativeTree(root)).toMatchObject({
+      children: [
+        {
+          tag: 'View',
+          props: { testID: 'batch-3-root' },
+          children: [
+            {
+              tag: 'StatusBar',
+              props: {
+                testID: 'status-bar',
+                barStyle: 'dark-content',
+              },
+            },
+            {
+              tag: 'TouchableOpacity',
+              props: {
+                testID: 'touch-opacity',
+                activeOpacity: 0.7,
+              },
+              listeners: ['onPress'],
+            },
+            {
+              tag: 'TouchableHighlight',
+              props: {
+                testID: 'touch-highlight',
+                underlayColor: '#e9f2ff',
+              },
+              listeners: ['onPress'],
+            },
+          ],
+        },
+      ],
+    })
+
+    expect(warnSpy).not.toHaveBeenCalledWith(
+      expect.stringContaining('Failed to resolve component'),
+    )
+    warnSpy.mockRestore()
+  })
+
   it('supports v-model roundtrip for TextInput and Switch', () => {
     const root = createNativeRoot()
     const state = reactive({

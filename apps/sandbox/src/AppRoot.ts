@@ -22,6 +22,9 @@ export const state = reactive({
   clickCount: 0,
   pointerDownCount: 0,
   pointerUpCount: 0,
+  statusHidden: false,
+  touchOpacityCount: 0,
+  touchHighlightCount: 0,
 })
 
 export function incrementCount() {
@@ -101,6 +104,15 @@ export function onIncrementPointerUp() {
   state.pointerUpCount += 1
 }
 
+export function onTouchableOpacityPress() {
+  state.touchOpacityCount += 1
+}
+
+export function onTouchableHighlightPress() {
+  state.touchHighlightCount += 1
+  state.statusHidden = !state.statusHidden
+}
+
 export const AppRoot = defineComponent({
   setup() {
     return {
@@ -122,11 +134,15 @@ export const AppRoot = defineComponent({
       onIncrementClick,
       onIncrementPointerDown,
       onIncrementPointerUp,
+      onTouchableOpacityPress,
+      onTouchableHighlightPress,
       state,
     }
   },
   template: `
     <View testID="root">
+      <StatusBar testID="status-bar" barStyle="dark-content" :hidden="state.statusHidden" />
+
       <Text :style="{ fontSize: 22 }">Count: {{ state.count }}</Text>
       <Text :style="{ fontSize: 14, opacity: 0.8 }">
         This tree is rendered by the Vue native host scaffold.
@@ -167,6 +183,20 @@ export const AppRoot = defineComponent({
         <Text :style="{ fontSize: 12, opacity: 0.75 }">
           scrollstart: {{ state.scrollStartCount }} · scrollend: {{ state.scrollEndCount }} · momentumstart: {{ state.momentumStartCount }} · momentumend: {{ state.momentumEndCount }}
         </Text>
+
+        <TouchableOpacity testID="touch-opacity" :activeOpacity="0.75" @press="onTouchableOpacityPress">
+          <Text :style="{ fontSize: 14 }">TouchableOpacity count: {{ state.touchOpacityCount }}</Text>
+        </TouchableOpacity>
+
+        <TouchableHighlight
+          testID="touch-highlight"
+          :underlay-color="'#dbeafe'"
+          @press="onTouchableHighlightPress"
+        >
+          <Text :style="{ fontSize: 14 }">
+            TouchableHighlight count: {{ state.touchHighlightCount }} · status hidden: {{ state.statusHidden }}
+          </Text>
+        </TouchableHighlight>
 
         <Image
           testID="preview"

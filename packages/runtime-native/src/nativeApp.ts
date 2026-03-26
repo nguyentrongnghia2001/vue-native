@@ -11,9 +11,12 @@ import {
 	SafeAreaView,
 	SectionList,
 	ScrollView,
+	StatusBar,
 	Switch,
 	Text,
 	TextInput,
+	TouchableHighlight,
+	TouchableOpacity,
 	View,
 } from './primitives.js'
 
@@ -33,5 +36,8 @@ export function createNativeApp(rootComponent: Component) {
 	app.component('Switch', Switch)
 	app.component('SectionList', SectionList)
 	app.component('RefreshControl', RefreshControl)
+	app.component('TouchableOpacity', TouchableOpacity)
+	app.component('TouchableHighlight', TouchableHighlight)
+	app.component('StatusBar', StatusBar)
 	return app
 }
