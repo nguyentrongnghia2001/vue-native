@@ -5,17 +5,18 @@ import {
   ScrollView,
   StyleSheet,
   Text as RNText,
+  Switch as RNSwitch,
+  TextInput as RNTextInput,
   View as RNView,
 } from 'react-native'
 import {
   createNativeApp,
   createNativeTransportBridgeAdapter,
   createNativeRoot,
-  dumpDebugOps,
   registerBridgeAdapter,
   snapshotNativeTree,
 } from '@vue-native/runtime-native'
-import { AppRoot, incrementCount } from './src/AppRoot'
+import AppRoot, { incrementCount } from './src/AppRoot.vue'
 import { createRuntimeNativeTransport } from './src/runtimeNativeTransport'
 
 function findNodeByTag(snapshot: any, tag: string): any | null {
@@ -31,6 +32,96 @@ function findNodeByTag(snapshot: any, tag: string): any | null {
   return null
 }
 
+function snapshotStyle(snapshot: any) {
+  if (!snapshot || typeof snapshot !== 'object') return undefined
+  const style = snapshot.props?.style
+  return style && typeof style === 'object' ? style : undefined
+}
+
+function snapshotTestId(snapshot: any) {
+  if (!snapshot || typeof snapshot !== 'object') return undefined
+  return snapshot.props?.testID ?? snapshot.props?.testId ?? snapshot.props?.['test-id']
+}
+
+function renderSnapshotNode(
+  snapshot: any,
+  keyPrefix = 'node',
+  insideText = false,
+): React.ReactNode {
+  if (!snapshot || typeof snapshot !== 'object') return null
+
+  if (snapshot.type === 'text') {
+    return insideText ? (
+      snapshot.text
+    ) : (
+      <RNText key={`${keyPrefix}-${snapshot.id}`} style={styles.previewText}>
+        {snapshot.text}
+      </RNText>
+    )
+  }
+
+  if (snapshot.type === 'comment') return null
+
+  const childNodes = Array.isArray(snapshot.children)
+    ? snapshot.children.map((child: any, index: number) =>
+        renderSnapshotNode(
+          child,
+          `${keyPrefix}-${snapshot.id}-${index}`,
+          snapshot.tag === 'Text',
+        ),
+      )
+    : null
+
+  const commonProps = {
+    key: `${keyPrefix}-${snapshot.id}`,
+    testID: snapshotTestId(snapshot),
+    style: snapshotStyle(snapshot),
+  }
+
+  switch (snapshot.tag) {
+    case 'root':
+    case 'View':
+    case 'SafeAreaView':
+      return <RNView {...commonProps}>{childNodes}</RNView>
+    case 'ScrollView':
+      return (
+        <ScrollView {...commonProps} contentContainerStyle={snapshotStyle(snapshot)}>
+          {childNodes}
+        </ScrollView>
+      )
+    case 'Text':
+      return (
+        <RNText {...commonProps}>
+          {childNodes}
+        </RNText>
+      )
+    case 'Pressable':
+      return <Pressable {...commonProps}>{childNodes}</Pressable>
+    case 'TextInput':
+      return (
+        <RNTextInput
+          {...commonProps}
+          value={typeof snapshot.props?.value === 'string' ? snapshot.props.value : ''}
+          editable={false}
+        />
+      )
+    case 'Switch':
+      return (
+        <RNSwitch
+          {...commonProps}
+          value={Boolean(snapshot.props?.value)}
+          disabled
+        />
+      )
+    default:
+      return <RNView {...commonProps}>{childNodes}</RNView>
+  }
+}
+
+function BrowserSnapshotPreview({ snapshot }: { snapshot: any }) {
+  return <RNView style={styles.previewCanvas}>{renderSnapshotNode(snapshot)}</RNView>
+}
+
 const root = createNativeRoot()
 const runtimeTransport = createRuntimeNativeTransport()
 const transportAdapter = createNativeTransportBridgeAdapter(runtimeTransport, {
@@ -44,17 +135,6 @@ export default function SandboxApp() {
   const [version, setVersion] = useState(0)
 
   const tree = useMemo(() => snapshotNativeTree(root), [version])
-  const ops = useMemo(() => dumpDebugOps().slice(-20), [version])
-  const transportStats = useMemo(() => transportAdapter.getStats(), [version])
-  const runtimeTransportStats = useMemo(() => runtimeTransport.getStats(), [version])
-  const runtimeTransportDiagnostics = useMemo(
-    () => runtimeTransport.getDiagnostics(),
-    [version],
-  )
-  const transportBatches = useMemo(
-    () => runtimeTransport.getRecentBatches().slice(0, 5),
-    [version],
-  )
 
   const increment = () => {
     incrementCount()
@@ -75,40 +155,23 @@ export default function SandboxApp() {
         <RNView style={styles.card}>
           <RNText style={styles.title}>Vue Native Sandbox</RNText>
           <RNText style={styles.body}>
-            Đây là repo độc lập để phát triển native renderer. Bấm nút để cập nhật
-            state Vue và xem cây native/debug ops đổi theo.
+            Đây là browser preview của UI được khai báo trong `AppRoot.vue`.
+            Bấm nút để xem state Vue cập nhật ngay trên màn hình.
           </RNText>
 
-          <Pressable onPress={increment} style={styles.button}>
-            <RNText style={styles.buttonText}>Increment count</RNText>
-          </Pressable>
-
-          <Pressable onPress={simulateNativePress} style={styles.secondaryButton}>
-            <RNText style={styles.buttonText}>Simulate native onPress</RNText>
-          </Pressable>
-
           <RNView style={styles.section}>
-            <RNText style={styles.sectionTitle}>Native tree snapshot</RNText>
-            <RNText style={styles.mono}>{JSON.stringify(tree, null, 2)}</RNText>
+            <RNText style={styles.sectionTitle}>Browser preview from AppRoot.vue</RNText>
+            <BrowserSnapshotPreview snapshot={tree} />
           </RNView>
 
-          <RNView style={styles.section}>
-            <RNText style={styles.sectionTitle}>Recent debug ops</RNText>
-            <RNText style={styles.mono}>{JSON.stringify(ops, null, 2)}</RNText>
-          </RNView>
+          <RNView style={styles.actionsRow}>
+            <Pressable onPress={increment} style={styles.button}>
+              <RNText style={styles.buttonText}>Increment count</RNText>
+            </Pressable>
 
-          <RNView style={styles.section}>
-            <RNText style={styles.sectionTitle}>Native transport stats</RNText>
-            <RNText style={styles.mono}>{JSON.stringify(transportStats, null, 2)}</RNText>
-            <RNText style={styles.mono}>{JSON.stringify(runtimeTransportStats, null, 2)}</RNText>
-            <RNText style={styles.mono}>
-              {JSON.stringify(runtimeTransportDiagnostics, null, 2)}
-            </RNText>
-          </RNView>
-
-          <RNView style={styles.section}>
-            <RNText style={styles.sectionTitle}>Recent transport batches</RNText>
-            <RNText style={styles.mono}>{JSON.stringify(transportBatches, null, 2)}</RNText>
+            <Pressable onPress={simulateNativePress} style={styles.secondaryButton}>
+              <RNText style={styles.buttonText}>Simulate native onPress</RNText>
+            </Pressable>
           </RNView>
         </RNView>
       </ScrollView>
@@ -135,6 +198,12 @@ const styles = StyleSheet.create({
   section: {
     gap: 8,
     marginTop: 4,
+  },
+  actionsRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 12,
+    marginTop: 8,
   },
   sectionTitle: {
     color: '#e9eeff',
@@ -169,9 +238,15 @@ const styles = StyleSheet.create({
     fontSize: 14,
     lineHeight: 20,
   },
-  mono: {
-    color: '#89a8ff',
-    fontFamily: 'Menlo',
-    fontSize: 12,
+  previewCanvas: {
+    gap: 10,
+    borderRadius: 18,
+    borderWidth: 1,
+    borderColor: '#263158',
+    backgroundColor: '#0e1530',
+    padding: 16,
+  },
+  previewText: {
+    color: '#e9eeff',
   },
 })

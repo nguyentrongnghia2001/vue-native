@@ -17,7 +17,7 @@ Biến runtime hiện tại từ "in-memory debug renderer" thành nền tảng 
 - `packages/runtime-native/src/renderer.ts`: renderer entry đang hoạt động.
 - `packages/runtime-native/src/compiler.ts`: đã có runtime template compiler.
 - `packages/runtime-native/src/primitives.ts`: có `View`, `Text`.
-- `apps/sandbox/src/AppRoot.ts`: authoring theo template syntax.
+- `apps/sandbox/src/AppRoot.vue`: authoring theo template syntax.
 - Host đang là tree in-memory + debug ops, chưa có bridge thật.
 
 ---
@@ -93,7 +93,7 @@ Giữ developer experience gần Vue web hơn, đồng thời mở rộng host c
    - đăng ký primitives nhất quán.
 
 3. Chuẩn hoá docs usage trong sandbox:
-   - file: `apps/sandbox/src/AppRoot.ts`, `README.md`
+   - file: `apps/sandbox/src/AppRoot.vue`, `README.md`
    - ví dụ template cho events/styles theo host mapping thực tế.
 
 ### Output kỳ vọng

@@ -147,6 +147,14 @@ Tài liệu này là **nguồn tổng hợp duy nhất** cho:
 
 ---
 
+## Sandbox web authoring
+
+- ✅ Sandbox demo đã hỗ trợ authoring bằng `AppRoot.vue` (browser preview)
+- ✅ Có custom Metro transformer cho `.vue` trong `apps/sandbox`
+- ✅ App shell vẫn giữ snapshot/debug view bằng React Native ở `apps/sandbox/App.tsx`
+
+---
+
 ## 4) Quy tắc làm việc bắt buộc (đang áp dụng)
 
 - Trước mỗi Phase/Feature mới:

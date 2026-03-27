@@ -1333,3 +1333,88 @@ Mục đích: Ghi lại phần đã làm để review nhanh trước khi vào Ph
 ### Decision / Next
 - Feature 7.11 hoàn tất.
 - Next ưu tiên vẫn là quay lại Phase 6.6 để verify end-to-end runtime roundtrip sau khi môi trường Android SDK/adb sẵn sàng.
+
+---
+
+## [2026-03-27 05:15] Phase 7 / Feature 7.12 Kickoff (Vue SFC trong sandbox web)
+
+### Overview
+- Mục tiêu: cho phép sandbox chạy demo bằng file `.vue` thật trên browser thay vì chỉ dùng `template` inline trong `.ts`.
+- Hướng triển khai: thêm loader/transformer cho `.vue` trong Expo web sandbox, sau đó chuyển `AppRoot` sang SFC nhưng vẫn giữ runtime-native renderer hiện tại.
+
+### Files changed
+- `docs/PHASE_FEATURE_LOG.md`
+
+### Validation
+- Trước triển khai: browser preview web đang chạy ổn, nhưng sandbox chưa có `.vue` loader.
+
+### Decision / Next
+- Implement transformer `.vue` + Metro config + chuyển demo root sang `AppRoot.vue`.
+
+---
+
+## [2026-03-27 06:45] Phase 7 / Feature 7.12 Hoàn tất (Vue SFC trong sandbox web)
+
+### Overview
+- Đã thêm support `.vue` SFC cho sandbox web bằng custom Metro transformer.
+- Chuyển demo root sang `apps/sandbox/src/AppRoot.vue` với một screen tối giản gồm `View`, `Text`, `Pressable`, `TextInput`, `Switch`.
+- Giữ nguyên shell debug/snapshot trong `apps/sandbox/App.tsx` để tiếp tục inspect tree trên browser.
+
+### Files changed
+- `apps/sandbox/App.tsx`
+- `apps/sandbox/metro.config.cjs`
+- `apps/sandbox/scripts/vue-transformer.cjs` (new)
+- `apps/sandbox/src/AppRoot.vue` (new)
+- `apps/sandbox/src/shims-vue.d.ts` (new)
+- `apps/sandbox/tsconfig.json`
+- `README.md`
+- `docs/NEXT_STEPS_ARCHITECTURE.md`
+- `docs/ROADMAP_STATUS.md`
+- `docs/PHASE_FEATURE_LOG.md`
+
+### Validation
+- ✅ `apps/sandbox` editor diagnostics: no errors
+- ✅ Browser web server trả `HTTP/1.1 200 OK` tại `http://localhost:8081`
+- ✅ Expo web bundle hoàn tất sau khi mở browser và nạp `AppRoot.vue`
+
+### Decision / Next
+- Sandbox giờ đã có đường authoring `.vue` thật trên browser.
+- Next hợp lý: thêm ví dụ SFC thứ hai hoặc tách shell/browser demo thành màn hình nhỏ hơn nếu muốn giảm nhiễu debug view.
+
+---
+
+## [2026-03-27 06:55] Phase 7 / Feature 7.13 Kickoff (Browser preview cho AppRoot.vue)
+
+### Overview
+- Hiện tại `AppRoot.vue` đã là source of truth cho sandbox demo, nhưng người dùng vẫn thấy debug shell hơn là preview trực quan của component.
+- Mục tiêu: render snapshot cây native ra một preview browser-friendly ngay trong `apps/sandbox/App.tsx` để nội dung trong `AppRoot.vue` nhìn thấy được rõ ràng.
+
+### Files changed
+- `docs/PHASE_FEATURE_LOG.md`
+
+### Validation
+- Trước triển khai: `AppRoot.vue` mount thành công và typecheck sandbox vẫn pass.
+
+### Decision / Next
+- Thêm preview renderer cho snapshot tree trong shell sandbox, ưu tiên render các primitive đang dùng trong demo (`View`, `Text`, `Pressable`, `TextInput`, `Switch`).
+
+---
+
+## [2026-03-27 07:05] Phase 7 / Feature 7.13 Hoàn tất (Browser preview cho AppRoot.vue)
+
+### Overview
+- Rút gọn shell sandbox để tập trung vào UI được render từ `AppRoot.vue`.
+- Giữ lại phần preview trực quan + 2 nút tương tác (`Increment count`, `Simulate native onPress`) nhưng bỏ toàn bộ JSON/debug panels gây nhiễu.
+- Kết quả: browser preview giờ giống một app UI thật hơn và dễ nhìn hơn.
+
+### Files changed
+- `apps/sandbox/App.tsx`
+- `docs/PHASE_FEATURE_LOG.md`
+
+### Validation
+- ✅ `pnpm --filter @vue-native/sandbox typecheck` pass (`EXIT:0`)
+- ✅ `apps/sandbox/App.tsx` diagnostics: no errors
+
+### Decision / Next
+- Feature 7.13 hoàn tất.
+- Nếu muốn tiếp, bước hợp lý là tiếp tục làm shell mỏng hơn nữa hoặc chuyển sang nhiều screen/SFC demo hơn.
