@@ -100,50 +100,89 @@ Tài liệu này là **nguồn tổng hợp duy nhất** cho:
 
 ## 3) Cần làm tiếp (ưu tiên) 🔜
 
-## Phase 6 — Adapter target thực thi native thật
+## Phase 8 — Product Host App Baseline
 
-**Mục tiêu:** ngoài in-memory target, thêm adapter cho môi trường native thực tế.
+**Mục tiêu:** tách rõ sandbox demo và app host cho product, để flow release không phụ thuộc debug shell.
 
 ### Việc cần làm
-- ✅ Tạo adapter implementation theo target cụ thể: `createNativeTransportBridgeAdapter`
-- ✅ Chuẩn hoá contract payload giữa JS mutation record và native execution layer (transport contract)
-- ✅ Theo dõi error/ack path cho applyMutations
-- ✅ Gắn sandbox transport implementation để kiểm chứng wiring trong host app
-- ✅ Bổ sung runtime-aware transport layer ưu tiên native module + event subscription
-- ✅ Implement native bridge module source cho Android/iOS (`VueNativeHostBridge`) + integration docs
-- ✅ Chuẩn hoá Android-first prebuild integration workflow (sync/check/run scripts + real-device checklist)
-- ✅ Verify end-to-end runtime roundtrip trên app native thật (device/emulator) sau khi tích hợp vào prebuild output
+- ⏳ Tạo `apps/product-host` (hoặc profile product trong sandbox) với entry tối giản, không phụ thuộc panel debug.
+- ⏳ Chuẩn hoá cấu trúc authoring theo Vue-like: `AppRoot.vue`, `components/`, `pages/`, `composables/`.
+- ⏳ Chốt bootstrap contract: một file khởi động mỏng (`index.js -> src/main.jsx`) + host nội bộ riêng.
+- ⏳ Thiết lập env config theo build type: `dev`, `staging`, `prod`.
 
 ### Done khi
-- Adapter chạy được trên target thật với mutation + event roundtrip
-- Test integration + typecheck pass
+- App host product chạy được Android emulator/device với cùng runtime-native package.
+- Team có template tạo màn hình mới theo SFC flow mà không cần sửa host internals.
 
 ---
 
-## Phase 7 — Primitive expansion nâng cao (tiếp)
+## Phase 9 — Runtime SDK Stabilization (v1 RC)
+
+**Mục tiêu:** khoá API public cho runtime-native trước khi phát hành nội bộ.
 
 ### Việc cần làm
-- ✅ Feature 7.1: thêm app-level primitives batch 1 (`SafeAreaView`, `ActivityIndicator`, `Modal`)
-- ✅ Feature 7.2: thêm input/form/list primitives batch 2 (`Switch`, `SectionList`, `RefreshControl`)
-- ✅ Refine mapping: hỗ trợ kebab-case prop/event normalization (`max-length`, `placeholder-text-color`, `@change-text`)
-- ✅ Feature 7.3: component-specific mapping edge-cases (`TextInput`/`Switch` v-model aliases, preserve `false` cho một số boolean props)
-- ✅ Feature 7.4: event alias normalization cho `TextInput` (`@focus`, `@blur`, `@submit -> onSubmitEditing`)
-- ✅ Feature 7.5: interaction alias refinement (`TextInput @change`, `Switch @change`, `Pressable @tap`)
-- ✅ Feature 7.6: web-friendly interaction lifecycle aliases (`TextInput @input`, `Switch @input`, `Pressable @longpress/@pressin/@pressout`)
-- ✅ Feature 7.7: scroll + pointer lifecycle aliases (`ScrollView @scrollstart/@scrollend/@momentumstart/@momentumend`, `Pressable @click/@pointerdown/@pointerup`)
-- ✅ Feature 7.8: app-level primitives batch 3 (`TouchableOpacity`, `TouchableHighlight`, `StatusBar`)
-- ✅ Feature 7.9: identifier + accessibility prop aliases (`test-id`, `native-id`, `aria-label`, `role`/`aria-role`)
-- ✅ Feature 7.10: finalization batch (`TouchableWithoutFeedback`, `ImageBackground`, touchable-family aliases, preserve `StatusBar.hidden=false`)
-- ✅ Feature 7.11: touchable parity expansion (`TouchableNativeFeedback` primitive + touchable-family alias parity)
-- ✅ Primitive set mở rộng đủ cho use case app cơ bản
-- ✅ Mapping component-specific ổn định, có test coverage cho edge-cases chính
-- ✅ Docs usage đã được bổ sung theo từng nhóm primitive/mapping
+- ⏳ Audit API export hiện tại (`index.ts`) và chốt danh sách stable APIs.
+- ⏳ Thêm test contract cho các API public quan trọng (`createNativeApp`, bridge adapter, event dispatch).
+- ⏳ Loại warning còn lại ở runtime host transport (`NativeEventEmitter` add/remove listener contract).
+- ⏳ Viết tài liệu migration notes cho breaking-change policy (semver).
 
 ### Done khi
-- ✅ Primitive set đủ cho use case app cơ bản
-- ✅ Mapping ổn định, test pass
+- Có baseline `v1.0.0-rc` cho runtime-native với test + typecheck pass.
+- Không còn warning runtime cấp platform trong flow chạy chuẩn.
 
-**Kết luận Phase 7:** ✅ Hoàn tất.
+---
+
+## Phase 10 — Quality, Observability, Performance
+
+**Mục tiêu:** nâng độ tin cậy để thử nghiệm nội bộ ở quy mô team.
+
+### Việc cần làm
+- ⏳ Bổ sung e2e smoke test (launch app, input, toggle, press event roundtrip).
+- ⏳ Thêm telemetry chuẩn cho bridge throughput, error rate, latency.
+- ⏳ Thêm crash/error reporting pipeline cho app host.
+- ⏳ Thiết lập performance baseline (startup time, first interaction latency, memory).
+
+### Done khi
+- CI có quality gate rõ ràng cho unit/integration/e2e smoke.
+- Có dashboard tối thiểu cho runtime health sau khi phát hành beta.
+
+---
+
+## Phase 11 — Security & Release Readiness
+
+**Mục tiêu:** sẵn sàng phát hành beta/public mà không thiếu compliance cơ bản.
+
+### Việc cần làm
+- ⏳ Dependency audit + secret handling + policy cho network/storage.
+- ⏳ Chuẩn hoá manifest/permission theo scope product.
+- ⏳ Chuẩn bị release checklist Android/iOS (assets, app id, signing, privacy text).
+- ⏳ Chuẩn hoá rollback plan + release notes template.
+
+### Done khi
+- Có thể phát hành internal beta theo checklist lặp lại được.
+- Mọi biến môi trường/signing được quản lý qua CI secrets.
+
+---
+
+## Phase 12 — Distribution & Product Iteration
+
+**Mục tiêu:** chạy beta thật với người dùng nội bộ, đo được KPI sản phẩm.
+
+### Việc cần làm
+- ⏳ Thiết lập kênh phát hành: `alpha -> beta -> stable`.
+- ⏳ Thu thập feedback loop (issue template, crash triage, product analytics).
+- ⏳ Chạy pilot 1-2 sprint để chốt backlog sau beta.
+- ⏳ Lập kế hoạch support matrix theo OS/device.
+
+### Done khi
+- Có release cadence ổn định và số liệu quyết định cho roadmap v2.
+
+---
+
+## Legacy Completed Phases
+
+- Phase 6: ✅ Adapter target native thực đã hoàn tất (bao gồm verify runtime roundtrip trên emulator/device).
+- Phase 7: ✅ Primitive expansion + prop/event mapping refinement đã hoàn tất.
 
 ---
 
@@ -151,7 +190,7 @@ Tài liệu này là **nguồn tổng hợp duy nhất** cho:
 
 - ✅ Sandbox demo đã hỗ trợ authoring bằng `AppRoot.vue` (browser preview)
 - ✅ Có custom Metro transformer cho `.vue` trong `apps/sandbox`
-- ✅ App shell vẫn giữ snapshot/debug view bằng React Native ở `apps/sandbox/App.tsx`
+- ✅ Bootstrap sandbox đã chuyển sang `index.js -> src/main.jsx` với host nội bộ tách riêng (`src/SandboxPreviewHost.jsx`)
 
 ---
 

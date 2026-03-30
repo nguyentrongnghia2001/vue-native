@@ -17,10 +17,10 @@ import {
   registerBridgeAdapter,
   snapshotNativeTree,
 } from '@vue-native/runtime-native'
-import AppRoot, { incrementCount } from './src/AppRoot.vue'
-import { createRuntimeNativeTransport } from './src/runtimeNativeTransport'
+import AppRoot, { incrementCount } from './AppRoot.vue'
+import { createRuntimeNativeTransport } from './runtimeNativeTransport'
 
-function findNodeByTag(snapshot: any, tag: string): any | null {
+function findNodeByTag(snapshot, tag) {
   if (!snapshot || typeof snapshot !== 'object') return null
   if (snapshot.tag === tag) return snapshot
 
@@ -33,18 +33,18 @@ function findNodeByTag(snapshot: any, tag: string): any | null {
   return null
 }
 
-function snapshotStyle(snapshot: any) {
+function snapshotStyle(snapshot) {
   if (!snapshot || typeof snapshot !== 'object') return undefined
   const style = snapshot.props?.style
   return style && typeof style === 'object' ? style : undefined
 }
 
-function snapshotTestId(snapshot: any) {
+function snapshotTestId(snapshot) {
   if (!snapshot || typeof snapshot !== 'object') return undefined
   return snapshot.props?.testID ?? snapshot.props?.testId ?? snapshot.props?.['test-id']
 }
 
-function findTextByPrefix(snapshot: any, prefix: string): string | null {
+function findTextByPrefix(snapshot, prefix) {
   if (!snapshot || typeof snapshot !== 'object') return null
   if (snapshot.type === 'text' && typeof snapshot.text === 'string') {
     if (snapshot.text.startsWith(prefix)) {
@@ -61,11 +61,7 @@ function findTextByPrefix(snapshot: any, prefix: string): string | null {
   return null
 }
 
-function renderSnapshotNode(
-  snapshot: any,
-  keyPrefix = 'node',
-  insideText = false,
-): React.ReactNode {
+function renderSnapshotNode(snapshot, keyPrefix = 'node', insideText = false) {
   if (!snapshot || typeof snapshot !== 'object') return null
 
   if (snapshot.type === 'text') {
@@ -81,7 +77,7 @@ function renderSnapshotNode(
   if (snapshot.type === 'comment') return null
 
   const childNodes = Array.isArray(snapshot.children)
-    ? snapshot.children.map((child: any, index: number) =>
+    ? snapshot.children.map((child, index) =>
         renderSnapshotNode(
           child,
           `${keyPrefix}-${snapshot.id}-${index}`,
@@ -91,6 +87,17 @@ function renderSnapshotNode(
     : null
 
   const nodeKey = `${keyPrefix}-${snapshot.id}`
+  const nodeId = typeof snapshot.id === 'number' ? snapshot.id : null
+  const emitSnapshotEvent = (event, args) => {
+    if (nodeId == null) return
+    if (args) {
+      runtimeTransport.emitEvent({ nodeId, event, args })
+      return
+    }
+
+    runtimeTransport.emitEvent({ nodeId, event })
+  }
+
   const commonProps = {
     testID: snapshotTestId(snapshot),
     style: snapshotStyle(snapshot),
@@ -118,14 +125,29 @@ function renderSnapshotNode(
         </RNText>
       )
     case 'Pressable':
-      return <Pressable key={nodeKey} {...commonProps}>{childNodes}</Pressable>
+      return (
+        <Pressable
+          key={nodeKey}
+          {...commonProps}
+          onPress={() => emitSnapshotEvent('onPress')}
+          onLongPress={() => emitSnapshotEvent('onLongPress')}
+          onPressIn={() => emitSnapshotEvent('onPressIn')}
+          onPressOut={() => emitSnapshotEvent('onPressOut')}
+        >
+          {childNodes}
+        </Pressable>
+      )
     case 'TextInput':
       return (
         <RNTextInput
           key={nodeKey}
           {...commonProps}
           value={typeof snapshot.props?.value === 'string' ? snapshot.props.value : ''}
-          editable={false}
+          editable={snapshot.props?.editable !== false}
+          onChangeText={(value) => emitSnapshotEvent('onChangeText', [value])}
+          onFocus={() => emitSnapshotEvent('onFocus')}
+          onBlur={() => emitSnapshotEvent('onBlur')}
+          onSubmitEditing={() => emitSnapshotEvent('onSubmitEditing')}
         />
       )
     case 'Switch':
@@ -134,7 +156,8 @@ function renderSnapshotNode(
           key={nodeKey}
           {...commonProps}
           value={Boolean(snapshot.props?.value)}
-          disabled
+          disabled={snapshot.props?.disabled === true}
+          onValueChange={(value) => emitSnapshotEvent('onValueChange', [value])}
         />
       )
     default:
@@ -142,7 +165,7 @@ function renderSnapshotNode(
   }
 }
 
-function BrowserSnapshotPreview({ snapshot }: { snapshot: any }) {
+function BrowserSnapshotPreview({ snapshot }) {
   return <RNView style={styles.previewCanvas}>{renderSnapshotNode(snapshot)}</RNView>
 }
 
@@ -161,15 +184,15 @@ export default function SandboxApp() {
   const tree = useMemo(() => snapshotNativeTree(root), [version])
 
   useEffect(() => {
-    const nativeBridge = (NativeModules as Record<string, any>).VueNativeHostBridge
+    const nativeBridge = NativeModules.VueNativeHostBridge
     const diagnostics = runtimeTransport.getDiagnostics()
     console.log('[runtime-native][verify] diagnostics', diagnostics)
 
     nativeBridge?.getStats?.()
-      ?.then((stats: unknown) => {
+      ?.then((stats) => {
         console.log('[runtime-native][verify] native stats on mount', stats)
       })
-      ?.catch((error: unknown) => {
+      ?.catch((error) => {
         console.warn('[runtime-native][verify] getStats failed', error)
       })
 
@@ -193,10 +216,10 @@ export default function SandboxApp() {
         console.log('[runtime-native][verify] count after native emitEvent', countLine)
 
         nativeBridge?.getStats?.()
-          ?.then((stats: unknown) => {
+          ?.then((stats) => {
             console.log('[runtime-native][verify] native stats after emitEvent', stats)
           })
-          ?.catch((error: unknown) => {
+          ?.catch((error) => {
             console.warn('[runtime-native][verify] getStats after emitEvent failed', error)
           })
 

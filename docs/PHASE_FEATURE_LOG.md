@@ -1421,6 +1421,37 @@ Mục đích: Ghi lại phần đã làm để review nhanh trước khi vào Ph
 
 ---
 
+## [2026-03-30 22:45] Phase 7 / Feature 7.14 Hoàn tất (Website-like authoring scaffold cho sandbox)
+
+### Overview
+- Mục tiêu: giúp team trải nghiệm Vue Native với cảm giác authoring gần Vue website.
+- Triển khai lại cấu trúc sandbox theo pattern web app:
+  - tách `composables` cho shared state/actions,
+  - tách `components` cho UI tái sử dụng,
+  - tách `pages` cho từng màn hình,
+  - giữ `AppRoot.vue` làm app shell + tab routing đơn giản.
+- Giữ tương thích với flow native verify hiện tại (vẫn có `Count:` + `Pressable` để quan sát runtime bridge behavior).
+
+### Files changed
+- `apps/sandbox/src/composables/usePlaygroundState.ts` (new)
+- `apps/sandbox/src/components/NavTabs.vue` (new)
+- `apps/sandbox/src/pages/HomePage.vue` (new)
+- `apps/sandbox/src/pages/FormPage.vue` (new)
+- `apps/sandbox/src/pages/LabPage.vue` (new)
+- `apps/sandbox/src/AppRoot.vue`
+- `README.md`
+
+### Validation
+- ✅ `pnpm --filter @vue-native/sandbox typecheck`
+- ✅ `pnpm test` (42/42 tests)
+- ✅ `pnpm --filter @vue-native/sandbox android` build + install + bundle thành công trên emulator
+
+### Decision / Next
+- Sandbox đã sẵn sàng cho teammate trial với flow Vue-like rõ ràng hơn.
+- Bước tiếp theo hợp lý: tách thêm reusable UI primitives (`BaseCard`, `BaseButton`) hoặc thêm một page demo data-list để mô phỏng app thực tế.
+
+---
+
 ## [2026-03-30 22:15] Phase 6 / Feature 6.6 Hoàn tất (Verify native runtime roundtrip trên emulator)
 
 ### Overview
@@ -1447,3 +1478,26 @@ Mục đích: Ghi lại phần đã làm để review nhanh trước khi vào Ph
 ### Decision / Next
 - Task pending của Phase 6.6 được chốt hoàn tất: đã verify mutation + native event roundtrip end-to-end trên target thật (Android emulator).
 - Có thể tiếp tục các ưu tiên roadmap tiếp theo; phần native runtime roundtrip không còn ở trạng thái chờ verify.
+
+---
+
+## [2026-03-30 23:20] Planning checkpoint / Productization roadmap refresh
+
+### Overview
+- Tổng hợp lại toàn bộ phase đã hoàn tất (Phase 1-7) và chuyển trọng tâm roadmap sang product hóa.
+- Chuẩn hoá kế hoạch tiếp theo vào 2 tài liệu nguồn:
+  - `docs/ROADMAP_STATUS.md` (tracking trạng thái + ưu tiên),
+  - `docs/NEXT_STEPS_ARCHITECTURE.md` (kiến trúc chi tiết theo phase).
+- Mục tiêu planning mới: từ sandbox/runtime demo sang khả năng release alpha/beta/stable.
+
+### Files changed
+- `docs/ROADMAP_STATUS.md`
+- `docs/NEXT_STEPS_ARCHITECTURE.md`
+- `docs/PHASE_FEATURE_LOG.md`
+
+### Validation
+- N/A (planning/docs update only)
+
+### Decision / Next
+- Phase tiếp theo ưu tiên: Product Host App Separation + Runtime SDK Stabilization.
+- Khi bắt đầu implement từng feature của các phase mới: tiếp tục áp dụng quy trình `implement -> test/typecheck -> commit riêng`.

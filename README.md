@@ -69,6 +69,11 @@ pnpm build
 - Use primitives from `@vue-native/runtime-native`: `View`, `Text`, `Image`, `ImageBackground`, `ScrollView`, `Pressable`, `TextInput`, `FlatList`, `KeyboardAvoidingView`, `SafeAreaView`, `ActivityIndicator`, `Modal`, `Switch`, `SectionList`, `RefreshControl`, `TouchableOpacity`, `TouchableHighlight`, `TouchableWithoutFeedback`, `TouchableNativeFeedback`, `StatusBar`.
 - Vue component syntax is template-first, similar to Vue on the web.
 - The sandbox browser demo is now authored in `apps/sandbox/src/AppRoot.vue`.
+- Website-like sandbox structure for team onboarding:
+	- `apps/sandbox/src/composables/usePlaygroundState.ts`: shared reactive state/actions
+	- `apps/sandbox/src/components/NavTabs.vue`: reusable UI component
+	- `apps/sandbox/src/pages/*.vue`: page-level SFCs (`HomePage`, `FormPage`, `LabPage`)
+	- `apps/sandbox/src/AppRoot.vue`: app shell + tab routing pattern
 - The sandbox shows the native tree snapshot and debug ops so you can inspect
 	renderer behavior while iterating.
 - Runtime implementation should go through `runtime-native` host/bridge/primitives (from Phase 3 onward, no direct React Native native APIs/components in runtime layer).

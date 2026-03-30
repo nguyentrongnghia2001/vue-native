@@ -1,128 +1,167 @@
 # Next-step architecture (vue-native)
 
-Tài liệu này chỉ tập trung vào **bước tiếp theo** cho codebase hiện tại.
+Tài liệu này mô tả kiến trúc **giai đoạn product hóa** dựa trên trạng thái hiện tại (Phase 1-7 đã hoàn tất).
 
-## Mục tiêu ngắn hạn
+## Mục tiêu kiến trúc trung hạn
 
-Biến runtime hiện tại từ "in-memory debug renderer" thành nền tảng có thể:
+Biến codebase từ sandbox/runtime demo thành nền tảng phát hành được:
 
-1. định nghĩa host contract ổn định,
-2. có bridge mutation rõ ràng,
-3. giữ syntax viết component giống Vue web (`setup + template`).
+1. App host production rõ ràng, không phụ thuộc debug shell.
+2. Runtime SDK có API ổn định, test được, versioning rõ ràng.
+3. Pipeline chất lượng + release đủ để chạy alpha/beta/stable.
 
 ---
 
 ## Trạng thái hiện tại (điểm xuất phát)
 
-- `packages/runtime-native/src/renderer.ts`: renderer entry đang hoạt động.
-- `packages/runtime-native/src/compiler.ts`: đã có runtime template compiler.
-- `packages/runtime-native/src/primitives.ts`: có `View`, `Text`.
-- `apps/sandbox/src/AppRoot.vue`: authoring theo template syntax.
-- Host đang là tree in-memory + debug ops, chưa có bridge thật.
+- Core runtime đã có bridge queue + batching + adapter contract.
+- Native transport flow Android đã verify roundtrip trên emulator/device.
+- Primitive coverage và prop/event mapping đã mở rộng đến use case app cơ bản.
+- Sandbox authoring đã chạy `.vue` SFC với bootstrap mỏng (`index.js -> src/main.jsx`).
+- Vẫn còn vài điểm chưa production-ready: warning NativeEventEmitter contract, thiếu CI e2e smoke, chưa có release host app tách riêng.
 
 ---
 
-## Phase 1 — Ổn định host contract (ưu tiên cao)
+## Phase A — Product Host App Separation
 
 ### Mục tiêu
 
-Chuẩn hoá contract giữa Vue patching và host layer để tránh rò rỉ behavior DOM.
+Tách lớp demo/sandbox khỏi lớp app phát hành.
 
 ### Việc cần làm
 
-1. Chuẩn hóa mapping props/events theo native host:
-   - file: `packages/runtime-native/src/patchProp.ts`
-   - quyết định rõ key nào vào `props`, key nào vào `eventListeners`.
-
-2. Chuẩn hóa snapshot model:
-   - file: `packages/runtime-native/src/types.ts`, `src/host.ts`
-   - đảm bảo snapshot đủ thông tin debug nhưng không chứa state dư thừa.
-
-3. Tách debug-op và host-op:
-   - file: `packages/runtime-native/src/host.ts`
-   - giữ `debugOps` chỉ là instrumentation, không phụ thuộc business flow.
+1. Tạo app host production profile (hoặc app mới trong `apps/`):
+   - entrypoint mỏng, không phụ thuộc preview/debug panels.
+2. Giữ host preview/debug ở module riêng (`SandboxPreviewHost`) để không rò sang release.
+3. Chuẩn hoá cấu trúc Vue authoring:
+   - `AppRoot.vue`, `components/`, `pages/`, `composables/`.
 
 ### Output kỳ vọng
 
-- Host contract được mô tả rõ và test được.
-- Không còn logic mang hơi hướng DOM trong patch/host.
+- Team chỉ viết feature ở SFC/composables.
+- Host internals không bị sửa trong luồng phát triển thường ngày.
 
 ---
 
-## Phase 2 — Introduce mutation bridge (JS -> Native)
+## Phase B — Runtime SDK Stabilization
 
 ### Mục tiêu
 
-Thay vì chỉ mutate tree in-memory, renderer sẽ phát mutation records qua bridge adapter.
+Khoá contract API của `@vue-native/runtime-native` ở mức v1 RC.
 
 ### Việc cần làm
 
-1. Tạo bridge adapter interface:
-   - file mới: `packages/runtime-native/src/bridge.ts`
-   - ví dụ API: `enqueue(op)`, `flush()`, `setEventDispatcher(fn)`.
-
-2. Chuyển host ops sang emit mutation:
-   - file: `packages/runtime-native/src/host.ts`
-   - các op `insert/remove/setText/patchProp` phải đi qua bridge queue.
-
-3. Add batching strategy:
-   - file: `packages/runtime-native/src/renderer.ts` hoặc `bridge.ts`
-   - flush theo tick/frame để tránh chattering.
+1. Audit API public (`packages/runtime-native/src/index.ts`) và chia rõ:
+   - Stable API,
+   - Experimental API.
+2. Hoàn thiện native event contract:
+   - đảm bảo `NativeEventEmitter` compatibility (`addListener`, `removeListeners`).
+3. Chuẩn hoá error semantics:
+   - ack/error path, retry policy, telemetry fields.
 
 ### Output kỳ vọng
 
-- Có thể thay bridge implementation mà không đổi renderer core.
-- Có log mutation batch rõ ràng để debug/perf.
+- Runtime package có changelog + semver policy rõ ràng.
+- Không còn warning platform-level trong flow chạy chuẩn.
 
 ---
 
-## Phase 3 — Mở rộng primitives + authoring experience
+## Phase C — Quality & Observability Baseline
 
 ### Mục tiêu
 
-Giữ developer experience gần Vue web hơn, đồng thời mở rộng host coverage.
+Tăng độ tin cậy cho internal beta.
 
 ### Việc cần làm
 
-1. Thêm primitives cơ bản:
-   - file: `packages/runtime-native/src/primitives.ts`
-   - thêm `Image`, `ScrollView`, `Pressable` wrapper.
-
-2. Global register mặc định trong native app:
-   - file: `packages/runtime-native/src/nativeApp.ts`
-   - đăng ký primitives nhất quán.
-
-3. Chuẩn hoá docs usage trong sandbox:
-   - file: `apps/sandbox/src/AppRoot.vue`, `README.md`
-   - ví dụ template cho events/styles theo host mapping thực tế.
+1. Bổ sung e2e smoke test cho luồng tương tác cơ bản:
+   - launch app,
+   - input,
+   - switch toggle,
+   - press event roundtrip.
+2. Bổ sung telemetry runtime:
+   - bridge latency,
+   - mutation throughput,
+   - dispatch failure rate.
+3. Thêm crash/error reporting cho host app.
 
 ### Output kỳ vọng
 
-- Viết component native theo syntax Vue web, ít ceremony.
-- Sandbox dùng làm reference implementation.
+- CI có quality gate đủ trước mỗi release candidate.
+- Có dashboard vận hành tối thiểu sau deploy.
 
 ---
 
-## Test strategy cho next steps
+## Phase D — Security & Compliance Hardening
 
-Tối thiểu bổ sung test ở `packages/runtime-native/__tests__`:
+### Mục tiêu
 
-1. `bridge.spec.ts`
-   - assert mutation batch order.
+Đáp ứng điều kiện phát hành beta/public.
 
-2. `props-events.spec.ts`
-   - assert mapping `@press`, `:style`, boolean props.
+### Việc cần làm
 
-3. `template-compiler.spec.ts`
-   - assert template compile + primitive resolution.
+1. Dependency audit + policy update định kỳ.
+2. Chuẩn hoá permission/sensitive API usage theo target store.
+3. Thiết lập secrets/signing qua CI vault, không để local leakage.
+4. Chuẩn bị privacy text + incident/rollback runbook.
+
+### Output kỳ vọng
+
+- Internal release checklist có thể lặp lại.
+- Mỗi bản build có provenance và rollback plan.
 
 ---
 
-## Định nghĩa Done cho milestone tiếp theo
+## Phase E — Release Operations & Distribution
 
-Done khi thoả cả 4 điều kiện:
+### Mục tiêu
+
+Thiết lập vòng đời phát hành sản phẩm.
+
+### Việc cần làm
+
+1. Thiết lập release channels:
+   - `alpha` (dev team),
+   - `beta` (internal users),
+   - `stable` (public).
+2. Chuẩn hoá release automation:
+   - build artifacts,
+   - changelog,
+   - staged rollout.
+3. Thiết lập KPI theo cohort beta:
+   - crash-free sessions,
+   - startup latency,
+   - retention baseline.
+
+### Output kỳ vọng
+
+- Có cadence release theo sprint.
+- Quyết định roadmap v2 dựa trên data thật.
+
+---
+
+## Test strategy cho các bước tiếp theo
+
+Tối thiểu cần mở rộng trong `packages/runtime-native/__tests__` và host app tests:
+
+1. Bridge/adapter contract tests:
+   - batch ordering,
+   - adapter attach/detach,
+   - error propagation.
+2. Interaction conformance tests:
+   - TextInput/Switch/Pressable roundtrip.
+3. Bootstrap/host tests:
+   - entrypoint smoke,
+   - mount/unmount consistency.
+
+---
+
+## Định nghĩa Done cho Product Milestone kế tiếp
+
+Done khi thoả đồng thời:
 
 1. `pnpm test` pass.
 2. `pnpm typecheck` pass.
-3. Sandbox vẫn render được với template syntax.
-4. Mutation flow không còn phụ thuộc debug tree nội bộ.
+3. Android release-host build chạy ổn trên emulator + 1 thiết bị thật.
+4. Không còn warning runtime-level nghiêm trọng trong flow chuẩn.
+5. Có CI workflow cho alpha/beta release.
