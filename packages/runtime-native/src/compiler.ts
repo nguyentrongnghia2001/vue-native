@@ -3,7 +3,10 @@ import * as VueRuntime from '@vue/runtime-core'
 import { registerRuntimeCompiler, warn } from '@vue/runtime-core'
 
 const compileCache = new Map<string, Function>()
-const isBrowserRuntime = typeof globalThis !== 'undefined' && 'window' in globalThis
+const isDomRuntime =
+  typeof globalThis !== 'undefined' &&
+  'window' in globalThis &&
+  'document' in globalThis
 
 function normalizeCompilerOptions(options: CompilerOptions): CompilerOptions {
   const normalized: CompilerOptions = {
@@ -14,7 +17,7 @@ function normalizeCompilerOptions(options: CompilerOptions): CompilerOptions {
 
   const wantsPrefixIdentifiers = normalized.prefixIdentifiers ?? true
 
-  if (isBrowserRuntime) {
+  if (isDomRuntime) {
     if (wantsPrefixIdentifiers) {
       warn('[runtime-native] compileNativeTemplate: prefixIdentifiers is not supported in browser compiler build, fallback to false.')
     }

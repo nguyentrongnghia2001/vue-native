@@ -1,5 +1,6 @@
-import React, { useMemo, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import {
+  NativeModules,
   Pressable,
   SafeAreaView,
   ScrollView,
@@ -43,6 +44,23 @@ function snapshotTestId(snapshot: any) {
   return snapshot.props?.testID ?? snapshot.props?.testId ?? snapshot.props?.['test-id']
 }
 
+function findTextByPrefix(snapshot: any, prefix: string): string | null {
+  if (!snapshot || typeof snapshot !== 'object') return null
+  if (snapshot.type === 'text' && typeof snapshot.text === 'string') {
+    if (snapshot.text.startsWith(prefix)) {
+      return snapshot.text
+    }
+  }
+
+  if (!Array.isArray(snapshot.children)) return null
+  for (const child of snapshot.children) {
+    const found = findTextByPrefix(child, prefix)
+    if (found) return found
+  }
+
+  return null
+}
+
 function renderSnapshotNode(
   snapshot: any,
   keyPrefix = 'node',
@@ -72,8 +90,8 @@ function renderSnapshotNode(
       )
     : null
 
+  const nodeKey = `${keyPrefix}-${snapshot.id}`
   const commonProps = {
-    key: `${keyPrefix}-${snapshot.id}`,
     testID: snapshotTestId(snapshot),
     style: snapshotStyle(snapshot),
   }
@@ -82,24 +100,29 @@ function renderSnapshotNode(
     case 'root':
     case 'View':
     case 'SafeAreaView':
-      return <RNView {...commonProps}>{childNodes}</RNView>
+      return <RNView key={nodeKey} {...commonProps}>{childNodes}</RNView>
     case 'ScrollView':
       return (
-        <ScrollView {...commonProps} contentContainerStyle={snapshotStyle(snapshot)}>
+        <ScrollView
+          key={nodeKey}
+          {...commonProps}
+          contentContainerStyle={snapshotStyle(snapshot)}
+        >
           {childNodes}
         </ScrollView>
       )
     case 'Text':
       return (
-        <RNText {...commonProps}>
+        <RNText key={nodeKey} {...commonProps}>
           {childNodes}
         </RNText>
       )
     case 'Pressable':
-      return <Pressable {...commonProps}>{childNodes}</Pressable>
+      return <Pressable key={nodeKey} {...commonProps}>{childNodes}</Pressable>
     case 'TextInput':
       return (
         <RNTextInput
+          key={nodeKey}
           {...commonProps}
           value={typeof snapshot.props?.value === 'string' ? snapshot.props.value : ''}
           editable={false}
@@ -108,13 +131,14 @@ function renderSnapshotNode(
     case 'Switch':
       return (
         <RNSwitch
+          key={nodeKey}
           {...commonProps}
           value={Boolean(snapshot.props?.value)}
           disabled
         />
       )
     default:
-      return <RNView {...commonProps}>{childNodes}</RNView>
+      return <RNView key={nodeKey} {...commonProps}>{childNodes}</RNView>
   }
 }
 
@@ -135,6 +159,55 @@ export default function SandboxApp() {
   const [version, setVersion] = useState(0)
 
   const tree = useMemo(() => snapshotNativeTree(root), [version])
+
+  useEffect(() => {
+    const nativeBridge = (NativeModules as Record<string, any>).VueNativeHostBridge
+    const diagnostics = runtimeTransport.getDiagnostics()
+    console.log('[runtime-native][verify] diagnostics', diagnostics)
+
+    nativeBridge?.getStats?.()
+      ?.then((stats: unknown) => {
+        console.log('[runtime-native][verify] native stats on mount', stats)
+      })
+      ?.catch((error: unknown) => {
+        console.warn('[runtime-native][verify] getStats failed', error)
+      })
+
+    const timer = setTimeout(() => {
+      const snapshotBefore = snapshotNativeTree(root)
+      const pressable = findNodeByTag(snapshotBefore, 'Pressable')
+
+      if (!pressable?.id || typeof nativeBridge?.emitEvent !== 'function') {
+        console.warn('[runtime-native][verify] emitEvent probe skipped', {
+          hasPressable: Boolean(pressable?.id),
+          hasEmitEvent: typeof nativeBridge?.emitEvent === 'function',
+        })
+        return
+      }
+
+      nativeBridge.emitEvent(pressable.id, 'onPress', null)
+
+      setTimeout(() => {
+        const snapshotAfter = snapshotNativeTree(root)
+        const countLine = findTextByPrefix(snapshotAfter, 'Count:')
+        console.log('[runtime-native][verify] count after native emitEvent', countLine)
+
+        nativeBridge?.getStats?.()
+          ?.then((stats: unknown) => {
+            console.log('[runtime-native][verify] native stats after emitEvent', stats)
+          })
+          ?.catch((error: unknown) => {
+            console.warn('[runtime-native][verify] getStats after emitEvent failed', error)
+          })
+
+        setVersion(v => v + 1)
+      }, 0)
+    }, 800)
+
+    return () => {
+      clearTimeout(timer)
+    }
+  }, [])
 
   const increment = () => {
     incrementCount()

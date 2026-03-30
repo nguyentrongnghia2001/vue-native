@@ -5,7 +5,7 @@ Tài liệu này là **nguồn tổng hợp duy nhất** cho:
 - Những gì đang làm
 - Những gì cần làm tiếp
 
-> Cập nhật gần nhất: **2026-03-26**
+> Cập nhật gần nhất: **2026-03-30**
 
 ---
 
@@ -112,10 +112,10 @@ Tài liệu này là **nguồn tổng hợp duy nhất** cho:
 - ✅ Bổ sung runtime-aware transport layer ưu tiên native module + event subscription
 - ✅ Implement native bridge module source cho Android/iOS (`VueNativeHostBridge`) + integration docs
 - ✅ Chuẩn hoá Android-first prebuild integration workflow (sync/check/run scripts + real-device checklist)
-- ⏳ Verify end-to-end runtime roundtrip trên app native thật (device/emulator) sau khi tích hợp vào prebuild output
+- ✅ Verify end-to-end runtime roundtrip trên app native thật (device/emulator) sau khi tích hợp vào prebuild output
 
 ### Done khi
-- Adapter chạy được trên target thật với mutation + event roundtrip (đang chờ verify runtime)
+- Adapter chạy được trên target thật với mutation + event roundtrip
 - Test integration + typecheck pass
 
 ---

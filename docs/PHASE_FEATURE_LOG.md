@@ -1418,3 +1418,32 @@ Mục đích: Ghi lại phần đã làm để review nhanh trước khi vào Ph
 ### Decision / Next
 - Feature 7.13 hoàn tất.
 - Nếu muốn tiếp, bước hợp lý là tiếp tục làm shell mỏng hơn nữa hoặc chuyển sang nhiều screen/SFC demo hơn.
+
+---
+
+## [2026-03-30 22:15] Phase 6 / Feature 6.6 Hoàn tất (Verify native runtime roundtrip trên emulator)
+
+### Overview
+- Mục tiêu pending của Phase 6.6 được thực thi lại trên Android emulator đã mở sẵn.
+- Đã chạy full pipeline `prebuild -> sync -> check -> run` và xác nhận app chạy trên emulator (`com.anonymous.vuenativesandbox`).
+- Trong quá trình verify phát hiện blocker Hermes parse error (`with (_ctx)`), đã sửa ở runtime compiler để không ép browser-mode trên môi trường React Native.
+- Bổ sung verify probe trong sandbox để log trực tiếp diagnostics/stats và kích hoạt native event roundtrip (`native module emitEvent -> JS handler -> mutation flush`).
+
+### Files changed
+- `packages/runtime-native/src/compiler.ts`
+- `apps/sandbox/App.tsx`
+- `docs/ROADMAP_STATUS.md`
+- `docs/PHASE_FEATURE_LOG.md`
+
+### Validation
+- ✅ `pnpm --filter @vue-native/sandbox typecheck`
+- ✅ `pnpm test` (42/42 tests)
+- ✅ `pnpm --filter @vue-native/sandbox native:run:android` chạy được trên emulator (build/install/open app thành công)
+- ✅ Runtime verification logs trên Android:
+  - `[runtime-native][verify] diagnostics` cho thấy `moduleDetected: true`, methods đầy đủ.
+  - `[runtime-native][verify] native stats on mount` cho thấy `mode: native-module`, `sentBatches: 1`, `sentMutations: 54`.
+  - Sau native `emitEvent`, stats tăng thành `receivedEvents: 1`, `sentBatches: 2`, `sentMutations: 55`.
+
+### Decision / Next
+- Task pending của Phase 6.6 được chốt hoàn tất: đã verify mutation + native event roundtrip end-to-end trên target thật (Android emulator).
+- Có thể tiếp tục các ưu tiên roadmap tiếp theo; phần native runtime roundtrip không còn ở trạng thái chờ verify.
