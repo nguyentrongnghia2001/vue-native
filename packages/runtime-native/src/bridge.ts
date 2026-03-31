@@ -20,6 +20,11 @@ export interface NativeBridgeAdapter {
   onDetach?: () => void
 }
 
+export type HostMutationRecord = NativeMutationRecord
+export type HostEventRecord = NativeEventRecord
+export type HostBridgeAdapterRuntime = NativeBridgeAdapterRuntime
+export type HostBridgeAdapter = NativeBridgeAdapter
+
 type MutationSink = (batch: NativeMutationRecord[]) => void
 type EventDispatcher = (event: NativeEventRecord) => void
 
@@ -96,6 +101,10 @@ export function scheduleFlush(): void {
 
 export function dispatchNativeEvent(event: NativeEventRecord): void {
   eventDispatcher?.(event)
+}
+
+export function dispatchHostEvent(event: HostEventRecord): void {
+  dispatchNativeEvent(event)
 }
 
 export function getPendingMutationCount(): number {

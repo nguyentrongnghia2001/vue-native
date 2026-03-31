@@ -1155,7 +1155,7 @@ Mục đích: Ghi lại phần đã làm để review nhanh trước khi vào Ph
 
 ### Decision / Next
 - Feature 7.8 hoàn tất.
-- Có thể tiếp tục Feature 7.9 (batch primitives kế tiếp hoặc refine mapping chuyên sâu theo behavior component-specific).
+- Có thể tiếp tục Feature 7.9 (batch primitives kế tiếp hoặc refine mapping edge-cases theo nhu cầu app thực tế).
 
 ---
 
@@ -1501,3 +1501,136 @@ Mục đích: Ghi lại phần đã làm để review nhanh trước khi vào Ph
 ### Decision / Next
 - Phase tiếp theo ưu tiên: Product Host App Separation + Runtime SDK Stabilization.
 - Khi bắt đầu implement từng feature của các phase mới: tiếp tục áp dụng quy trình `implement -> test/typecheck -> commit riêng`.
+
+---
+
+## [2026-03-31 19:25] Phase 8 / Direction Pivot Checkpoint (No Expo + React Native lock-in)
+
+### Overview
+- Review lại trạng thái hiện tại: core runtime (Phase 1-7) ổn định, test pass; workspace đã có `apps/product-host` như lớp host chuyển tiếp.
+- Quyết định kiến trúc mới: phát triển theo hướng runtime/app host không phụ thuộc Expo + React Native trong dài hạn.
+- Giữ host Expo/RN hiện tại như lớp compatibility để không gián đoạn verify native trong giai đoạn migration.
+
+### Files changed
+- `docs/ROADMAP_STATUS.md`
+- `docs/NEXT_STEPS_ARCHITECTURE.md`
+- `docs/PHASE_FEATURE_LOG.md`
+
+### Validation
+- N/A (checkpoint planning/docs only)
+
+### Decision / Next
+- Ưu tiên implementation kế tiếp: **Phase 8B / Feature 8B.1 — Host-Agnostic Contract Extraction**.
+- Trước khi code feature 8B.1: chốt review checkpoint trong chat theo quy trình bắt buộc.
+
+---
+
+## [2026-03-31 21:20] Phase 8B / Feature 8B.1 (Host-Agnostic Contract Extraction)
+
+### Overview
+- Triển khai contract host-agnostic đầu tiên cho transport adapter để giảm lock-in naming `Native*`.
+- Thêm API mới `createHostTransportBridgeAdapter` và các kiểu `Host*` tương ứng.
+- Giữ tương thích ngược: `createNativeTransportBridgeAdapter` vẫn hoạt động qua compatibility wrapper.
+- Thêm bridge alias `dispatchHostEvent` + type aliases `Host*` trong bridge contract.
+
+### Files changed
+- `packages/runtime-native/src/bridge.ts`
+- `packages/runtime-native/src/adapters/hostTransportBridgeAdapter.ts` (new)
+- `packages/runtime-native/src/adapters/nativeTransportBridgeAdapter.ts`
+- `packages/runtime-native/src/index.ts`
+- `packages/runtime-native/__tests__/host-transport-adapter.spec.ts` (new)
+- `apps/product-host/src/ProductHost.jsx`
+- `docs/PHASE_FEATURE_LOG.md`
+
+### Validation
+- ✅ `pnpm test` (44/44 tests pass)
+- ✅ `pnpm typecheck` (runtime-native + sandbox + product-host đều pass)
+
+### Decision / Next
+- Feature 8B.1 hoàn tất, API host-agnostic đã có baseline và không phá backward compatibility.
+- Bước tiếp theo: **Feature 8B.2** — tách runtime host transport contract khỏi `react-native` trong app layer và thêm non-RN host adapter đầu tiên.
+
+---
+
+## [2026-03-31 21:45] Phase 8B / Feature 8B.2 (App-layer transport decoupling + first non-RN host adapter)
+
+### Overview
+- Tách app-layer transport khỏi implementation `react-native` bằng factory contract chung `HostMutationTransport`.
+- Cô lập RN-specific transport vào module riêng (`reactNativeHostTransport.ts`).
+- Thêm non-RN host adapter đầu tiên trong runtime package: `createInMemoryHostTransport`.
+- Giữ compatibility cho code cũ qua `runtimeNativeTransport.ts` re-export.
+
+### Files changed
+- `packages/runtime-native/src/adapters/inMemoryHostTransport.ts` (new)
+- `packages/runtime-native/__tests__/in-memory-host-transport.spec.ts` (new)
+- `packages/runtime-native/src/index.ts`
+- `apps/product-host/src/hostTransport.ts` (new)
+- `apps/product-host/src/reactNativeHostTransport.ts` (new)
+- `apps/product-host/src/runtimeNativeTransport.ts`
+- `apps/product-host/src/ProductHost.jsx`
+- `apps/product-host/README.md`
+- `docs/PHASE_FEATURE_LOG.md`
+
+### Validation
+- ✅ `pnpm test` (46/46 tests pass)
+- ✅ `pnpm typecheck` (runtime-native + sandbox + product-host đều pass)
+
+### Decision / Next
+- Feature 8B.2 hoàn tất (code + validation).
+- Bước tiếp theo: **Feature 8B.3** — thêm host runner non-RN tối thiểu để verify cùng `AppRoot.vue` trên dual host path.
+
+---
+
+## [2026-03-31 22:00] Phase 8B / Feature 8B.3 (Non-RN host runner + dual AppRoot path)
+
+### Overview
+- Thêm host runtime session host-agnostic cho app layer (`productRuntimeSession`) để bootstrap không phụ thuộc trực tiếp React Native APIs.
+- Thêm dual runner cho chính `AppRoot.vue` (`dualHostAppRootRunner`) để chạy cùng root component trên `in-memory` và `auto` transport path.
+- Cập nhật `ProductHost` dùng runner session mới thay cho bootstrap trực tiếp trước đó.
+- Bổ sung integration test dual host transport path ở runtime package.
+
+### Files changed
+- `apps/product-host/src/productRuntimeSession.ts` (new)
+- `apps/product-host/src/dualHostAppRootRunner.ts` (new)
+- `apps/product-host/src/shims-vue.d.ts` (new)
+- `apps/product-host/src/ProductHost.jsx`
+- `apps/product-host/src/hostTransport.ts`
+- `apps/product-host/README.md`
+- `packages/runtime-native/__tests__/dual-host-transport.integration.spec.ts` (new)
+- `docs/PHASE_FEATURE_LOG.md`
+
+### Validation
+- ✅ `pnpm test` (47/47 tests pass)
+- ✅ `pnpm typecheck` (runtime-native + sandbox + product-host đều pass)
+
+### Decision / Next
+- Feature 8B.3 hoàn tất: đã có non-RN host runner baseline + dual AppRoot host path entrypoints.
+- Bước tiếp theo: **Feature 8B.4** — contract hóa host scheduler/render lifecycle còn lại và thêm smoke verify có thể assert snapshot parity sâu hơn giữa các host modes.
+
+---
+
+## [2026-03-31 22:20] Phase 8B / Feature 8B.4 (Scheduler/lifecycle contract + deep parity smoke)
+
+### Overview
+- Thêm `HostRuntimeSession` contract trong runtime core để chuẩn hóa vòng đời mount/snapshot/emit-event/unmount.
+- Contract mới hỗ trợ `HostRuntimeScheduler` và `HostRuntimeLifecycleHooks` để host app cắm scheduler/hook một cách rõ ràng.
+- Chuyển `apps/product-host/src/productRuntimeSession.ts` sang dùng runtime contract mới thay vì tự bootstrap adapter riêng.
+- Nâng cấp dual-host integration smoke: thêm normalized snapshot parity assertion giữa host adapter path và native-compat path.
+
+### Files changed
+- `packages/runtime-native/src/hostRuntimeSession.ts` (new)
+- `packages/runtime-native/src/index.ts`
+- `packages/runtime-native/__tests__/host-runtime-session.spec.ts` (new)
+- `packages/runtime-native/__tests__/dual-host-transport.integration.spec.ts`
+- `apps/product-host/src/productRuntimeSession.ts`
+- `apps/product-host/src/dualHostAppRootRunner.ts`
+- `apps/product-host/README.md`
+- `docs/PHASE_FEATURE_LOG.md`
+
+### Validation
+- ✅ `pnpm test` (49/49 tests pass)
+- ✅ `pnpm typecheck` (runtime-native + sandbox + product-host đều pass)
+
+### Decision / Next
+- Feature 8B.4 hoàn tất.
+- Phase 8B đã đạt baseline mục tiêu host-agnostic; bước tiếp theo chuyển trọng tâm sang **Phase 9 — Runtime SDK Stabilization (v1 RC)**.

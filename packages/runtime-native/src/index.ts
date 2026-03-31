@@ -1,7 +1,36 @@
 export * from './renderer'
 export * from './bridge'
+export {
+	createHostRuntimeSession,
+	type HostRuntimeLifecycleHooks,
+	type HostRuntimePhase,
+	type HostRuntimeScheduler,
+	type HostRuntimeSession,
+	type HostRuntimeSessionOptions,
+	type HostRuntimeTransport,
+} from './hostRuntimeSession'
 export { createInMemoryBridgeAdapter } from './adapters/inMemoryBridgeAdapter'
-export { createNativeTransportBridgeAdapter } from './adapters/nativeTransportBridgeAdapter'
+export {
+	createInMemoryHostTransport,
+	type InMemoryHostTransport,
+	type InMemoryHostTransportStats,
+} from './adapters/inMemoryHostTransport'
+export {
+	createHostTransportBridgeAdapter,
+	type HostMutationTransport,
+	type HostTransportAck,
+	type HostTransportAdapterStats,
+	type HostTransportBridgeAdapterController,
+	type HostTransportBridgeAdapterOptions,
+} from './adapters/hostTransportBridgeAdapter'
+export {
+	createNativeTransportBridgeAdapter,
+	type NativeMutationTransport,
+	type NativeTransportAck,
+	type NativeTransportAdapterStats,
+	type NativeTransportBridgeAdapterController,
+	type NativeTransportBridgeAdapterOptions,
+} from './adapters/nativeTransportBridgeAdapter'
 export {
 	ActivityIndicator,
 	FlatList,

@@ -6,6 +6,7 @@
   "type": "module",
   "scripts": {
     "dev:sandbox": "pnpm --filter @vue-native/sandbox start",
+    "dev:product": "pnpm --filter @vue-native/product-host start",
     "test": "vitest run",
     "typecheck": "pnpm -r typecheck",
     "lint": "pnpm -r lint",

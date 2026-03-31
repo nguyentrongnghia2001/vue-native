@@ -5,7 +5,7 @@ Tài liệu này là **nguồn tổng hợp duy nhất** cho:
 - Những gì đang làm
 - Những gì cần làm tiếp
 
-> Cập nhật gần nhất: **2026-03-30**
+> Cập nhật gần nhất: **2026-03-31**
 
 ---
 
@@ -100,7 +100,16 @@ Tài liệu này là **nguồn tổng hợp duy nhất** cho:
 
 ## 3) Cần làm tiếp (ưu tiên) 🔜
 
-## Phase 8 — Product Host App Baseline
+## Strategic Pivot (2026-03-31) — Hướng #2
+
+**Quyết định kiến trúc:** ưu tiên tiến tới runtime/app host **không lock-in Expo + React Native**.
+
+- `apps/product-host` hiện tại được xem là lớp chuyển tiếp để giữ khả năng chạy native trong khi tách contract.
+- Từ mốc này, mọi feature mới cần ưu tiên **host-agnostic contract** trước khi thêm logic phụ thuộc platform.
+
+---
+
+## Phase 8A — Transitional Product Host (giữ tương thích hiện tại)
 
 **Mục tiêu:** tách rõ sandbox demo và app host cho product, để flow release không phụ thuộc debug shell.
 
@@ -113,6 +122,32 @@ Tài liệu này là **nguồn tổng hợp duy nhất** cho:
 ### Done khi
 - App host product chạy được Android emulator/device với cùng runtime-native package.
 - Team có template tạo màn hình mới theo SFC flow mà không cần sửa host internals.
+
+---
+
+## Phase 8B — Host-Agnostic Runtime Foundation (ưu tiên cao nhất)
+
+**Mục tiêu:** biến `runtime-native` thành runtime đa host, không bắt buộc Expo/RN để phát triển feature chính.
+
+### Tiến độ hiện tại
+- ✅ Feature 8B.1: Host transport contract extraction đã hoàn tất (`Host*` adapter contract + compatibility wrapper cho API cũ).
+- ✅ Feature 8B.2: App-layer transport decoupling đã hoàn tất (factory host-agnostic + RN module isolation + in-memory host transport).
+- ✅ Feature 8B.3: Non-RN host runner baseline đã hoàn tất (`productRuntimeSession` + `dualHostAppRootRunner` + dual transport integration test).
+- ✅ Feature 8B.4: Scheduler/lifecycle contract và deep parity smoke đã hoàn tất (`HostRuntimeSession` + normalized snapshot parity assertion).
+
+### Việc cần làm
+- ✅ Trích xuất platform contract mới (render target + event bridge + scheduler hooks) thành interface rõ ràng.
+- ✅ Tách transport/event channel khỏi `react-native` API trong lớp host runtime.
+- ✅ Tạo adapter theo host: `react-native` (legacy/transitional) và 1 host không-RN để chứng minh portability.
+- ✅ Chuẩn hoá bootstrap contract để cùng một `AppRoot.vue` chạy trên nhiều host adapter.
+
+### Trạng thái Phase 8B
+- ✅ Baseline hoàn tất. Có thể chuyển trọng tâm sang Phase 9 (Runtime SDK Stabilization).
+
+### Done khi
+- `packages/runtime-native` không còn import trực tiếp `react-native` ở runtime package core.
+- Cùng một flow authoring (`AppRoot.vue`) chạy được qua ít nhất 2 host adapters (RN + non-RN).
+- Test contract cho host adapter pass trong `pnpm test` + `pnpm typecheck`.
 
 ---
 
