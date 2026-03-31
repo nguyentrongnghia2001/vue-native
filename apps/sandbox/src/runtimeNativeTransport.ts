@@ -6,6 +6,11 @@ const DEFAULT_NATIVE_EVENT_NAME = 'vue-native:bridge-event'
 
 type ListenerSubscription = { remove: () => void }
 
+interface NativeEventEmitterCompatibleModule {
+  addListener: (eventName: string) => void
+  removeListeners: (count: number) => void
+}
+
 interface NativeBridgeModule {
   applyMutations?: (
     batch: NativeMutationRecord[],
@@ -100,6 +105,17 @@ function detectNativeBridgeModule(moduleName: string): NativeBridgeModule | null
   return detected as NativeBridgeModule
 }
 
+function isNativeEventEmitterCompatible(
+  value: unknown,
+): value is NativeEventEmitterCompatibleModule {
+  if (!value || typeof value !== 'object') return false
+  const candidate = value as Record<string, unknown>
+  return (
+    typeof candidate.addListener === 'function' &&
+    typeof candidate.removeListeners === 'function'
+  )
+}
+
 async function sendBatchToNative(
   nativeModule: NativeBridgeModule,
   batch: NativeMutationRecord[],
@@ -187,12 +203,14 @@ export function createRuntimeNativeTransport(
   const ensureSubscription = () => {
     if (subscription || !nativeModule) return
 
-    try {
-      const emitter = new NativeEventEmitter(nativeModule as never)
+    const nativeModuleFromRegistry = (NativeModules as Record<string, unknown>)[moduleName]
+    if (isNativeEventEmitterCompatible(nativeModuleFromRegistry)) {
+      const emitter = new NativeEventEmitter(nativeModuleFromRegistry as never)
       subscription = emitter.addListener(eventName, dispatchIncomingEvent)
-    } catch {
-      subscription = DeviceEventEmitter.addListener(eventName, dispatchIncomingEvent)
+      return
     }
+
+    subscription = DeviceEventEmitter.addListener(eventName, dispatchIncomingEvent)
   }
 
   return {

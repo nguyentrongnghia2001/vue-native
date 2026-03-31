@@ -1634,3 +1634,95 @@ Mục đích: Ghi lại phần đã làm để review nhanh trước khi vào Ph
 ### Decision / Next
 - Feature 8B.4 hoàn tất.
 - Phase 8B đã đạt baseline mục tiêu host-agnostic; bước tiếp theo chuyển trọng tâm sang **Phase 9 — Runtime SDK Stabilization (v1 RC)**.
+
+---
+
+## [2026-03-31 22:45] Phase 9 / Feature 9.1 (Public API audit + stable manifest)
+
+### Overview
+- Audit toàn bộ export surface của `packages/runtime-native/src/index.ts`.
+- Chốt danh sách API theo nhóm `stable` / `compat` / `experimental` bằng manifest code-level.
+- Bổ sung contract test đảm bảo các export đã chốt luôn tồn tại.
+- Cập nhật README package với policy semver cho v1 RC.
+
+### Files changed
+- `packages/runtime-native/src/apiContract.ts` (new)
+- `packages/runtime-native/src/index.ts`
+- `packages/runtime-native/__tests__/public-api-contract.spec.ts` (new)
+- `packages/runtime-native/README.md`
+- `docs/PHASE_FEATURE_LOG.md`
+
+### Validation
+- ✅ `pnpm test` (52/52 tests pass)
+- ✅ `pnpm typecheck` (runtime-native + sandbox + product-host đều pass)
+
+### Decision / Next
+- Feature 9.1 hoàn tất (implementation + validation).
+- Bước tiếp theo: **Feature 9.2** — bổ sung test contract sâu cho các API public trọng yếu (`createNativeApp`, bridge adapter, event dispatch).
+
+---
+
+## [2026-03-31 22:55] Phase 9 / Feature 9.2 (Critical public API contract tests)
+
+### Overview
+- Bổ sung test contract chuyên biệt cho 3 API public quan trọng:
+  - `createNativeApp` (mount + primitive registration contract),
+  - bridge adapter contract (forward batch + ack/error semantics),
+  - `dispatchEventToNativeNode` (listener dispatch contract).
+- Mục tiêu: khóa behavior cốt lõi của public APIs trước khi vào v1 RC stabilization sâu hơn.
+
+### Files changed
+- `packages/runtime-native/__tests__/public-api-critical-contract.spec.ts` (new)
+- `docs/PHASE_FEATURE_LOG.md`
+
+### Validation
+- ✅ `pnpm test` (55/55 tests pass)
+- ✅ `pnpm typecheck` (runtime-native + sandbox + product-host đều pass)
+
+### Decision / Next
+- Feature 9.2 hoàn tất (implementation + validation).
+- Bước tiếp theo: **Feature 9.3** — xử lý warning contract quanh runtime host transport (`NativeEventEmitter` add/remove listener contract) và harden fallback semantics.
+
+---
+
+## [2026-03-31 23:05] Phase 9 / Feature 9.3 (NativeEventEmitter contract warning hardening)
+
+### Overview
+- Harden runtime host transport event subscription để tránh warning `NativeEventEmitter` contract.
+- Chỉ tạo `NativeEventEmitter(nativeModule)` khi module có đủ `addListener/removeListeners`.
+- Nếu module không tương thích emitter contract, fallback trực tiếp sang `DeviceEventEmitter`.
+- Áp dụng cho cả sandbox transport và product RN transport.
+
+### Files changed
+- `apps/sandbox/src/runtimeNativeTransport.ts`
+- `apps/product-host/src/reactNativeHostTransport.ts`
+- `docs/PHASE_FEATURE_LOG.md`
+
+### Validation
+- ✅ `pnpm test` (55/55 tests pass)
+- ✅ `pnpm typecheck` (runtime-native + sandbox + product-host đều pass)
+
+### Decision / Next
+- Feature 9.3 hoàn tất (implementation + validation).
+- Bước tiếp theo: **Feature 9.4** — viết migration notes cho semver/breaking-change policy (v1 RC).
+
+---
+
+## [2026-03-31 23:20] Phase 9 / Feature 9.4 (Migration notes + breaking-change policy)
+
+### Overview
+- Viết migration notes cho v1 RC gồm semver policy, breaking-change criteria, và mapping API legacy -> preferred.
+- Chuẩn hoá guideline cho compatibility window của `v1.0.0-rc.*`.
+- Link tài liệu migration notes từ README của `runtime-native`.
+
+### Files changed
+- `docs/PHASE_9_MIGRATION_NOTES.md` (new)
+- `packages/runtime-native/README.md`
+- `docs/PHASE_FEATURE_LOG.md`
+
+### Validation
+- N/A (docs-only feature)
+
+### Decision / Next
+- Feature 9.4 hoàn tất.
+- Phase 9 đã có baseline cho API audit + contract tests + warning hardening + migration policy; có thể tiến tới bước chốt `v1.0.0-rc` checklist.

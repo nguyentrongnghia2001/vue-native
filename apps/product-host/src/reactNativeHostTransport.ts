@@ -11,6 +11,11 @@ const DEFAULT_NATIVE_EVENT_NAME = 'vue-native:bridge-event'
 
 type ListenerSubscription = { remove: () => void }
 
+interface NativeEventEmitterCompatibleModule {
+  addListener: (eventName: string) => void
+  removeListeners: (count: number) => void
+}
+
 interface NativeBridgeModule {
   applyMutations?: (
     batch: HostMutationRecord[],
@@ -67,6 +72,17 @@ function normalizeAckResponse(raw: unknown): NativeBridgeAckResponse {
   return result
 }
 
+function isNativeEventEmitterCompatible(
+  value: unknown,
+): value is NativeEventEmitterCompatibleModule {
+  if (!value || typeof value !== 'object') return false
+  const candidate = value as Record<string, unknown>
+  return (
+    typeof candidate.addListener === 'function' &&
+    typeof candidate.removeListeners === 'function'
+  )
+}
+
 export function createReactNativeHostTransport(
   options?: {
     moduleName?: string
@@ -103,19 +119,10 @@ export function createReactNativeHostTransport(
     if (eventSubscription) return
 
     try {
-      const emitter = new NativeEventEmitter(NativeModules[moduleName] as any)
-      eventSubscription = emitter.addListener(eventName, (payload: unknown) => {
-        if (!eventReceiver) return
-        const event: HostEventRecord = typeof payload === 'object' && payload !== null
-          ? payload as HostEventRecord
-          : { nodeId: -1, event: 'unknown', args: [payload] }
-        stats.receivedEvents += 1
-        eventReceiver(event)
-      })
-      stats.receiverAttached = true
-    } catch {
-      try {
-        eventSubscription = DeviceEventEmitter.addListener(eventName, (payload: unknown) => {
+      const nativeModuleFromRegistry = (NativeModules as Record<string, unknown>)[moduleName]
+      if (isNativeEventEmitterCompatible(nativeModuleFromRegistry)) {
+        const emitter = new NativeEventEmitter(nativeModuleFromRegistry as any)
+        eventSubscription = emitter.addListener(eventName, (payload: unknown) => {
           if (!eventReceiver) return
           const event: HostEventRecord = typeof payload === 'object' && payload !== null
             ? payload as HostEventRecord
@@ -124,9 +131,20 @@ export function createReactNativeHostTransport(
           eventReceiver(event)
         })
         stats.receiverAttached = true
-      } catch (err) {
-        stats.lastError = err instanceof Error ? err.message : String(err)
+        return
       }
+
+      eventSubscription = DeviceEventEmitter.addListener(eventName, (payload: unknown) => {
+        if (!eventReceiver) return
+        const event: HostEventRecord = typeof payload === 'object' && payload !== null
+          ? payload as HostEventRecord
+          : { nodeId: -1, event: 'unknown', args: [payload] }
+        stats.receivedEvents += 1
+        eventReceiver(event)
+      })
+      stats.receiverAttached = true
+    } catch (err) {
+      stats.lastError = err instanceof Error ? err.message : String(err)
     }
   }
 

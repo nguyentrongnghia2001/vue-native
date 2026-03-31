@@ -155,11 +155,21 @@ Tài liệu này là **nguồn tổng hợp duy nhất** cho:
 
 **Mục tiêu:** khoá API public cho runtime-native trước khi phát hành nội bộ.
 
+### Tiến độ hiện tại
+- ✅ Feature 9.1: Public API audit + stable/compat/experimental manifest đã hoàn tất (kèm contract test).
+- ✅ Feature 9.2: Critical public API contract tests đã hoàn tất (`createNativeApp`, bridge adapter, `dispatchEventToNativeNode`).
+- ✅ Feature 9.3: Runtime host transport warning hardening đã hoàn tất (`NativeEventEmitter` contract guard + fallback semantics).
+- ✅ Feature 9.4: Migration notes + breaking-change policy (semver) đã hoàn tất.
+
 ### Việc cần làm
-- ⏳ Audit API export hiện tại (`index.ts`) và chốt danh sách stable APIs.
-- ⏳ Thêm test contract cho các API public quan trọng (`createNativeApp`, bridge adapter, event dispatch).
-- ⏳ Loại warning còn lại ở runtime host transport (`NativeEventEmitter` add/remove listener contract).
-- ⏳ Viết tài liệu migration notes cho breaking-change policy (semver).
+- 🔄 Audit API export hiện tại (`index.ts`) và chốt danh sách stable APIs. *(đã có manifest code-level + README policy)*
+- ✅ Thêm test contract cho các API public quan trọng (`createNativeApp`, bridge adapter, event dispatch).
+- ✅ Loại warning còn lại ở runtime host transport (`NativeEventEmitter` add/remove listener contract).
+- ✅ Viết tài liệu migration notes cho breaking-change policy (semver).
+
+### Trạng thái Phase 9
+- 🔄 Đang trong giai đoạn chốt RC checklist.
+- Các hạng mục implementation chính của Feature 9.1 -> 9.4 đã hoàn tất.
 
 ### Done khi
 - Có baseline `v1.0.0-rc` cho runtime-native với test + typecheck pass.

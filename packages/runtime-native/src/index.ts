@@ -1,6 +1,14 @@
 export * from './renderer'
 export * from './bridge'
 export {
+	COMPAT_PUBLIC_API_KEYS,
+	EXPERIMENTAL_PUBLIC_API_KEYS,
+	STABLE_PUBLIC_API_KEYS,
+	type CompatPublicApiKey,
+	type ExperimentalPublicApiKey,
+	type StablePublicApiKey,
+} from './apiContract'
+export {
 	createHostRuntimeSession,
 	type HostRuntimeLifecycleHooks,
 	type HostRuntimePhase,
