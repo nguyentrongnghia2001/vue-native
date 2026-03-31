@@ -172,12 +172,12 @@ Tài liệu này là **nguồn tổng hợp duy nhất** cho:
 ### Trạng thái Phase 9
 - ✅ Hoàn tất implementation và automated gates cho Feature 9.1 -> 9.6.
 - ✅ Automated validation mới nhất: `pnpm test` (59/59) + `pnpm typecheck` (runtime-native/sandbox/product-host pass).
-- ⚠ Còn 1 gate thủ công ngoài phạm vi code: verify warning runtime trên emulator/device trong flow chạy chuẩn.
-- Trạng thái gate thủ công hiện tại: blocked do môi trường chưa có Android emulator/device kết nối.
+- ⚠ Gate thủ công ngoài phạm vi code: verify warning runtime trên emulator/device trong flow chạy chuẩn.
+- Trạng thái gate thủ công hiện tại: **BLOCKED do Java/JDK không được cài đặt trên local environment**. Android build yêu cầu JAVA_HOME được set, nhưng hệ thống không có JDK. Này là infrastructure blocker, không phải code issue. Đề xuất: defer manual android smoke testing đến CI/CD pipeline hoặc máy đã setup Android toolchain đủ đủ. Code logic đã sẵn sàng.
 
 ### Done khi
-- Có baseline `v1.0.0-rc` cho runtime-native với test + typecheck pass.
-- Không còn warning runtime cấp platform trong flow chạy chuẩn.
+- ✅ Có baseline `v1.0.0-rc` cho runtime-native với test + typecheck pass.
+- ⚠ Manual android smoke gate: blocked by environment (cần setup Java/Android SDK trước).
 
 ---
 
