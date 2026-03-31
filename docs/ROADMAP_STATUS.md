@@ -160,6 +160,7 @@ Tài liệu này là **nguồn tổng hợp duy nhất** cho:
 - ✅ Feature 9.2: Critical public API contract tests đã hoàn tất (`createNativeApp`, bridge adapter, `dispatchEventToNativeNode`).
 - ✅ Feature 9.3: Runtime host transport warning hardening đã hoàn tất (`NativeEventEmitter` contract guard + fallback semantics).
 - ✅ Feature 9.4: Migration notes + breaking-change policy (semver) đã hoàn tất.
+- ✅ Feature 9.5: RC baseline checklist + version baseline `v1.0.0-rc.0` đã hoàn tất (implementation).
 
 ### Việc cần làm
 - 🔄 Audit API export hiện tại (`index.ts`) và chốt danh sách stable APIs. *(đã có manifest code-level + README policy)*
@@ -170,6 +171,9 @@ Tài liệu này là **nguồn tổng hợp duy nhất** cho:
 ### Trạng thái Phase 9
 - 🔄 Đang trong giai đoạn chốt RC checklist.
 - Các hạng mục implementation chính của Feature 9.1 -> 9.4 đã hoàn tất.
+- Còn 1 gate thủ công: verify warning runtime trên emulator/device trong flow chạy chuẩn.
+- Trạng thái gate thủ công hiện tại: ⚠ blocked do chưa có Android emulator/device kết nối trong môi trường chạy.
+- Còn 1 gate thủ công: verify warning runtime trên emulator/device trong flow chạy chuẩn.
 
 ### Done khi
 - Có baseline `v1.0.0-rc` cho runtime-native với test + typecheck pass.

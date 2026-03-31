@@ -1726,3 +1726,44 @@ Mục đích: Ghi lại phần đã làm để review nhanh trước khi vào Ph
 ### Decision / Next
 - Feature 9.4 hoàn tất.
 - Phase 9 đã có baseline cho API audit + contract tests + warning hardening + migration policy; có thể tiến tới bước chốt `v1.0.0-rc` checklist.
+
+---
+
+## [2026-03-31 23:30] Phase 9 / Feature 9.5 Kickoff Checkpoint (v1 RC baseline checklist)
+
+### Overview
+- Review lại đầu ra Feature 9.1 -> 9.4: API manifest, critical contract tests, emitter warning hardening, migration notes đã có.
+- Scope Feature 9.5: chốt baseline `v1.0.0-rc` cho runtime-native ở mức metadata + checklist validation.
+- Kế hoạch thực thi: bump version RC, bổ sung checklist tài liệu, chạy lại `pnpm test` + `pnpm typecheck`, cập nhật roadmap/log.
+
+### Files changed
+- `docs/PHASE_FEATURE_LOG.md`
+
+### Validation
+- N/A (kickoff checkpoint)
+
+### Decision / Next
+- Bắt đầu implement Feature 9.5.
+
+---
+
+## [2026-03-31 23:40] Phase 9 / Feature 9.5 (v1 RC baseline checklist)
+
+### Overview
+- Thiết lập baseline version `v1.0.0-rc.0` cho `@vue-native/runtime-native`.
+- Bổ sung checklist Phase 9 RC để chốt các gate: API stabilization, contract tests, warning hardening, migration policy.
+- Phân tách rõ automated gates (test/typecheck) và manual gate (runtime warning smoke trên emulator/device).
+
+### Files changed
+- `packages/runtime-native/package.json`
+- `docs/PHASE_9_RC_CHECKLIST.md` (new)
+- `docs/PHASE_FEATURE_LOG.md`
+
+### Validation
+- ✅ `pnpm test` (55/55 tests pass)
+- ✅ `pnpm typecheck` (runtime-native + sandbox + product-host đều pass)
+
+### Decision / Next
+- Feature 9.5 hoàn tất (implementation + automated validation).
+- Đã thử manual runtime smoke bằng `pnpm --filter @vue-native/sandbox native:run:android`, nhưng bị block do môi trường không có emulator/device.
+- Next: chạy lại manual runtime smoke khi có emulator/device để chốt hẳn gate warning platform-level của Phase 9.
