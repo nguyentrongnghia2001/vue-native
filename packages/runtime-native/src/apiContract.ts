@@ -25,6 +25,8 @@ export const COMPAT_PUBLIC_API_KEYS = [
 ] as const
 
 export const EXPERIMENTAL_PUBLIC_API_KEYS = [
+  'attachNativeEventChannel',
+  'isNativeEventEmitterCompatibleModule',
   'createNativeRenderer',
   'createNativeHydrationRenderer',
   'render',

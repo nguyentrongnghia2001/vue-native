@@ -1767,3 +1767,34 @@ Mục đích: Ghi lại phần đã làm để review nhanh trước khi vào Ph
 - Feature 9.5 hoàn tất (implementation + automated validation).
 - Đã thử manual runtime smoke bằng `pnpm --filter @vue-native/sandbox native:run:android`, nhưng bị block do môi trường không có emulator/device.
 - Next: chạy lại manual runtime smoke khi có emulator/device để chốt hẳn gate warning platform-level của Phase 9.
+
+---
+
+## [2026-03-31 23:55] Phase 9 / Feature 9.6 (Shared native event channel utility + fallback contract tests)
+
+### Overview
+- Trích xuất logic attach event channel từ app transports vào runtime helper dùng chung: `attachNativeEventChannel` + `isNativeEventEmitterCompatibleModule`.
+- Tích hợp helper mới vào cả sandbox transport và product-host RN transport để tránh trùng logic fallback.
+- Bổ sung test contract riêng cho helper để khóa các nhánh hành vi quan trọng:
+  - Dùng `NativeEventEmitter` khi module tương thích.
+  - Fallback sang `DeviceEventEmitter` khi module không tương thích.
+  - Fallback sang `DeviceEventEmitter` khi constructor `NativeEventEmitter` throw.
+
+### Files changed
+- `packages/runtime-native/src/nativeEventChannel.ts` (new)
+- `packages/runtime-native/src/index.ts`
+- `packages/runtime-native/src/apiContract.ts`
+- `packages/runtime-native/__tests__/native-event-channel.spec.ts` (new)
+- `apps/sandbox/src/runtimeNativeTransport.ts`
+- `apps/product-host/src/reactNativeHostTransport.ts`
+- `docs/ROADMAP_STATUS.md`
+- `docs/PHASE_FEATURE_LOG.md`
+
+### Validation
+- ✅ `pnpm test` (59/59 tests pass)
+- ✅ `pnpm typecheck` (runtime-native + sandbox + product-host đều pass)
+
+### Decision / Next
+- Feature 9.6 hoàn tất (implementation + automated validation).
+- Phase 9 implementation có thể xem là hoàn tất về mặt code/test/type.
+- Gate còn lại duy nhất: manual runtime warning smoke trên emulator/device khi môi trường sẵn sàng.

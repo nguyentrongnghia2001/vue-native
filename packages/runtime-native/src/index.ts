@@ -9,6 +9,17 @@ export {
 	type StablePublicApiKey,
 } from './apiContract'
 export {
+	attachNativeEventChannel,
+	isNativeEventEmitterCompatibleModule,
+	type AttachNativeEventChannelOptions,
+	type DeviceEventEmitterLike,
+	type EventSubscription,
+	type NativeEventChannelKind,
+	type NativeEventEmitterCompatibleModule,
+	type NativeEventEmitterConstructor,
+	type NativeEventEmitterInstance,
+} from './nativeEventChannel'
+export {
 	createHostRuntimeSession,
 	type HostRuntimeLifecycleHooks,
 	type HostRuntimePhase,

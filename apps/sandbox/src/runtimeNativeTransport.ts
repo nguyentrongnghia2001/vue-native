@@ -1,15 +1,14 @@
 import { DeviceEventEmitter, NativeEventEmitter, NativeModules } from 'react-native'
-import type { NativeEventRecord, NativeMutationRecord } from '@vue-native/runtime-native'
+import {
+  attachNativeEventChannel,
+  type NativeEventRecord,
+  type NativeMutationRecord,
+} from '@vue-native/runtime-native'
 
 const DEFAULT_NATIVE_MODULE_NAME = 'VueNativeHostBridge'
 const DEFAULT_NATIVE_EVENT_NAME = 'vue-native:bridge-event'
 
 type ListenerSubscription = { remove: () => void }
-
-interface NativeEventEmitterCompatibleModule {
-  addListener: (eventName: string) => void
-  removeListeners: (count: number) => void
-}
 
 interface NativeBridgeModule {
   applyMutations?: (
@@ -105,17 +104,6 @@ function detectNativeBridgeModule(moduleName: string): NativeBridgeModule | null
   return detected as NativeBridgeModule
 }
 
-function isNativeEventEmitterCompatible(
-  value: unknown,
-): value is NativeEventEmitterCompatibleModule {
-  if (!value || typeof value !== 'object') return false
-  const candidate = value as Record<string, unknown>
-  return (
-    typeof candidate.addListener === 'function' &&
-    typeof candidate.removeListeners === 'function'
-  )
-}
-
 async function sendBatchToNative(
   nativeModule: NativeBridgeModule,
   batch: NativeMutationRecord[],
@@ -203,14 +191,15 @@ export function createRuntimeNativeTransport(
   const ensureSubscription = () => {
     if (subscription || !nativeModule) return
 
-    const nativeModuleFromRegistry = (NativeModules as Record<string, unknown>)[moduleName]
-    if (isNativeEventEmitterCompatible(nativeModuleFromRegistry)) {
-      const emitter = new NativeEventEmitter(nativeModuleFromRegistry as never)
-      subscription = emitter.addListener(eventName, dispatchIncomingEvent)
-      return
-    }
-
-    subscription = DeviceEventEmitter.addListener(eventName, dispatchIncomingEvent)
+    const attached = attachNativeEventChannel({
+      moduleRegistry: NativeModules as Record<string, unknown>,
+      moduleName,
+      eventName,
+      listener: dispatchIncomingEvent,
+      NativeEventEmitter: NativeEventEmitter as unknown as any,
+      DeviceEventEmitter: DeviceEventEmitter as unknown as any,
+    })
+    subscription = attached.subscription as ListenerSubscription
   }
 
   return {
