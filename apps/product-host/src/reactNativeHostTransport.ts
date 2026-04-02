@@ -47,6 +47,12 @@ export interface ReactNativeHostTransportDiagnostics {
   availableMethods: string[]
 }
 
+export interface ReactNativeHostTransportError {
+  code: string
+  message: string
+  details?: Record<string, unknown>
+}
+
 export interface ReactNativeHostTransport extends HostMutationTransport {
   emitEvent: (event: HostEventRecord) => void
   getStats: () => ReactNativeHostTransportStats
@@ -72,10 +78,15 @@ export function createReactNativeHostTransport(
   options?: {
     moduleName?: string
     eventName?: string
+    onError?: (error: ReactNativeHostTransportError) => void
   },
 ): ReactNativeHostTransport {
   const moduleName = options?.moduleName ?? DEFAULT_NATIVE_MODULE_NAME
   const eventName = options?.eventName ?? DEFAULT_NATIVE_EVENT_NAME
+
+  const reportError = (error: ReactNativeHostTransportError) => {
+    options?.onError?.(error)
+  }
 
   let eventReceiver: ((event: HostEventRecord) => void) | null = null
   let eventSubscription: ListenerSubscription | null = null
@@ -123,7 +134,16 @@ export function createReactNativeHostTransport(
       eventSubscription = attached.subscription as ListenerSubscription
       stats.receiverAttached = true
     } catch (err) {
-      stats.lastError = err instanceof Error ? err.message : String(err)
+      const message = err instanceof Error ? err.message : String(err)
+      stats.lastError = message
+      reportError({
+        code: 'attach-event-channel-failed',
+        message,
+        details: {
+          moduleName,
+          eventName,
+        },
+      })
     }
   }
 
@@ -164,11 +184,27 @@ export function createReactNativeHostTransport(
         result = normalizeAckResponse(raw)
       } else {
         stats.lastError = `No mutation method on ${moduleName}`
+        reportError({
+          code: 'missing-mutation-method',
+          message: stats.lastError,
+          details: {
+            moduleName,
+            availableMethods,
+          },
+        })
         return { ok: false, error: stats.lastError }
       }
 
       if (!result.ok) {
         stats.lastError = result.error ?? 'unknown error'
+        reportError({
+          code: 'non-ok-ack',
+          message: stats.lastError,
+          details: {
+            moduleName,
+            eventName,
+          },
+        })
       }
 
       const response: HostTransportAck = { ok: result.ok }
@@ -179,6 +215,14 @@ export function createReactNativeHostTransport(
     } catch (err) {
       const message = err instanceof Error ? err.message : String(err)
       stats.lastError = message
+      reportError({
+        code: 'send-mutations-throw',
+        message,
+        details: {
+          moduleName,
+          eventName,
+        },
+      })
       return { ok: false, error: message }
     }
   }

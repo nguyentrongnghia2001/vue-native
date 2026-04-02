@@ -1895,3 +1895,36 @@ Mục đích: Ghi lại phần đã làm để review nhanh trước khi vào Ph
 ### Decision / Next
 - Feature 10.2 hoàn tất ở mức baseline telemetry cho bridge adapter.
 - Next ưu tiên: Feature 10.3 (crash/error reporting pipeline cho app host).
+
+---
+
+## [2026-04-02 00:55] Phase 10 / Feature 10.3 (Crash/error reporting pipeline cho app host)
+
+### Overview
+- Thêm pipeline báo lỗi dùng chung ở runtime package (`createRuntimeErrorReporter`, `installGlobalErrorHandlers`) để chuẩn hóa cách thu thập lỗi theo source/code/message/fatal/context.
+- Tích hợp pipeline vào product-host:
+  - Bắt lỗi từ transport factory + RN transport qua callback `onError` có payload chuẩn hóa.
+  - Gắn global handlers cho ErrorUtils/window/process để không bỏ sót uncaught errors và unhandled rejections.
+  - Bọc vòng đời runtime session (`runner-init`, snapshot polling loop, dispose) bằng báo cáo lỗi có mã lỗi rõ ràng.
+  - Thêm fallback UI khi gặp lỗi fatal.
+- Bổ sung contract test cho reporter/global handler để khóa hành vi buffer, subscription, cleanup và handler restore.
+
+### Files changed
+- `packages/runtime-native/src/errorReporting.ts` (new)
+- `packages/runtime-native/__tests__/error-reporting.spec.ts` (new)
+- `packages/runtime-native/src/index.ts`
+- `packages/runtime-native/src/apiContract.ts`
+- `apps/product-host/src/hostTransport.ts`
+- `apps/product-host/src/reactNativeHostTransport.ts`
+- `apps/product-host/src/dualHostAppRootRunner.ts`
+- `apps/product-host/src/ProductHost.jsx`
+- `docs/ROADMAP_STATUS.md`
+- `docs/PHASE_FEATURE_LOG.md`
+
+### Validation
+- ✅ `pnpm test` (63/63 tests pass)
+- ✅ `pnpm typecheck` (runtime-native + sandbox + product-host đều pass)
+
+### Decision / Next
+- Feature 10.3 hoàn tất, app host đã có pipeline thu thập lỗi nhất quán và có điểm cắm sẵn cho sink ngoài (Sentry/Datadog/Crashlytics).
+- Next ưu tiên: Feature 10.4 (performance baseline: startup time, first interaction latency, memory).

@@ -1,8 +1,13 @@
 import React, { useEffect, useMemo, useState } from 'react'
 import {
   StyleSheet,
+  Text as RNText,
   View as RNView,
 } from 'react-native'
+import {
+  createRuntimeErrorReporter,
+  installGlobalErrorHandlers,
+} from '@vue-native/runtime-native'
 import { createAppRootHostRunner } from './dualHostAppRootRunner'
 
 /**
@@ -15,20 +20,111 @@ import { createAppRootHostRunner } from './dualHostAppRootRunner'
  */
 export default function ProductHost() {
   const [snapshot, setSnapshot] = useState(null)
+  const [fatalReport, setFatalReport] = useState(null)
+
+  const errorReporter = useMemo(() => createRuntimeErrorReporter({
+    maxReports: 100,
+    onReport(report) {
+      if (report.fatal) {
+        console.error('[product-host][error-pipeline][fatal]', report)
+        return
+      }
+      console.warn('[product-host][error-pipeline]', report)
+    },
+  }), [])
 
   useEffect(() => {
-    const runner = createAppRootHostRunner('auto')
-    setSnapshot(runner.getSnapshot())
-
-    const interval = setInterval(() => {
-      setSnapshot(runner.getSnapshot())
-    }, 250)
+    const unsubscribe = errorReporter.subscribe((report) => {
+      if (report.fatal) {
+        setFatalReport(report)
+      }
+    })
 
     return () => {
-      clearInterval(interval)
-      runner.dispose()
+      unsubscribe()
     }
-  }, [])
+  }, [errorReporter])
+
+  useEffect(() => {
+    const disposeGlobalHandlers = installGlobalErrorHandlers(errorReporter, {
+      sourcePrefix: 'product-host/global',
+    })
+
+    return () => {
+      disposeGlobalHandlers()
+    }
+  }, [errorReporter])
+
+  useEffect(() => {
+    let runner = null
+    let interval = null
+
+    try {
+      runner = createAppRootHostRunner('auto', {
+        transportOptions: {
+          onError(transportError) {
+            errorReporter.report({
+              source: `product-host/${transportError.source}`,
+              code: transportError.code,
+              message: transportError.message,
+              ...(transportError.details ? { context: transportError.details } : {}),
+            })
+          },
+        },
+      })
+
+      setSnapshot(runner.getSnapshot())
+
+      interval = setInterval(() => {
+        if (!runner) return
+
+        try {
+          setSnapshot(runner.getSnapshot())
+        } catch (error) {
+          errorReporter.report({
+            source: 'product-host/runtime-session',
+            code: 'snapshot-read-failed',
+            error,
+          })
+        }
+      }, 250)
+    } catch (error) {
+      const report = errorReporter.report({
+        source: 'product-host/runtime-session',
+        code: 'runner-init-failed',
+        error,
+        fatal: true,
+      })
+      setFatalReport(report)
+    }
+
+    return () => {
+      if (interval) {
+        clearInterval(interval)
+      }
+
+      if (runner) {
+        try {
+          runner.dispose()
+        } catch (error) {
+          errorReporter.report({
+            source: 'product-host/runtime-session',
+            code: 'runner-dispose-failed',
+            error,
+          })
+        }
+      }
+    }
+  }, [errorReporter])
+
+  if (fatalReport) {
+    return (
+      <RNView style={styles.fatalRoot}>
+        <RNText style={styles.fatalTitle}>Product Host encountered a fatal runtime error.</RNText>
+        <RNText style={styles.fatalMessage}>{fatalReport.message}</RNText>
+      </RNView>
+    )
+  }
 
   const tree = useMemo(() => {
     if (!snapshot) return null
@@ -95,5 +191,24 @@ const styles = StyleSheet.create({
   root: {
     flex: 1,
     backgroundColor: '#0f172a',
+  },
+  fatalRoot: {
+    flex: 1,
+    backgroundColor: '#0f172a',
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 24,
+    gap: 10,
+  },
+  fatalTitle: {
+    color: '#f8fafc',
+    fontSize: 18,
+    fontWeight: '700',
+    textAlign: 'center',
+  },
+  fatalMessage: {
+    color: '#fca5a5',
+    fontSize: 14,
+    textAlign: 'center',
   },
 })

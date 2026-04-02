@@ -171,7 +171,7 @@ Tài liệu này là **nguồn tổng hợp duy nhất** cho:
 
 ### Trạng thái Phase 9
 - ✅ Hoàn tất implementation và automated gates cho Feature 9.1 -> 9.6.
-- ✅ Automated validation mới nhất: `pnpm test` (61/61) + `pnpm typecheck` (runtime-native/sandbox/product-host pass).
+- ✅ Automated validation mới nhất: `pnpm test` (63/63) + `pnpm typecheck` (runtime-native/sandbox/product-host pass).
 - ⚠ Gate thủ công ngoài phạm vi code: verify warning runtime trên emulator/device trong flow chạy chuẩn.
 - Trạng thái gate thủ công hiện tại: **BLOCKED do Java/JDK không được cài đặt trên local environment**. Android build yêu cầu JAVA_HOME được set, nhưng hệ thống không có JDK. Này là infrastructure blocker, không phải code issue. Đề xuất: defer manual android smoke testing đến CI/CD pipeline hoặc máy đã setup Android toolchain đủ đủ. Code logic đã sẵn sàng.
 
@@ -188,11 +188,12 @@ Tài liệu này là **nguồn tổng hợp duy nhất** cho:
 ### Tiến độ hiện tại
 - ✅ Feature 10.1: E2E smoke test baseline đã hoàn tất (launch app + input + toggle + press event roundtrip) trong `packages/runtime-native/__tests__/e2e-smoke.spec.ts`.
 - ✅ Feature 10.2: Telemetry baseline cho host transport adapter đã hoàn tất (throughput + errorRate + ack latency metrics) với contract test trong `packages/runtime-native/__tests__/host-transport-adapter.spec.ts`.
+- ✅ Feature 10.3: Crash/error reporting pipeline cho app host đã hoàn tất (runtime reporter + global handler install + product-host transport/runtime integration) với contract test trong `packages/runtime-native/__tests__/error-reporting.spec.ts`.
 
 ### Việc cần làm
 - ✅ Bổ sung e2e smoke test (launch app, input, toggle, press event roundtrip).
 - ✅ Thêm telemetry chuẩn cho bridge throughput, error rate, latency. *(baseline ở host transport adapter stats)*
-- ⏳ Thêm crash/error reporting pipeline cho app host.
+- ✅ Thêm crash/error reporting pipeline cho app host.
 - ⏳ Thiết lập performance baseline (startup time, first interaction latency, memory).
 
 ### Done khi

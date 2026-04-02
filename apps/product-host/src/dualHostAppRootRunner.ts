@@ -2,6 +2,7 @@ import type { NativeNodeSnapshot } from '@vue-native/runtime-native'
 import AppRoot from './AppRoot.vue'
 import {
   createProductHostTransport,
+  type CreateProductHostTransportOptions,
   type ProductHostTransportMode,
 } from './hostTransport'
 import {
@@ -14,11 +15,18 @@ export interface AppRootHostRunner extends ProductRuntimeSession {
   mode: ProductHostTransportMode
 }
 
+export interface AppRootHostRunnerOptions extends ProductRuntimeSessionOptions {
+  transportOptions?: Omit<CreateProductHostTransportOptions, 'mode'>
+}
+
 export function createAppRootHostRunner(
   mode: ProductHostTransportMode = 'auto',
-  options: ProductRuntimeSessionOptions = {},
+  options: AppRootHostRunnerOptions = {},
 ): AppRootHostRunner {
-  const transport = createProductHostTransport({ mode })
+  const transport = createProductHostTransport({
+    mode,
+    ...(options.transportOptions ?? {}),
+  })
   const sessionOptions: ProductRuntimeSessionOptions = {
     adapterId: options.adapterId ?? `product-app-root-${mode}`,
   }

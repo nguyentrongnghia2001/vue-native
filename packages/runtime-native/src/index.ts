@@ -20,6 +20,16 @@ export {
 	type NativeEventEmitterInstance,
 } from './nativeEventChannel'
 export {
+	createRuntimeErrorReporter,
+	installGlobalErrorHandlers,
+	type GlobalErrorHandlerInstallOptions,
+	type GlobalErrorTarget,
+	type RuntimeErrorReport,
+	type RuntimeErrorReportInput,
+	type RuntimeErrorReporter,
+	type RuntimeErrorReporterOptions,
+} from './errorReporting'
+export {
 	createHostRuntimeSession,
 	type HostRuntimeLifecycleHooks,
 	type HostRuntimePhase,
