@@ -30,6 +30,14 @@ export {
 	type RuntimeErrorReporterOptions,
 } from './errorReporting'
 export {
+	createRuntimePerformanceBaseline,
+	type RuntimePerformanceBaseline,
+	type RuntimePerformanceBaselineOptions,
+	type RuntimePerformanceBaselineSnapshot,
+	type RuntimePerformanceMarks,
+	type RuntimePerformanceMemoryStats,
+} from './performanceBaseline'
+export {
 	createHostRuntimeSession,
 	type HostRuntimeLifecycleHooks,
 	type HostRuntimePhase,

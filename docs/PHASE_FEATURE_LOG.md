@@ -1928,3 +1928,55 @@ Mục đích: Ghi lại phần đã làm để review nhanh trước khi vào Ph
 ### Decision / Next
 - Feature 10.3 hoàn tất, app host đã có pipeline thu thập lỗi nhất quán và có điểm cắm sẵn cho sink ngoài (Sentry/Datadog/Crashlytics).
 - Next ưu tiên: Feature 10.4 (performance baseline: startup time, first interaction latency, memory).
+
+---
+
+## [2026-04-02 01:05] Phase 10 / Feature 10.4 (Kickoff Checkpoint)
+
+### Overview
+- Phase 10.1 -> 10.3 đã hoàn tất với quality gate + telemetry + error reporting pipeline.
+- Bắt đầu Feature 10.4 để thiết lập performance baseline cho app host theo 3 tín hiệu chính: startup time, first interaction latency, memory usage.
+- Hướng triển khai: tạo performance baseline utility ở runtime package (test được trong CI) và tích hợp vào `ProductHost` để thu thập metric thực tế runtime.
+
+### Files changed
+- `docs/PHASE_FEATURE_LOG.md` (this checkpoint)
+
+### Validation
+- N/A (checkpoint trước implementation Feature 10.4)
+
+### Decision / Next
+- Triển khai utility đo baseline + contract test.
+- Tích hợp vào product-host lifecycle và interaction hooks.
+- Chạy `pnpm test` + `pnpm typecheck`, rồi commit riêng cho Feature 10.4.
+
+---
+
+## [2026-04-02 01:20] Phase 10 / Feature 10.4 (Performance baseline)
+
+### Overview
+- Thêm utility `createRuntimePerformanceBaseline` trong runtime package để đo các baseline metric cốt lõi:
+  - startup time
+  - first interaction latency
+  - memory usage (current/peak/sample count)
+- Utility hỗ trợ cả sampling từ môi trường runtime (`performance.memory` hoặc `process.memoryUsage`) và sampling thủ công.
+- Tích hợp performance baseline vào product-host lifecycle:
+  - mark startup begin/ready khi bootstrap runner.
+  - bắt first interaction qua `onTouchStart` ở root host view.
+  - sampling memory định kỳ và gắn snapshot performance vào error context để phối hợp với pipeline 10.3.
+
+### Files changed
+- `packages/runtime-native/src/performanceBaseline.ts` (new)
+- `packages/runtime-native/__tests__/performance-baseline.spec.ts` (new)
+- `packages/runtime-native/src/index.ts`
+- `packages/runtime-native/src/apiContract.ts`
+- `apps/product-host/src/ProductHost.jsx`
+- `docs/ROADMAP_STATUS.md`
+- `docs/PHASE_FEATURE_LOG.md`
+
+### Validation
+- ✅ `pnpm test` (65/65 tests pass)
+- ✅ `pnpm typecheck` (runtime-native + sandbox + product-host đều pass)
+
+### Decision / Next
+- Feature 10.4 hoàn tất: đã có baseline metrics cho startup/interaction/memory và điểm tích hợp vào app host.
+- Next: nối các baseline metric vào dashboard runtime health tối thiểu để chốt đầy đủ tiêu chí "Done khi" của Phase 10.

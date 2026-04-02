@@ -6,6 +6,7 @@ import {
 } from 'react-native'
 import {
   createRuntimeErrorReporter,
+  createRuntimePerformanceBaseline,
   installGlobalErrorHandlers,
 } from '@vue-native/runtime-native'
 import { createAppRootHostRunner } from './dualHostAppRootRunner'
@@ -33,6 +34,8 @@ export default function ProductHost() {
     },
   }), [])
 
+  const performanceBaseline = useMemo(() => createRuntimePerformanceBaseline(), [])
+
   useEffect(() => {
     const unsubscribe = errorReporter.subscribe((report) => {
       if (report.fatal) {
@@ -59,21 +62,30 @@ export default function ProductHost() {
     let runner = null
     let interval = null
 
+    performanceBaseline.markStartupStart()
+
     try {
       runner = createAppRootHostRunner('auto', {
         transportOptions: {
           onError(transportError) {
+            const performanceSnapshot = performanceBaseline.getSnapshot()
             errorReporter.report({
               source: `product-host/${transportError.source}`,
               code: transportError.code,
               message: transportError.message,
-              ...(transportError.details ? { context: transportError.details } : {}),
+              context: {
+                ...(transportError.details ?? {}),
+                performance: performanceSnapshot,
+              },
             })
           },
         },
       })
 
       setSnapshot(runner.getSnapshot())
+      performanceBaseline.markStartupReady()
+      performanceBaseline.sampleMemoryFromEnvironment()
+      console.info('[product-host][performance][startup]', performanceBaseline.getSnapshot())
 
       interval = setInterval(() => {
         if (!runner) return
@@ -85,6 +97,9 @@ export default function ProductHost() {
             source: 'product-host/runtime-session',
             code: 'snapshot-read-failed',
             error,
+            context: {
+              performance: performanceBaseline.getSnapshot(),
+            },
           })
         }
       }, 250)
@@ -94,6 +109,9 @@ export default function ProductHost() {
         code: 'runner-init-failed',
         error,
         fatal: true,
+        context: {
+          performance: performanceBaseline.getSnapshot(),
+        },
       })
       setFatalReport(report)
     }
@@ -111,11 +129,35 @@ export default function ProductHost() {
             source: 'product-host/runtime-session',
             code: 'runner-dispose-failed',
             error,
+            context: {
+              performance: performanceBaseline.getSnapshot(),
+            },
           })
         }
       }
     }
-  }, [errorReporter])
+  }, [errorReporter, performanceBaseline])
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      performanceBaseline.sampleMemoryFromEnvironment()
+    }, 2000)
+
+    return () => {
+      clearInterval(interval)
+    }
+  }, [performanceBaseline])
+
+  const markFirstInteraction = () => {
+    const before = performanceBaseline.getSnapshot()
+    if (before.marks.firstInteractionAtMs !== null) {
+      return
+    }
+
+    performanceBaseline.markFirstInteraction()
+    performanceBaseline.sampleMemoryFromEnvironment()
+    console.info('[product-host][performance][first-interaction]', performanceBaseline.getSnapshot())
+  }
 
   if (fatalReport) {
     return (
@@ -132,7 +174,10 @@ export default function ProductHost() {
   }, [snapshot])
 
   return (
-    <RNView style={styles.root}>
+    <RNView
+      style={styles.root}
+      onTouchStart={markFirstInteraction}
+    >
       {tree}
     </RNView>
   )

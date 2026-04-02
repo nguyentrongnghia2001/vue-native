@@ -29,6 +29,7 @@ export const EXPERIMENTAL_PUBLIC_API_KEYS = [
   'isNativeEventEmitterCompatibleModule',
   'createRuntimeErrorReporter',
   'installGlobalErrorHandlers',
+  'createRuntimePerformanceBaseline',
   'createNativeRenderer',
   'createNativeHydrationRenderer',
   'render',
