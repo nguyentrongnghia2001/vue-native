@@ -76,6 +76,13 @@ describe('host runtime session', () => {
     const afterSnapshot = session.getSnapshot()
     expect(findTextByPrefix(afterSnapshot, 'Count:')).toBe('Count: 1')
 
+    await Promise.resolve()
+    await Promise.resolve()
+
+    const adapterStats = session.getAdapterStats()
+    expect(adapterStats.sentBatches).toBeGreaterThan(0)
+    expect(adapterStats.sentMutations).toBeGreaterThan(0)
+
     session.dispose()
     expect(getActiveBridgeAdapterId()).toBeNull()
   })

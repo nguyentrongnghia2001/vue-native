@@ -190,17 +190,22 @@ Tài liệu này là **nguồn tổng hợp duy nhất** cho:
 - ✅ Feature 10.2: Telemetry baseline cho host transport adapter đã hoàn tất (throughput + errorRate + ack latency metrics) với contract test trong `packages/runtime-native/__tests__/host-transport-adapter.spec.ts`.
 - ✅ Feature 10.3: Crash/error reporting pipeline cho app host đã hoàn tất (runtime reporter + global handler install + product-host transport/runtime integration) với contract test trong `packages/runtime-native/__tests__/error-reporting.spec.ts`.
 - ✅ Feature 10.4: Performance baseline đã hoàn tất (startup time + first interaction latency + memory sampling) với contract test trong `packages/runtime-native/__tests__/performance-baseline.spec.ts` và product-host integration.
+- ✅ Feature 10.5: Runtime health dashboard tối thiểu đã hoàn tất (dashboard overlay trong product-host, tổng hợp telemetry + error + performance snapshot theo thời gian thực).
 
 ### Việc cần làm
 - ✅ Bổ sung e2e smoke test (launch app, input, toggle, press event roundtrip).
 - ✅ Thêm telemetry chuẩn cho bridge throughput, error rate, latency. *(baseline ở host transport adapter stats)*
 - ✅ Thêm crash/error reporting pipeline cho app host.
 - ✅ Thiết lập performance baseline (startup time, first interaction latency, memory).
-- ⏳ Nối telemetry + error + performance baseline vào dashboard runtime health tối thiểu cho beta gate.
+- ✅ Nối telemetry + error + performance baseline vào dashboard runtime health tối thiểu cho beta gate.
+
+### Trạng thái Phase 10
+- ✅ Hoàn tất implementation baseline cho quality, observability, performance ở mức thử nghiệm nội bộ team.
+- ✅ Runtime health dashboard tối thiểu đã sẵn sàng trên product-host để theo dõi mode, throughput, latency, memory và error signals.
 
 ### Done khi
-- CI có quality gate rõ ràng cho unit/integration/e2e smoke.
-- Có dashboard tối thiểu cho runtime health sau khi phát hành beta.
+- ✅ CI có quality gate rõ ràng cho unit/integration/e2e smoke.
+- ✅ Có dashboard tối thiểu cho runtime health sau khi phát hành beta.
 
 ---
 

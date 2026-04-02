@@ -5,6 +5,7 @@ import {
 } from './bridge'
 import {
   createHostTransportBridgeAdapter,
+  type HostTransportAdapterStats,
   type HostMutationTransport,
 } from './adapters/hostTransportBridgeAdapter'
 import { createNativeApp } from './nativeApp'
@@ -32,6 +33,7 @@ export interface HostRuntimeSessionOptions {
 export interface HostRuntimeSession {
   getSnapshot: () => NativeNodeSnapshot
   emitEvent: (event: HostEventRecord) => void
+  getAdapterStats: () => HostTransportAdapterStats
   dispose: () => void
 }
 
@@ -81,6 +83,9 @@ export function createHostRuntimeSession(
       runPhase('emit-event', () => {
         transport.emitEvent?.(event)
       })
+    },
+    getAdapterStats() {
+      return adapterController.getStats()
     },
     dispose() {
       if (disposed) return

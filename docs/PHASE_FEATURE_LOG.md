@@ -1980,3 +1980,36 @@ Mục đích: Ghi lại phần đã làm để review nhanh trước khi vào Ph
 ### Decision / Next
 - Feature 10.4 hoàn tất: đã có baseline metrics cho startup/interaction/memory và điểm tích hợp vào app host.
 - Next: nối các baseline metric vào dashboard runtime health tối thiểu để chốt đầy đủ tiêu chí "Done khi" của Phase 10.
+
+---
+
+## [2026-04-02 01:45] Phase 10 / Feature 10.5 (Runtime health dashboard tối thiểu)
+
+### Overview
+- Hoàn tất dashboard runtime health tối thiểu ngay trong product-host (`RuntimeHealthDashboard` overlay) để theo dõi runtime signals theo thời gian thực.
+- Dashboard tổng hợp đủ 3 nhóm dữ liệu của Phase 10:
+  - Telemetry bridge adapter: throughput (mut/s, batch/s), error rate, ack latency.
+  - Error pipeline: tổng số reports, fatal reports, mã lỗi gần nhất.
+  - Performance baseline: startup time, first interaction latency, memory current/peak.
+- Mở rộng host runner/session để expose telemetry chính xác cho dashboard:
+  - `HostRuntimeSession#getAdapterStats()`
+  - `AppRootHostRunner#getTransportStats()` và `getTransportDiagnostics()`
+- Product host refresh runtime health định kỳ cùng vòng snapshot polling và memory sampling loop.
+
+### Files changed
+- `packages/runtime-native/src/hostRuntimeSession.ts`
+- `packages/runtime-native/__tests__/host-runtime-session.spec.ts`
+- `apps/product-host/src/dualHostAppRootRunner.ts`
+- `apps/product-host/src/components/RuntimeHealthDashboard.jsx` (new)
+- `apps/product-host/src/ProductHost.jsx`
+- `apps/product-host/README.md`
+- `docs/ROADMAP_STATUS.md`
+- `docs/PHASE_FEATURE_LOG.md`
+
+### Validation
+- ✅ `pnpm test` (65/65 tests pass)
+- ✅ `pnpm typecheck` (runtime-native + sandbox + product-host đều pass)
+
+### Decision / Next
+- Feature 10.5 hoàn tất; tiêu chí "Done khi" của Phase 10 đã được đáp ứng đầy đủ (quality gate + runtime health dashboard tối thiểu).
+- Có thể chuyển trọng tâm sang Phase 11 (Security & Release Readiness).

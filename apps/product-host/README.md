@@ -18,7 +18,8 @@ apps/product-host/
 │   ├── dualHostAppRootRunner.ts # Dual-host runner for the same AppRoot.vue
 │   ├── shims-vue.d.ts          # Type support for *.vue modules
 │   ├── components/             # Reusable UI components
-│   │   └── NavTabs.vue
+│   │   ├── NavTabs.vue
+│   │   └── RuntimeHealthDashboard.jsx
 │   ├── pages/                  # Screen-level components
 │   │   ├── HomePage.vue
 │   │   └── AboutPage.vue
@@ -36,7 +37,7 @@ apps/product-host/
 
 | Sandbox | Product Host |
 |---------|-------------|
-| Debug overlay, mutation log | Không có debug UI |
+| Debug overlay, mutation log | Runtime health dashboard tối thiểu |
 | Snapshot inspector | Chỉ render Vue tree |
 | Nhiều primitives demo | Tối giản, production-ready |
 | Dùng cho dev/test | Dùng cho phát hành |
@@ -65,6 +66,14 @@ apps/product-host/
 	- `snapshot`
 	- `emit-event`
 	- `unmount`
+
+## Runtime health dashboard (minimum)
+
+- `ProductHost.jsx` đã render dashboard tối thiểu để theo dõi runtime health ngay trong app host.
+- Dashboard tổng hợp ba nhóm tín hiệu:
+	- Telemetry bridge adapter: throughput, error rate, ack latency.
+	- Error pipeline: tổng số report, fatal report, mã lỗi gần nhất.
+	- Performance baseline: startup time, first interaction latency, memory usage (current/peak).
 
 ## Phát triển
 

@@ -10,6 +10,7 @@ import {
   installGlobalErrorHandlers,
 } from '@vue-native/runtime-native'
 import { createAppRootHostRunner } from './dualHostAppRootRunner'
+import RuntimeHealthDashboard from './components/RuntimeHealthDashboard'
 
 /**
  * ProductHost — production entry, không phụ thuộc debug panels.
@@ -22,6 +23,7 @@ import { createAppRootHostRunner } from './dualHostAppRootRunner'
 export default function ProductHost() {
   const [snapshot, setSnapshot] = useState(null)
   const [fatalReport, setFatalReport] = useState(null)
+  const [runtimeHealth, setRuntimeHealth] = useState(null)
 
   const errorReporter = useMemo(() => createRuntimeErrorReporter({
     maxReports: 100,
@@ -62,6 +64,18 @@ export default function ProductHost() {
     let runner = null
     let interval = null
 
+    const refreshRuntimeHealth = () => {
+      if (!runner) {
+        return
+      }
+
+      setRuntimeHealth(buildRuntimeHealthSnapshot({
+        runner,
+        errorReporter,
+        performanceBaseline,
+      }))
+    }
+
     performanceBaseline.markStartupStart()
 
     try {
@@ -78,6 +92,8 @@ export default function ProductHost() {
                 performance: performanceSnapshot,
               },
             })
+
+            refreshRuntimeHealth()
           },
         },
       })
@@ -85,7 +101,7 @@ export default function ProductHost() {
       setSnapshot(runner.getSnapshot())
       performanceBaseline.markStartupReady()
       performanceBaseline.sampleMemoryFromEnvironment()
-      console.info('[product-host][performance][startup]', performanceBaseline.getSnapshot())
+      refreshRuntimeHealth()
 
       interval = setInterval(() => {
         if (!runner) return
@@ -102,6 +118,8 @@ export default function ProductHost() {
             },
           })
         }
+
+        refreshRuntimeHealth()
       }, 250)
     } catch (error) {
       const report = errorReporter.report({
@@ -114,6 +132,21 @@ export default function ProductHost() {
         },
       })
       setFatalReport(report)
+
+      setRuntimeHealth({
+        updatedAtMs: Date.now(),
+        mode: 'auto',
+        adapterStats: null,
+        transportStats: null,
+        transportDiagnostics: null,
+        performance: performanceBaseline.getSnapshot(),
+        errors: {
+          totalReports: 1,
+          fatalReports: 1,
+          lastCode: report.code,
+          lastMessage: report.message,
+        },
+      })
     }
 
     return () => {
@@ -134,6 +167,8 @@ export default function ProductHost() {
             },
           })
         }
+
+        refreshRuntimeHealth()
       }
     }
   }, [errorReporter, performanceBaseline])
@@ -141,6 +176,17 @@ export default function ProductHost() {
   useEffect(() => {
     const interval = setInterval(() => {
       performanceBaseline.sampleMemoryFromEnvironment()
+      setRuntimeHealth(prev => {
+        if (!prev) {
+          return prev
+        }
+
+        return {
+          ...prev,
+          updatedAtMs: Date.now(),
+          performance: performanceBaseline.getSnapshot(),
+        }
+      })
     }, 2000)
 
     return () => {
@@ -156,16 +202,17 @@ export default function ProductHost() {
 
     performanceBaseline.markFirstInteraction()
     performanceBaseline.sampleMemoryFromEnvironment()
-    console.info('[product-host][performance][first-interaction]', performanceBaseline.getSnapshot())
-  }
+    setRuntimeHealth(prev => {
+      if (!prev) {
+        return prev
+      }
 
-  if (fatalReport) {
-    return (
-      <RNView style={styles.fatalRoot}>
-        <RNText style={styles.fatalTitle}>Product Host encountered a fatal runtime error.</RNText>
-        <RNText style={styles.fatalMessage}>{fatalReport.message}</RNText>
-      </RNView>
-    )
+      return {
+        ...prev,
+        updatedAtMs: Date.now(),
+        performance: performanceBaseline.getSnapshot(),
+      }
+    })
   }
 
   const tree = useMemo(() => {
@@ -173,14 +220,56 @@ export default function ProductHost() {
     return renderSnapshotTree(snapshot)
   }, [snapshot])
 
+  if (fatalReport) {
+    return (
+      <RNView style={styles.fatalRoot}>
+        <RNText style={styles.fatalTitle}>Product Host encountered a fatal runtime error.</RNText>
+        <RNText style={styles.fatalMessage}>{fatalReport.message}</RNText>
+        <RuntimeHealthDashboard health={runtimeHealth} />
+      </RNView>
+    )
+  }
+
   return (
     <RNView
       style={styles.root}
       onTouchStart={markFirstInteraction}
     >
       {tree}
+      <RuntimeHealthDashboard health={runtimeHealth} />
     </RNView>
   )
+}
+
+function buildRuntimeHealthSnapshot({
+  runner,
+  errorReporter,
+  performanceBaseline,
+}) {
+  const reports = errorReporter.getReports()
+  const lastReport = reports[0] ?? null
+
+  let fatalReports = 0
+  for (const report of reports) {
+    if (report.fatal) {
+      fatalReports += 1
+    }
+  }
+
+  return {
+    updatedAtMs: Date.now(),
+    mode: runner.mode,
+    adapterStats: runner.getAdapterStats(),
+    transportStats: runner.getTransportStats(),
+    transportDiagnostics: runner.getTransportDiagnostics(),
+    performance: performanceBaseline.getSnapshot(),
+    errors: {
+      totalReports: reports.length,
+      fatalReports,
+      lastCode: lastReport?.code ?? null,
+      lastMessage: lastReport?.message ?? null,
+    },
+  }
 }
 
 /**

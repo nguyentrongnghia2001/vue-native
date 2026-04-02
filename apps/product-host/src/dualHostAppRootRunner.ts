@@ -1,4 +1,7 @@
-import type { NativeNodeSnapshot } from '@vue-native/runtime-native'
+import type {
+  HostTransportAdapterStats,
+  NativeNodeSnapshot,
+} from '@vue-native/runtime-native'
 import AppRoot from './AppRoot.vue'
 import {
   createProductHostTransport,
@@ -13,10 +16,21 @@ import {
 
 export interface AppRootHostRunner extends ProductRuntimeSession {
   mode: ProductHostTransportMode
+  getAdapterStats: () => HostTransportAdapterStats
+  getTransportStats: () => Record<string, unknown> | null
+  getTransportDiagnostics: () => Record<string, unknown> | null
 }
 
 export interface AppRootHostRunnerOptions extends ProductRuntimeSessionOptions {
   transportOptions?: Omit<CreateProductHostTransportOptions, 'mode'>
+}
+
+function toRecord(value: unknown): Record<string, unknown> | null {
+  if (!value || typeof value !== 'object') {
+    return null
+  }
+
+  return value as Record<string, unknown>
 }
 
 export function createAppRootHostRunner(
@@ -42,6 +56,23 @@ export function createAppRootHostRunner(
   return {
     mode,
     ...session,
+    getAdapterStats() {
+      return session.getAdapterStats()
+    },
+    getTransportStats() {
+      if (typeof transport.getStats !== 'function') {
+        return null
+      }
+
+      return toRecord(transport.getStats())
+    },
+    getTransportDiagnostics() {
+      if (typeof transport.getDiagnostics !== 'function') {
+        return null
+      }
+
+      return toRecord(transport.getDiagnostics())
+    },
   }
 }
 
