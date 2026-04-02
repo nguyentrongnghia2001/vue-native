@@ -43,6 +43,47 @@ describe('host transport bridge adapter', () => {
     })
   })
 
+  it('reports throughput, error-rate and latency telemetry', async () => {
+    const sendMutations = vi
+      .fn()
+      .mockResolvedValueOnce({ ok: true, processed: 2 })
+      .mockResolvedValueOnce({ ok: false, error: 'reject on second batch' })
+
+    const timestamps = [0, 100, 200, 350, 350]
+    const now = () => timestamps.shift() ?? 350
+
+    const controller = createHostTransportBridgeAdapter(
+      { sendMutations },
+      { id: 'telemetry-probe', now },
+    )
+
+    registerBridgeAdapter(controller.adapter)
+
+    enqueue({ type: 'insert', childId: 1, parentId: 0 })
+    enqueue({ type: 'setText', nodeId: 1, text: 'first' })
+    flush()
+    await Promise.resolve()
+
+    enqueue({ type: 'setText', nodeId: 1, text: 'second' })
+    flush()
+    await Promise.resolve()
+
+    const stats = controller.getStats()
+
+    expect(stats.sentBatches).toBe(2)
+    expect(stats.sentMutations).toBe(3)
+    expect(stats.ackCount).toBe(2)
+    expect(stats.errorCount).toBe(1)
+    expect(stats.errorRate).toBe(0.5)
+    expect(stats.lastAckLatencyMs).toBe(150)
+    expect(stats.minAckLatencyMs).toBe(100)
+    expect(stats.maxAckLatencyMs).toBe(150)
+    expect(stats.averageAckLatencyMs).toBe(125)
+    expect(stats.throughputBatchesPerSecond).toBeCloseTo(5.714, 3)
+    expect(stats.throughputMutationsPerSecond).toBeCloseTo(8.571, 3)
+    expect(stats.lastError).toBe('reject on second batch')
+  })
+
   it('wires transport receiver into host event dispatcher alias', () => {
     type HostEvent = { nodeId: number; event: string; args?: unknown[] }
     let receiver: ((event: HostEvent) => void) | null = null

@@ -1824,3 +1824,74 @@ Mục đích: Ghi lại phần đã làm để review nhanh trước khi vào Ph
 - Recommendation: defer manual smoke testing to CI/CD pipeline or machine with Android toolchain installed.
 - Code changes are production-ready; manual verification is operational prerequisite, not functional validation.
 - Proceed to Phase 10 (Quality, Observability, Performance) with note that android smoke should run before production release.
+
+---
+
+## [2026-04-02 00:10] Phase 10 / Kickoff Checkpoint
+
+### Overview
+- Phase 9 đã hoàn tất implementation + automated gates (`pnpm test`, `pnpm typecheck` pass).
+- Manual Android smoke gate của Phase 9 đang blocked do thiếu Java/JDK trên local environment.
+- Bắt đầu Phase 10 theo roadmap với ưu tiên Feature 10.1: e2e smoke test cho flow launch app + input/toggle/press event roundtrip.
+
+### Files changed
+- `docs/PHASE_FEATURE_LOG.md` (this checkpoint)
+
+### Validation
+- N/A (checkpoint trước khi implement Feature 10.1)
+
+### Decision / Next
+- Triển khai Feature 10.1 trong runtime-native test suite để tạo quality gate e2e smoke chạy được trong CI.
+- Sau khi implement sẽ chạy `pnpm test` (và `pnpm typecheck` nếu thay đổi type/contract), rồi commit riêng theo feature.
+
+---
+
+## [2026-04-02 00:22] Phase 10 / Feature 10.1 (E2E smoke quality gate)
+
+### Overview
+- Bổ sung e2e smoke test cho flow cốt lõi: launch app -> input text -> toggle switch -> press action button -> assert state roundtrip qua host runtime event channel.
+- Test chạy ở mức host runtime session + in-memory host transport để không phụ thuộc emulator/device, phù hợp CI quality gate.
+- Khóa các tín hiệu quan trọng của roundtrip:
+  - Sự kiện UI được dispatch vào runtime (`onChangeText`, `onValueChange`, `onPress`).
+  - Snapshot phản ánh đúng state sau chuỗi tương tác.
+  - Transport stats ghi nhận số lượng event nhận đúng kỳ vọng.
+
+### Files changed
+- `packages/runtime-native/__tests__/e2e-smoke.spec.ts` (new)
+- `docs/ROADMAP_STATUS.md`
+- `docs/PHASE_FEATURE_LOG.md`
+
+### Validation
+- ✅ `pnpm test` (60/60 tests pass)
+- ✅ `pnpm typecheck` (runtime-native + sandbox + product-host đều pass)
+
+### Decision / Next
+- Feature 10.1 hoàn tất, đã có e2e smoke gate trong test suite.
+- Next ưu tiên: Feature 10.2 (telemetry chuẩn cho throughput/error rate/latency) để tăng observability.
+
+---
+
+## [2026-04-02 00:35] Phase 10 / Feature 10.2 (Telemetry baseline cho bridge adapter)
+
+### Overview
+- Mở rộng `HostTransportAdapterStats` để có telemetry chuẩn cho observability:
+  - `throughputBatchesPerSecond`, `throughputMutationsPerSecond`
+  - `errorRate`
+  - `last/min/max/average ack latency`
+  - timestamp fields (`startedAtMs`, `lastAckAtMs`, `lastErrorAtMs`)
+- Bổ sung time source hook `now?: () => number` trong adapter options để test telemetry deterministically và để host có thể custom time provider khi cần.
+- Thêm contract test xác minh các metric throughput/error-rate/latency cập nhật đúng sau chuỗi batch thành công + non-ok ack.
+
+### Files changed
+- `packages/runtime-native/src/adapters/hostTransportBridgeAdapter.ts`
+- `packages/runtime-native/__tests__/host-transport-adapter.spec.ts`
+- `docs/ROADMAP_STATUS.md`
+- `docs/PHASE_FEATURE_LOG.md`
+
+### Validation
+- ✅ `pnpm test` (61/61 tests pass)
+- ✅ `pnpm typecheck` (runtime-native + sandbox + product-host đều pass)
+
+### Decision / Next
+- Feature 10.2 hoàn tất ở mức baseline telemetry cho bridge adapter.
+- Next ưu tiên: Feature 10.3 (crash/error reporting pipeline cho app host).
