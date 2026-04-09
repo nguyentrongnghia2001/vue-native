@@ -64,6 +64,28 @@ Build all packages that expose build scripts:
 pnpm build
 ```
 
+## Security baseline
+
+Run dependency audit with policy threshold (default: high severity, prod deps only):
+
+```bash
+pnpm security:audit
+```
+
+Run tracked-file secret scan:
+
+```bash
+pnpm security:secrets
+```
+
+Run full baseline:
+
+```bash
+pnpm security:baseline
+```
+
+See [PHASE_11_FEATURE_1_security_baseline.md](./docs/PHASE_11_FEATURE_1_security_baseline.md) for policy details (dependency audit cadence, secret handling, network/storage policy).
+
 ## Development notes
 
 - Use primitives from `@vue-native/runtime-native`: `View`, `Text`, `Image`, `ImageBackground`, `ScrollView`, `Pressable`, `TextInput`, `FlatList`, `KeyboardAvoidingView`, `SafeAreaView`, `ActivityIndicator`, `Modal`, `Switch`, `SectionList`, `RefreshControl`, `TouchableOpacity`, `TouchableHighlight`, `TouchableWithoutFeedback`, `TouchableNativeFeedback`, `StatusBar`.

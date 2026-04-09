@@ -10,7 +10,10 @@
     "test": "vitest run",
     "typecheck": "pnpm -r typecheck",
     "lint": "pnpm -r lint",
-    "build": "pnpm -r build"
+    "build": "pnpm -r build",
+    "security:audit": "node scripts/security/dependency-audit.mjs",
+    "security:secrets": "node scripts/security/check-secrets.mjs",
+    "security:baseline": "pnpm security:audit && pnpm security:secrets"
   },
   "workspaces": [
     "packages/*",

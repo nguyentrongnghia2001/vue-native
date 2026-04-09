@@ -5,7 +5,7 @@ Tài liệu này là **nguồn tổng hợp duy nhất** cho:
 - Những gì đang làm
 - Những gì cần làm tiếp
 
-> Cập nhật gần nhất: **2026-04-02**
+> Cập nhật gần nhất: **2026-04-09**
 
 ---
 
@@ -213,11 +213,17 @@ Tài liệu này là **nguồn tổng hợp duy nhất** cho:
 
 **Mục tiêu:** sẵn sàng phát hành beta/public mà không thiếu compliance cơ bản.
 
+### Tiến độ hiện tại
+- ✅ Feature 11.1: Dependency audit + secret handling + policy cho network/storage baseline đã hoàn tất (root security scripts + policy doc + hardening `.gitignore`).
+
 ### Việc cần làm
-- ⏳ Dependency audit + secret handling + policy cho network/storage.
+- ✅ Dependency audit + secret handling + policy cho network/storage.
 - ⏳ Chuẩn hoá manifest/permission theo scope product.
 - ⏳ Chuẩn bị release checklist Android/iOS (assets, app id, signing, privacy text).
 - ⏳ Chuẩn hoá rollback plan + release notes template.
+
+### Trạng thái Phase 11
+- 🔄 Đang triển khai. Baseline bảo mật đã có ở Feature 11.1; còn lại 11.2 -> 11.4 để đạt full release readiness.
 
 ### Done khi
 - Có thể phát hành internal beta theo checklist lặp lại được.

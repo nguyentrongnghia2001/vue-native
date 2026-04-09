@@ -2013,3 +2013,60 @@ Mục đích: Ghi lại phần đã làm để review nhanh trước khi vào Ph
 ### Decision / Next
 - Feature 10.5 hoàn tất; tiêu chí "Done khi" của Phase 10 đã được đáp ứng đầy đủ (quality gate + runtime health dashboard tối thiểu).
 - Có thể chuyển trọng tâm sang Phase 11 (Security & Release Readiness).
+
+---
+
+## [2026-04-09 10:00] Phase 11 / Feature 11.1 (Kickoff Checkpoint)
+
+### Overview
+- Đã review lại roadmap + trạng thái triển khai: Phase 10 đã hoàn tất baseline quality/observability/performance, có thể chuyển sang Security & Release Readiness.
+- Chọn feature ưu tiên tiếp theo theo roadmap: **Feature 11.1 - Dependency audit + secret handling + policy cho network/storage**.
+- Scope triển khai feature này:
+  1. Thiết lập security commands ở root để audit dependency và rà soát secret leakage.
+  2. Thiết lập policy tài liệu hóa cho network/storage và nguyên tắc quản lý secrets.
+  3. Cập nhật roadmap/log theo trạng thái mới sau validation.
+
+### Files changed
+- `docs/PHASE_FEATURE_LOG.md` (entry checkpoint này)
+
+### Validation
+- N/A (checkpoint trước implementation Feature 11.1)
+
+### Decision / Next
+- Bắt đầu triển khai Feature 11.1 với các artifacts chạy được trong repo:
+  - `scripts/security/dependency-audit.mjs`
+  - `scripts/security/check-secrets.mjs`
+  - policy docs cho network/storage + secret handling
+- Chạy tối thiểu `pnpm test` sau khi hoàn tất feature, và bổ sung lệnh security baseline vào package scripts.
+
+---
+
+## [2026-04-09 10:20] Phase 11 / Feature 11.1 (Dependency audit + secret handling + network/storage policy)
+
+### Overview
+- Thiết lập baseline automation cho security ở root workspace:
+  - `dependency-audit` wrapper để chuẩn hóa policy threshold khi chạy `pnpm audit`.
+  - `check-secrets` scanner để phát hiện mẫu secret phổ biến trên tracked files.
+- Tích hợp security baseline vào `package.json` scripts để team/CI có entrypoint thống nhất (`security:audit`, `security:secrets`, `security:baseline`).
+- Hardening `.gitignore` để giảm rủi ro commit nhầm secrets/signing artifacts.
+- Bổ sung tài liệu policy cho dependency audit cadence, secret handling, network policy và storage policy.
+- Đồng bộ roadmap status để phản ánh Feature 11.1 đã hoàn tất.
+
+### Files changed
+- `scripts/security/dependency-audit.mjs` (new)
+- `scripts/security/check-secrets.mjs` (new)
+- `package.json`
+- `.gitignore`
+- `README.md`
+- `docs/PHASE_11_FEATURE_1_security_baseline.md` (new)
+- `docs/ROADMAP_STATUS.md`
+- `docs/PHASE_FEATURE_LOG.md`
+
+### Validation
+- ✅ `pnpm security:secrets` (pass, 142 tracked files checked)
+- ✅ `node scripts/security/dependency-audit.mjs --help` (script interface verified)
+- ✅ `pnpm test` (65/65 tests pass)
+
+### Decision / Next
+- Feature 11.1 hoàn tất ở mức baseline có thể chạy trong repo + có policy docs để triển khai CI gate.
+- Next ưu tiên: Feature 11.2 (chuẩn hoá manifest/permission theo scope product).
