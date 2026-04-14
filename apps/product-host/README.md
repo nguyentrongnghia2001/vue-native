@@ -75,6 +75,19 @@ apps/product-host/
 	- Error pipeline: tổng số report, fatal report, mã lỗi gần nhất.
 	- Performance baseline: startup time, first interaction latency, memory usage (current/peak).
 
+## Manifest and permission scope
+
+- `app.json` la source of truth cho release manifest cua `product-host`.
+- Scope hien tai theo nguyen tac least privilege:
+  - Android chi cho phep `android.permission.INTERNET`.
+  - Block cac quyen nhay cam khong dung trong product scope hien tai: camera, microphone, location, contacts, media storage, notifications, overlay, vibration.
+  - iOS khong khai bao usage description keys cho sensitive APIs; chi set `ITSAppUsesNonExemptEncryption=false`.
+- Chay validate local:
+
+```bash
+pnpm --filter @vue-native/product-host manifest:check
+```
+
 ## Phát triển
 
 ```bash

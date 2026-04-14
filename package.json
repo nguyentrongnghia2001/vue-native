@@ -13,7 +13,8 @@
     "build": "pnpm -r build",
     "security:audit": "node scripts/security/dependency-audit.mjs",
     "security:secrets": "node scripts/security/check-secrets.mjs",
-    "security:baseline": "pnpm security:audit && pnpm security:secrets"
+    "security:manifest": "node scripts/security/validate-product-manifest.mjs",
+    "security:baseline": "pnpm security:audit && pnpm security:secrets && pnpm security:manifest"
   },
   "workspaces": [
     "packages/*",

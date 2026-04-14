@@ -78,13 +78,19 @@ Run tracked-file secret scan:
 pnpm security:secrets
 ```
 
+Run product manifest + permission policy validation:
+
+```bash
+pnpm security:manifest
+```
+
 Run full baseline:
 
 ```bash
 pnpm security:baseline
 ```
 
-See [PHASE_11_FEATURE_1_security_baseline.md](./docs/PHASE_11_FEATURE_1_security_baseline.md) for policy details (dependency audit cadence, secret handling, network/storage policy).
+See [PHASE_11_FEATURE_1_security_baseline.md](./docs/PHASE_11_FEATURE_1_security_baseline.md) for dependency/secret/network/storage policy details, and [PHASE_11_FEATURE_2_manifest_permissions.md](./docs/PHASE_11_FEATURE_2_manifest_permissions.md) for product-host manifest/permission scope.
 
 ## Development notes
 

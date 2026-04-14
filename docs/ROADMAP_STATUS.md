@@ -5,7 +5,7 @@ Tài liệu này là **nguồn tổng hợp duy nhất** cho:
 - Những gì đang làm
 - Những gì cần làm tiếp
 
-> Cập nhật gần nhất: **2026-04-09**
+> Cập nhật gần nhất: **2026-04-14**
 
 ---
 
@@ -215,15 +215,16 @@ Tài liệu này là **nguồn tổng hợp duy nhất** cho:
 
 ### Tiến độ hiện tại
 - ✅ Feature 11.1: Dependency audit + secret handling + policy cho network/storage baseline đã hoàn tất (root security scripts + policy doc + hardening `.gitignore`).
+- ✅ Feature 11.2: Product manifest/permission scope đã được chuẩn hoá (least-privilege app config + manifest validator + contract tests).
 
 ### Việc cần làm
 - ✅ Dependency audit + secret handling + policy cho network/storage.
-- ⏳ Chuẩn hoá manifest/permission theo scope product.
+- ✅ Chuẩn hoá manifest/permission theo scope product.
 - ⏳ Chuẩn bị release checklist Android/iOS (assets, app id, signing, privacy text).
 - ⏳ Chuẩn hoá rollback plan + release notes template.
 
 ### Trạng thái Phase 11
-- 🔄 Đang triển khai. Baseline bảo mật đã có ở Feature 11.1; còn lại 11.2 -> 11.4 để đạt full release readiness.
+- 🔄 Đang triển khai. Baseline bảo mật + permission scope đã có ở Feature 11.1-11.2; còn lại 11.3-11.4 để đạt full release readiness.
 
 ### Done khi
 - Có thể phát hành internal beta theo checklist lặp lại được.

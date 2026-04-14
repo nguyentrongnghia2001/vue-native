@@ -2070,3 +2070,66 @@ Mục đích: Ghi lại phần đã làm để review nhanh trước khi vào Ph
 ### Decision / Next
 - Feature 11.1 hoàn tất ở mức baseline có thể chạy trong repo + có policy docs để triển khai CI gate.
 - Next ưu tiên: Feature 11.2 (chuẩn hoá manifest/permission theo scope product).
+
+---
+
+## [2026-04-14 21:54] Phase 11 / Feature 11.2 (Kickoff Checkpoint)
+
+### Overview
+- Đã review lại đầu ra Feature 11.1: workspace đã có security baseline cho dependency audit, secret scan, network/storage policy.
+- Chọn feature tiếp theo theo roadmap: **Feature 11.2 - Chuẩn hoá manifest/permission theo scope product**.
+- Scope triển khai feature này:
+  1. Chốt `apps/product-host/app.json` theo nguyên tắc least privilege.
+  2. Bổ sung validator để fail sớm nếu manifest hoặc direct dependency vượt scope permission hiện tại.
+  3. Đồng bộ README/roadmap/log để team có source of truth rõ ràng cho release host.
+
+### Files changed
+- `docs/PHASE_FEATURE_LOG.md` (entry checkpoint này)
+
+### Validation
+- N/A (checkpoint trước khi implementation Feature 11.2)
+
+### Decision / Next
+- Bắt đầu triển khai Feature 11.2 với ba đầu việc chính:
+  - siết manifest Android/iOS theo product scope hiện tại,
+  - thêm `security:manifest` validator + contract test,
+  - cập nhật tài liệu policy cho product host.
+
+---
+
+## [2026-04-14 22:05] Phase 11 / Feature 11.2 (Product manifest + permission scope)
+
+### Overview
+- Chuẩn hoá `apps/product-host/app.json` theo nguyên tắc least privilege:
+  - thêm `scheme` và `jsEngine`,
+  - giới hạn `android.permissions` chỉ còn `android.permission.INTERNET`,
+  - block nhóm quyền nhạy cảm chưa dùng trong product scope hiện tại (camera, microphone, location, contacts, media storage, notifications, overlay, vibration),
+  - chốt `ios.infoPlist.ITSAppUsesNonExemptEncryption=false`.
+- Bổ sung validator repo-level `scripts/security/validate-product-manifest.mjs` để kiểm tra:
+  - Android permission scope,
+  - iOS usage description keys,
+  - direct dependencies nhạy cảm trong `apps/product-host/package.json`.
+- Bổ sung contract test cho validator và nối command mới vào scripts:
+  - `pnpm security:manifest`
+  - `pnpm --filter @vue-native/product-host manifest:check`
+- Cập nhật docs/README/roadmap để product host có source of truth rõ ràng cho permission review.
+
+### Files changed
+- `apps/product-host/app.json`
+- `apps/product-host/package.json`
+- `apps/product-host/README.md`
+- `scripts/security/validate-product-manifest.mjs` (new)
+- `packages/runtime-native/__tests__/product-manifest-policy.spec.ts` (new)
+- `docs/PHASE_11_FEATURE_2_manifest_permissions.md` (new)
+- `README.md`
+- `package.json`
+- `docs/ROADMAP_STATUS.md`
+- `docs/PHASE_FEATURE_LOG.md`
+
+### Validation
+- ✅ `pnpm security:manifest`
+- ✅ `pnpm test` (68/68 tests pass)
+
+### Decision / Next
+- Feature 11.2 hoàn tất ở mức repo config + automation guard cho manifest/permission scope của `product-host`.
+- Next ưu tiên: Feature 11.3 (release checklist Android/iOS: assets, app id, signing, privacy text).
